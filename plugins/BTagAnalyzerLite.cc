@@ -1,4 +1,4 @@
-#include "RecoBTag/BTagAnalyzerLite/interface/BTagAnalyzerLite.h"
+#include "RecoBTag/BTagAnalyzerLite/plugins/BTagAnalyzerLite.h"
 
 #include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
 #include "FWCore/Common/interface/Provenance.h"
