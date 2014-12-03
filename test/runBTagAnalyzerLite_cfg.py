@@ -596,6 +596,13 @@ if options.runSubJets:
 #---------------------------------------
 
 #---------------------------------------
+## Event counter
+from MyAnalysis.EventCounter.eventcounter_cfi import eventCounter
+process.allEvents = eventCounter.clone()
+process.selectedEvents = eventCounter.clone()
+#---------------------------------------
+
+#---------------------------------------
 ## Define event filter sequence
 process.filtSeq = cms.Sequence(
     #process.noscraping
@@ -613,7 +620,9 @@ if options.runSubJets:
 #---------------------------------------
 
 process.p = cms.Path(
-    process.filtSeq
+    process.allEvents
+    * process.filtSeq
+    * process.selectedEvents
     * process.analyzerSeq
 )
 
