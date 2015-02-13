@@ -13,7 +13,7 @@ git cms-merge-topic cms-btv-pog:CSVV2-V02_from-CMSSW_5_3_20
 git clone -b V00-00-01 git://github.com/cms-btv-pog/cms-EventCounter.git MyAnalysis/EventCounter
 git clone -b 5_3_X_SD git@github.com:cms-btv-pog/RecoBTag-BTagAnalyzerLite.git RecoBTag/BTagAnalyzerLite
 
-copy SD files to ( ShowerDeconstruction/ ) in  working area CMSSW_X/src
+copy SD files ( ShowerDeconstruction/ ) in  working area CMSSW_X/src
 
 make sure folder inputdata/ exist under ShowerDeconstruction/ 
 and has the file input_data.dat in inputdata/ for SD configurations
