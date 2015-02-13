@@ -1,4 +1,6 @@
-RecoBTag-BTagAnalyzerLite - Implementing Shower Deconstruction code
+RecoBTag-BTagAnalyzerLite - Implementing Shower Deconstruction (http://arxiv.org/abs/1211.3140, http://arxiv.org/abs/1102.3480)
+
+
 =========================
 cmsrel CMSSW_5_3_20
 cd CMSSW_5_3_20/src
