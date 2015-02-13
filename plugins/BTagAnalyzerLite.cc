@@ -565,7 +565,7 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
 
       double Psignal = 0.0;
       double Pbackground = 0.0;
-      LOGLEVEL(INFO); //DEBUG to turn on, INFO to turn off. (not sure if this the intended way) - rizki
+      LOGLEVEL(INFO); //DEBUG to turn on, INFO to turn off.  - rizki
       double chi;
       try {
         chi = deconstruct->deconstruct(microjets, Psignal, Pbackground); //call SD
@@ -574,7 +574,10 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
 	std::cout << "Exception while running SD: " << e.what() << std::endl;
       }
 
-      std::cout << "chi value is "<< chi << endl;
+      std::cour << --- Shower Deconstruction calc ---- << endl;
+      std::cout << "Psig = "<< Psignal << endl;
+      std::cout << "Pbkg =  "<< Pbackground << endl;
+      std::cout << "Chi = "<< chi << endl;
       std::cout << " "<< endl;
       JetInfo[iJetColl].Jet_SD_chi[JetInfo[iJetColl].nJet] = chi;
 
