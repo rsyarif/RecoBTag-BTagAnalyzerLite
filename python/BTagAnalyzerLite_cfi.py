@@ -9,6 +9,7 @@ btagana = cms.EDAnalyzer("BTagAnalyzerLite",
     storeMuonInfo            = cms.bool(False),
     storeTagVariables        = cms.bool(False),
     storeCSVTagVariables     = cms.bool(True),
+    microjetConesize         = cms.double(0.2), #SD parameter added by rizki
     MaxEta                   = cms.double(2.5),
     MinPt                    = cms.double(20.0),
     src                      = cms.InputTag('generator'),
@@ -22,6 +23,7 @@ btagana = cms.EDAnalyzer("BTagAnalyzerLite",
 
     svComputer               = cms.string('combinedSecondaryVertex'),
     svComputerFatJets        = cms.string('combinedSecondaryVertex'),
+    SDinputcard              = cms.FileInPath('ShowerDeconstruction/inputdata/input_card.dat'), #SD parameter added by rizki
 
     # list of taggers
     trackCHEBJetTags      = cms.string('trackCountingHighEffBJetTags'),
