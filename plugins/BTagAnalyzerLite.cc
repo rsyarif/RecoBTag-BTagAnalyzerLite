@@ -30,6 +30,8 @@ BTagAnalyzerLite::BTagAnalyzerLite(const edm::ParameterSet& iConfig):
   storeCSVTagVariables_ = iConfig.getParameter<bool>("storeCSVTagVariables");
   minJetPt_  = iConfig.getParameter<double>("MinPt");
   maxJetEta_ = iConfig.getParameter<double>("MaxEta");
+  microjetConesize_ = iConfig.getParameter<double>("microjetConesize"); //added by rizki
+  SDinputcard_             = iConfig.getParameter<edm::FileInPath>("SDinputcard"); //added by rizki
 
   // Modules
   src_                 = iConfig.getParameter<edm::InputTag>("src");
@@ -448,6 +450,21 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
   JetInfo[iJetColl].nTrkEtaRelTagVarCSV = 0;
   JetInfo[iJetColl].nSubJet = 0;
 
+  //ShowerDeconstruction initialization - added by rizki - start
+  if(runSubJets_==1&&iJetColl==1) cout<<"Fatjet size = " << jetsColl->size() << endl;
+  AnalysisParameters param(SDinputcard_.fullPath());   //load ShowerDeconstruction config file
+
+  HBBModel *signal = 0;
+  BackgroundModel *background = 0;
+  ISRModel *isr = 0;
+  Deconstruct *deconstruct = 0;
+
+  signal = new HBBModel(param);
+  background = new BackgroundModel(param);
+  isr = new ISRModel(param);
+  deconstruct = new Deconstruct(param, *signal, *background, *isr);
+  //ShowerDeconstruction initialization - added by rizki - end
+
   //// Loop over the jets
   for ( PatJetCollection::const_iterator pjet = jetsColl->begin(); pjet != jetsColl->end(); ++pjet ) {
 
@@ -522,6 +539,47 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
 
     if ( runSubJets_ && iJetColl == 1 )
     {
+
+      //---------------------- ShowerDeconstruction added by rizki - start --------------------------
+      cout << "FatJet pT = " << pjet->pt()<< endl; //debug -rizki
+      reco::Jet::Constituents constituents=pjet->getJetConstituents();
+
+      std::vector<fastjet::PseudoJet> fjConstituents;
+      for(auto constituentItr=constituents.begin(); constituentItr!=constituents.end(); ++constituentItr){
+	edm::Ptr<reco::Candidate> constituent=*constituentItr;
+        fjConstituents.push_back(fastjet::PseudoJet(constituent->px(),
+                                                    constituent->py(),
+                                                    constituent->pz(),
+                                                    constituent->energy()));
+      }
+
+      fastjet::JetDefinition microjet_def(fastjet::kt_algorithm, microjetConesize_);
+      fastjet::ClusterSequence clust_seq_microjet(fjConstituents, microjet_def);
+      vector<fastjet::PseudoJet> microjets = sorted_by_pt(clust_seq_microjet.inclusive_jets(20));
+
+      cout << "microjet size = " << microjets.size() << " , microjet cone size = " << microjetConesize_ << endl; // debug - rizki
+      if (microjets.size() > 9) {
+        microjets.erase(microjets.begin() + (int) 9,
+                        microjets.begin() + microjets.size());
+      } //remove low pt micro jets if there are more than 9 microjets
+
+      double Psignal = 0.0;
+      double Pbackground = 0.0;
+      LOGLEVEL(INFO); //DEBUG to turn on, INFO to turn off. (not sure if this the intended way) - rizki
+      double chi;
+      try {
+        chi = deconstruct->deconstruct(microjets, Psignal, Pbackground); //call SD
+      }
+      catch(Deconstruction::Exception &e) {
+	std::cout << "Exception while running SD: " << e.what() << std::endl;
+      }
+
+      std::cout << "chi value is "<< chi << endl;
+      std::cout << " "<< endl;
+      JetInfo[iJetColl].Jet_SD_chi[JetInfo[iJetColl].nJet] = chi;
+
+      //------------------ ShowerDeconstruction added by rizki - end -----------------------
+
       // N-subjettiness
       JetInfo[iJetColl].Jet_tau1[JetInfo[iJetColl].nJet] = pjet->userFloat("Njettiness:tau1");;
       JetInfo[iJetColl].Jet_tau2[JetInfo[iJetColl].nJet] = pjet->userFloat("Njettiness:tau2");;
@@ -1072,6 +1130,13 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
 
     ++JetInfo[iJetColl].nJet;
   } // end loop on jet
+
+  //Deleting ShowerDeconstruction pointers - added by rizki - start
+  delete signal;
+  delete background;
+  delete isr;
+  delete deconstruct;
+  //Deleting ShowerDeconstruction pointers - added by rizki - end
 
   return;
 } // BTagAnalyzerLite:: processJets
