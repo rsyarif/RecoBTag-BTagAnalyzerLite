@@ -32,6 +32,7 @@ Implementation:
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "FWCore/Utilities/interface/RegexMatch.h"
+#include "FWCore/ParameterSet/interface/FileInPath.h" // added by rizki
 
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/BTauReco/interface/JetTag.h"
@@ -61,6 +62,25 @@ Implementation:
 #include "RecoBTau/JetTagComputer/interface/JetTagComputerRecord.h"
 #include "RecoBTag/SecondaryVertex/interface/TrackKinematics.h"
 #include "RecoVertex/VertexPrimitives/interface/ConvertToFromReco.h"
+
+//added by rizki - start
+#include <fastjet/PseudoJet.hh>
+#include <fastjet/FunctionOfPseudoJet.hh>
+#include "fastjet/tools/Filter.hh"
+#include "fastjet/tools/Pruner.hh"
+#include "fastjet/tools/MassDropTagger.hh"
+#include "fastjet/ClusterSequenceArea.hh"
+#include "ShowerDeconstruction/SDAlgorithm/interface/Exception.h"
+#include "ShowerDeconstruction/SDAlgorithm/interface/AnalysisParameters.h"
+#include "ShowerDeconstruction/SDAlgorithm/interface/HBBModel.h"
+#include "ShowerDeconstruction/SDAlgorithm/interface/BackgroundModel.h"
+#include "ShowerDeconstruction/SDAlgorithm/interface/ISRModel.h"
+#include "ShowerDeconstruction/SDAlgorithm/interface/Deconstruct.h"
+#include "ShowerDeconstruction/SDAlgorithm/interface/Message.h"
+#include "ShowerDeconstruction/SDAlgorithm/interface/Parameters.h"
+#include "ShowerDeconstruction/SDAlgorithm/interface/ParseUtils.h"
+using namespace Deconstruction;
+//added by rizki - end
 
 #include "TFile.h"
 #include "TTree.h"
@@ -136,6 +156,9 @@ class BTagAnalyzerLite : public edm::EDAnalyzer
     bool storeMuonInfo_;
     bool storeTagVariables_;
     bool storeCSVTagVariables_;
+
+    double microjetConesize_; //SD parameter added by rizki
+    edm::FileInPath SDinputcard_; //added by rizki
 
     edm::InputTag src_;  // Generator/handronizer module label
     edm::InputTag muonCollectionName_;
