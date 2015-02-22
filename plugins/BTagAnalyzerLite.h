@@ -213,6 +213,7 @@ class BTagAnalyzerLite : public edm::EDAnalyzer
     std::string svTagInfos_;
     std::string softPFMuonTagInfos_;
     std::string softPFElectronTagInfos_;
+    std::string ivfTagInfos_; //added by rizki
 
     std::string   SVComputer_;
     std::string   SVComputerFatJets_;

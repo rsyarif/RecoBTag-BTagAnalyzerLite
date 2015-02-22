@@ -87,6 +87,7 @@ BTagAnalyzerLite::BTagAnalyzerLite(const edm::ParameterSet& iConfig):
   svTagInfos_              = iConfig.getParameter<std::string>("svTagInfos");
   softPFMuonTagInfos_      = iConfig.getParameter<std::string>("softPFMuonTagInfos");
   softPFElectronTagInfos_  = iConfig.getParameter<std::string>("softPFElectronTagInfos");
+  ivfTagInfos_              = iConfig.getParameter<std::string>("ivfTagInfos"); //added by rizki
 
   SVComputer_               = iConfig.getParameter<std::string>("svComputer");
   SVComputerFatJets_        = iConfig.getParameter<std::string>("svComputerFatJets");
@@ -617,6 +618,7 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
     const reco::SecondaryVertexTagInfo *svTagInfo  = pjet->tagInfoSecondaryVertex(svTagInfos_.c_str());
     const reco::SoftLeptonTagInfo *softPFMuTagInfo = pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str());
     const reco::SoftLeptonTagInfo *softPFElTagInfo = pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str());
+    const reco::SecondaryVertexTagInfo *ivfTagInfo  = pjet->tagInfoSecondaryVertex(ivfTagInfos_.c_str()); //added by rizki
     //*****************************************************************
     // Taggers
     //*****************************************************************
@@ -1026,8 +1028,8 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
 	fjConstituents.push_back(fastjet::PseudoJet(constituent->px(),
 						    constituent->py(),
 						    constituent->pz(),
-						    constituent->energy()));
-	//ATTENTION: need to make sure microjets are not exactly massless, otherwise SD breaks! But maybe dnt need to worry about this here. Not sure yet. (not yet implemented) - rizki
+						    constituent->energy()+0.1));
+	//ATTENTION: energy+0.1: need to make sure microjets are not exactly massless, otherwise SD breaks! need double checking! - rizki
       }
 
       fastjet::JetDefinition microjet_def(fastjet::kt_algorithm, microjetConesize_);
@@ -1047,8 +1049,9 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
 	double mjphi = microjets[mji].phi();
 
 	//if SV present
-	for (int vtx = 0; vtx < JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]; ++vtx ){
-	  const Vertex &vertex = svTagInfo->secondaryVertex(vtx);
+	//for (int vtx = 0; vtx < JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]; ++vtx ){
+	for (unsigned int vtx = 0; vtx < ivfTagInfo->nVertices(); ++vtx ){
+	  const Vertex &vertex = ivfTagInfo->secondaryVertex(vtx);
 	  double SVeta = vertex.p4().eta();
 	  double SVphi = vertex.p4().phi();
 

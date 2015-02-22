@@ -9,7 +9,7 @@ btagana = cms.EDAnalyzer("BTagAnalyzerLite",
     storeMuonInfo            = cms.bool(False),
     storeTagVariables        = cms.bool(False),
     storeCSVTagVariables     = cms.bool(True),
-    microjetConesize         = cms.double(0.2), #SD parameter added by rizki
+    microjetConesize         = cms.double(0.15), #SD parameter added by rizki
     MaxEta                   = cms.double(2.5),
     MinPt                    = cms.double(20.0),
     src                      = cms.InputTag('generator'),
@@ -68,7 +68,7 @@ btagana = cms.EDAnalyzer("BTagAnalyzerLite",
     svTagInfos               = cms.string('secondaryVertex'), # need to omit the 'TagInfos' part from the label
     softPFMuonTagInfos       = cms.string('softPFMuons'),     # need to omit the 'TagInfos' part from the label
     softPFElectronTagInfos   = cms.string('softPFElectrons'), # need to omit the 'TagInfos' part from the label
-
+    ivfTagInfos               = cms.string('inclusiveSecondaryVertexFinder'), # need to omit the 'TagInfos' part from the label //added by rizki
     TriggerPathNames = cms.vstring(
         "HLT_HT750_v*"
     )
