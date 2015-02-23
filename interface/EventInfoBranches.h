@@ -6,7 +6,7 @@
 const UInt_t nMaxPVs_= 1000;
 const UInt_t nMaxPUs_= 1000;
 const UInt_t nMaxTrkAll_ = 100000;
-
+//const UInt_t nMaxSVs_= 10000;
 class EventInfoBranches {
 
   public :
@@ -70,6 +70,9 @@ class EventInfoBranches {
     float Muon_IPsig[1000];
     float Muon_IP2D[1000];
     float Muon_IP2Dsig[1000];
+
+
+	
 
 
     void RegisterTree(TTree *tree) {
@@ -204,6 +207,32 @@ class EventInfoBranches {
       tree->SetBranchAddress("Muon_IPsig"   , Muon_IPsig   );
       tree->SetBranchAddress("Muon_IP2D"    , Muon_IP2D    );
       tree->SetBranchAddress("Muon_IP2Dsig" , Muon_IP2Dsig );
+
+/*      tree->SetBranchAddress("nSV"              ,&nSV               ) ;
+      tree->SetBranchAddress("SV_x"             ,SV_x                     ) ;
+      tree->SetBranchAddress("SV_y"             ,SV_y                     ) ;
+      tree->SetBranchAddress("SV_z"             ,SV_z                     ) ;
+      tree->SetBranchAddress("SV_ex"            ,SV_ex                  ) ;
+      tree->SetBranchAddress("SV_ey"            ,SV_ey                  ) ;
+      tree->SetBranchAddress("SV_ez"            ,SV_ez                  ) ;
+      tree->SetBranchAddress("SV_chi2"          ,SV_chi2            ) ;
+      tree->SetBranchAddress("SV_ndf"           ,SV_ndf                 ) ;
+      tree->SetBranchAddress("SV_flight"        ,SV_flight          ) ;
+      tree->SetBranchAddress("SV_flightErr"     ,SV_flightErr       ) ;
+      tree->SetBranchAddress("SV_deltaR_jet"    ,SV_deltaR_jet      ) ;
+      tree->SetBranchAddress("SV_deltaR_sum_jet",SV_deltaR_sum_jet  ) ;
+      tree->SetBranchAddress("SV_deltaR_sum_dir",SV_deltaR_sum_dir  ) ;
+      tree->SetBranchAddress("SV_vtx_pt"        ,SV_vtx_pt          ) ;
+      tree->SetBranchAddress("SV_flight2D"      ,SV_flight2D        ) ;
+      tree->SetBranchAddress("SV_flight2DErr"   ,SV_flight2DErr     ) ;
+      tree->SetBranchAddress("SV_totCharge"     ,SV_totCharge       ) ;
+      tree->SetBranchAddress("SV_vtxDistJetAxis",SV_vtxDistJetAxis  ) ;
+      tree->SetBranchAddress("SV_nTrk"          ,SV_nTrk            ) ;
+      tree->SetBranchAddress("SV_mass"          ,SV_mass            ) ;
+      tree->SetBranchAddress("SV_vtx_eta"       ,SV_vtx_eta         ) ;
+      tree->SetBranchAddress("SV_vtx_phi"       ,SV_vtx_phi         ) ;
+*/
+     
     }
 };
 
