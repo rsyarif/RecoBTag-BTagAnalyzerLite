@@ -621,7 +621,7 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
 
     int nseltracks = 0;
     int nsharedtracks = 0;
-
+    TrackKinematics allKinematics;
     if ( produceJetTrackTree_ )
     {
       const reco::TrackRefVector & selectedTracks( ipTagInfo->selectedTracks() );
@@ -651,7 +651,7 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
         float deltaR = reco::deltaR( ptrack.eta(), ptrack.phi(),
                                      JetInfo[iJetColl].Jet_eta[JetInfo[iJetColl].nJet], JetInfo[iJetColl].Jet_phi[JetInfo[iJetColl].nJet] );
 
-        if (deltaR < 0.3) nseltracks++;
+        if (deltaR < 0.8) nseltracks++;
 
         if ( runSubJets_ && iJetColl == 1 && subjet1Idx >= 0 && subjet2Idx >= 0 ) {
 
@@ -688,12 +688,14 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
         JetInfo[iJetColl].Track_nHitTEC[JetInfo[iJetColl].nTrack]  = ptrack.hitPattern().numberOfValidStripTECHits();
         JetInfo[iJetColl].Track_nHitPXB[JetInfo[iJetColl].nTrack]  = ptrack.hitPattern().numberOfValidPixelBarrelHits();
         JetInfo[iJetColl].Track_nHitPXF[JetInfo[iJetColl].nTrack]  = ptrack.hitPattern().numberOfValidPixelEndcapHits();
-        JetInfo[iJetColl].Track_isHitL1[JetInfo[iJetColl].nTrack]  = ptrack.hitPattern().hasValidHitInFirstPixelBarrel();
+        JetInfo[iJetColl].Track_isHitL1[JetInfo[iJetColl].nTrack]  = ptrack.hitPattern().hasValidHitInFirstPixelBarrel();	
 
         setTracksPV(ptrackRef, primaryVertex,
                     JetInfo[iJetColl].Track_PV[JetInfo[iJetColl].nTrack],
                     JetInfo[iJetColl].Track_PVweight[JetInfo[iJetColl].nTrack]);
+//std::cout<< JetInfo[iJetColl].Track_PV[JetInfo[iJetColl].nTrack] <<"   "<<JetInfo[iJetColl].Track_PVweight[JetInfo[iJetColl].nTrack] <<std::endl;
 
+	if(JetInfo[iJetColl].Track_PVweight[JetInfo[iJetColl].nTrack]>0) { allKinematics.add(ptrack, JetInfo[iJetColl].Track_PVweight[JetInfo[iJetColl].nTrack]); }// std::cout<<"  asd  "<<std::endl; }
         if( pjet->hasTagInfo(svTagInfos_.c_str()) )
         {
           setTracksSV(ptrackRef, svTagInfo,
@@ -1023,7 +1025,7 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
 
       Int_t totcharge=0;
       TrackKinematics vertexKinematics;
-
+	
       Bool_t hasRefittedTracks = vertex.hasRefittedTracks();
 
       TrackRefVector vertexTracks = svTagInfo->vertexTracks(vtx);
@@ -1043,10 +1045,15 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
           totcharge+=mytrack.charge();
         }
       }
+
+         math::XYZTLorentzVector allSum =  allKinematics.weightedVectorSum() ; //allKinematics.vectorSum()
+         math::XYZTLorentzVector vertexSum = vertexKinematics.weightedVectorSum() ;
+std::cout<< vertexSum.E()  << "   vertexSum.E()  "<<allSum.E()<<std::endl;	
+      JetInfo[iJetColl].SV_EnergyRatio[JetInfo[iJetColl].nSV]= vertexSum.E() / allSum.E();
+	
       // total charge at the secondary vertex
       JetInfo[iJetColl].SV_totCharge[JetInfo[iJetColl].nSV]=totcharge;
 
-      math::XYZTLorentzVector vertexSum = vertexKinematics.weightedVectorSum();
       edm::RefToBase<Jet> jet = ipTagInfo->jet();
       math::XYZVector jetDir = jet->momentum().Unit();
       GlobalVector flightDir = svTagInfo->flightDirection(vtx);
@@ -1077,8 +1084,7 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
 } // BTagAnalyzerLite:: processJets
 
 
-void BTagAnalyzerLite::setTracksPV( const reco::TrackRef & trackRef, const edm::Handle<reco::VertexCollection> & pvHandle, int & iPV, float & PVweight )
-{
+void BTagAnalyzerLite::setTracksPV( const reco::TrackRef & trackRef, const edm::Handle<reco::VertexCollection> & pvHandle, int & iPV, float & PVweight ) {
   iPV = -1;
   PVweight = 0.;
 
@@ -1108,7 +1114,7 @@ void BTagAnalyzerLite::setTracksPV( const reco::TrackRef & trackRef, const edm::
       }
     }
   }
-
+///std::cout<< iPV <<std::endl;
 }
 
 
@@ -1227,5 +1233,4 @@ void BTagAnalyzerLite::matchGroomedJets(const edm::Handle<PatJetCollection>& jet
 
 //define this as a plug-in
 DEFINE_FWK_MODULE(BTagAnalyzerLite);
-
 
