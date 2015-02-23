@@ -166,6 +166,7 @@ class JetInfoBranches {
     float SV_mass[nMaxSVs_];
     float SV_vtx_eta[nMaxSVs_];
     float SV_vtx_phi[nMaxSVs_];
+    float SV_EnergyRatio[nMaxSVs_];
 
     // TagInfo TaggingVariables
     // per jet
@@ -334,6 +335,7 @@ class JetInfoBranches {
       tree->Branch((name+"SV_mass").c_str()            ,SV_mass            ,(name+"SV_mass["+name+"nSV]/F").c_str());
       tree->Branch((name+"SV_vtx_eta").c_str()         ,SV_vtx_eta         ,(name+"SV_vtx_eta["+name+"nSV]/F").c_str());
       tree->Branch((name+"SV_vtx_phi").c_str()         ,SV_vtx_phi         ,(name+"SV_vtx_phi["+name+"nSV]/F").c_str());
+      tree->Branch((name+"SV_EnergyRatio").c_str()         ,SV_EnergyRatio         ,(name+"SV_EnergyRatio["+name+"nSV]/F").c_str());//SV_EnergyRatio	
     }
 
     void RegisterJetPFLeptonTree(TTree *tree, std::string name="") {
