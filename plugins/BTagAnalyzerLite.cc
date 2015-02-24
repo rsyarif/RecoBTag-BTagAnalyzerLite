@@ -1,23 +1,276 @@
-#include "RecoBTag/BTagAnalyzerLite/plugins/BTagAnalyzerLite.h"
+// -*- C++ -*-
+//
+// Package:    BTagAnalyzerLiteT
+// Class:      BTagAnalyzerLiteT
+//
+/**\class BTagAnalyzerLiteT BTagAnalyzerLite.cc RecoBTag/BTagAnalyzerLite/plugins/BTagAnalyzerLite.cc
+
+Description: <one line class summary>
+
+Implementation:
+<Notes on implementation>
+*/
+//
+// Original Author:  Andrea Jeremy
+//         Created:  Thu Dec 20 10:00:00 CEST 2012
+//
+//
+//
+
+// system include files
+#include <memory>
+
+// user include files
+#include "FWCore/Common/interface/Provenance.h"
+#include "FWCore/Framework/interface/Frameworkfwd.h"
+#include "FWCore/Framework/interface/EDAnalyzer.h"
+#include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/ESHandle.h"
+#include "FWCore/Framework/interface/MakerMacros.h"
+#include "FWCore/Framework/interface/TriggerNamesService.h"
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "FWCore/ServiceRegistry/interface/Service.h"
+#include "FWCore/Utilities/interface/RegexMatch.h"
+
+#include "DataFormats/Candidate/interface/VertexCompositePtrCandidate.h"
+#include "DataFormats/Common/interface/TriggerResults.h"
+#include "DataFormats/BTauReco/interface/JetTag.h"
+#include "DataFormats/BTauReco/interface/CandIPTagInfo.h"
+#include "DataFormats/BTauReco/interface/TrackIPTagInfo.h"
+#include "DataFormats/BTauReco/interface/CandSoftLeptonTagInfo.h"
+#include "DataFormats/GeometrySurface/interface/Line.h"
+#include "DataFormats/GeometryCommonDetAlgo/interface/Measurement1D.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "DataFormats/Math/interface/deltaR.h"
+#include "DataFormats/JetReco/interface/GenJetCollection.h"
+#include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
+#include "DataFormats/PatCandidates/interface/Jet.h"
+#include "DataFormats/PatCandidates/interface/Muon.h"
+#include "DataFormats/PatCandidates/interface/PackedCandidate.h"
+#include "DataFormats/TrackReco/interface/TrackFwd.h"
+#include "DataFormats/TrackReco/interface/Track.h"
+#include "DataFormats/VertexReco/interface/Vertex.h"
+
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
+
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 #include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
-#include "FWCore/Common/interface/Provenance.h"
-#include "FWCore/Framework/interface/ESHandle.h"
 
-PFJetIDSelectionFunctor pfjetIDLoose( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE );
-PFJetIDSelectionFunctor pfjetIDTight( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::TIGHT );
+#include "RecoBTau/JetTagComputer/interface/GenericMVAJetTagComputer.h"
+#include "RecoBTau/JetTagComputer/interface/GenericMVAJetTagComputerWrapper.h"
+#include "RecoBTau/JetTagComputer/interface/JetTagComputer.h"
+#include "RecoBTau/JetTagComputer/interface/JetTagComputerRecord.h"
+#include "RecoBTag/SecondaryVertex/interface/TrackKinematics.h"
+#include "RecoVertex/VertexPrimitives/interface/ConvertToFromReco.h"
 
-pat::strbitset retpf = pfjetIDLoose.getBitTemplate();
+#include "TFile.h"
+#include "TTree.h"
 
-BTagAnalyzerLite::BTagAnalyzerLite(const edm::ParameterSet& iConfig):
+#include <boost/regex.hpp>
+
+#include "RecoBTag/BTagAnalyzerLite/interface/JetInfoBranches.h"
+#include "RecoBTag/BTagAnalyzerLite/interface/EventInfoBranches.h"
+
+//
+// constants, enums and typedefs
+//
+typedef std::vector<pat::Jet> PatJetCollection;
+
+
+//
+// class declaration
+//
+
+struct orderByPt {
+    const std::string mCorrLevel;
+    orderByPt(const std::string& fCorrLevel) : mCorrLevel(fCorrLevel) {}
+    bool operator ()(PatJetCollection::const_iterator const& a, PatJetCollection::const_iterator const& b) {
+      if( mCorrLevel=="Uncorrected" )
+        return a->correctedJet("Uncorrected").pt() > b->correctedJet("Uncorrected").pt();
+      else
+        return a->pt() > b->pt();
+    }
+};
+
+const math::XYZPoint & position(const reco::Vertex & sv) {return sv.position();}
+const math::XYZPoint & position(const reco::VertexCompositePtrCandidate & sv) {return sv.vertex();}
+const double xError(const reco::Vertex & sv) {return sv.xError();}
+const double xError(const reco::VertexCompositePtrCandidate & sv) {return sqrt(sv.vertexCovariance(0,0));}
+const double yError(const reco::Vertex & sv) {return sv.yError();}
+const double yError(const reco::VertexCompositePtrCandidate & sv) {return sqrt(sv.vertexCovariance(1,1));}
+const double zError(const reco::Vertex & sv) {return sv.zError();}
+const double zError(const reco::VertexCompositePtrCandidate & sv) {return sqrt(sv.vertexCovariance(2,2));}
+const double chi2(const reco::Vertex & sv) {return sv.chi2();}
+const double chi2(const reco::VertexCompositePtrCandidate & sv) {return sv.vertexChi2();}
+const double ndof(const reco::Vertex & sv) {return sv.ndof();}
+const double ndof(const reco::VertexCompositePtrCandidate & sv) {return sv.vertexNdof();}
+const unsigned int nTracks(const reco::Vertex & sv) {return sv.nTracks();}
+const unsigned int nTracks(const reco::VertexCompositePtrCandidate & sv) {return sv.numberOfSourceCandidatePtrs();}
+
+const UInt_t MAX_JETCOLLECTIONS=2;
+
+template<typename IPTI,typename VTX>
+class BTagAnalyzerLiteT : public edm::EDAnalyzer
+{
+  public:
+    explicit BTagAnalyzerLiteT(const edm::ParameterSet&);
+    ~BTagAnalyzerLiteT();
+    typedef IPTI IPTagInfo;
+    typedef typename IPTI::input_container Tracks;
+    typedef typename IPTI::input_container::value_type TrackRef;
+    typedef VTX Vertex;
+    typedef reco::TemplatedSecondaryVertexTagInfo<IPTI,VTX> SVTagInfo;
+
+  private:
+    virtual void beginJob() ;
+    virtual void analyze(const edm::Event&, const edm::EventSetup&);
+    virtual void endJob() ;
+
+    const IPTagInfo * toIPTagInfo(const pat::Jet & jet, const std::string & tagInfos);
+    const SVTagInfo * toSVTagInfo(const pat::Jet & jet, const std::string & tagInfos);
+
+    void setTracksPVBase(const reco::TrackRef & trackRef, const edm::Handle<reco::VertexCollection> & pvHandle, int & iPV, float & PVweight);
+    void setTracksPV(const TrackRef & trackRef, const edm::Handle<reco::VertexCollection> & pvHandle, int & iPV, float & PVweight);
+
+    void setTracksSV(const TrackRef & trackRef, const SVTagInfo *, int & isFromSV, int & iSV, float & SVweight);
+
+    void vertexKinematicsAndChange(const Vertex & vertex, reco::TrackKinematics & vertexKinematics, Int_t & charge);
+
+    bool NameCompatible(const std::string& pattern, const std::string& name);
+
+    void processTrig(const edm::Handle<edm::TriggerResults>&, const std::vector<std::string>&) ;
+
+    void processJets(const edm::Handle<PatJetCollection>&, const edm::Handle<PatJetCollection>&,
+                     const edm::Event&, const edm::EventSetup&,
+                     const edm::Handle<PatJetCollection>&, std::vector<int>&, const int) ;
+
+    bool isHardProcess(const int status);
+
+    void matchGroomedJets(const edm::Handle<PatJetCollection>& jets,
+                          const edm::Handle<PatJetCollection>& matchedJets,
+                          std::vector<int>& matchedIndices);
+
+    // ----------member data ---------------------------
+    std::string outputFile_;
+    //std::vector< std::string > moduleLabel_;
+
+    bool runSubJets_ ;
+    bool allowJetSkipping_ ;
+    bool storeEventInfo_;
+    bool produceJetTrackTree_;
+    bool produceJetPFLeptonTree_;
+    bool storeMuonInfo_;
+    bool storeTagVariables_;
+    bool storeCSVTagVariables_;
+
+    edm::InputTag src_;  // Generator/handronizer module label
+    edm::InputTag muonCollectionName_;
+    edm::InputTag prunedGenParticleCollectionName_;
+    edm::InputTag triggerTable_;
+
+    edm::InputTag JetCollectionTag_;
+    edm::InputTag FatJetCollectionTag_;
+    edm::InputTag GroomedFatJetCollectionTag_;
+
+    edm::InputTag primaryVertexColl_;
+
+    std::string jetPBJetTags_;
+    std::string jetPNegBJetTags_;
+    std::string jetPPosBJetTags_;
+
+    std::string jetBPBJetTags_;
+    std::string jetBPNegBJetTags_;
+    std::string jetBPPosBJetTags_;
+
+    std::string trackCHEBJetTags_;
+    std::string trackCNegHEBJetTags_;
+
+    std::string trackCHPBJetTags_;
+    std::string trackCNegHPBJetTags_;
+
+    std::string simpleSVHighEffBJetTags_;
+    std::string simpleSVNegHighEffBJetTags_;
+    std::string simpleSVHighPurBJetTags_;
+    std::string simpleSVNegHighPurBJetTags_;
+
+    std::string simpleIVFSVHighPurBJetTags_;
+    std::string simpleIVFSVHighEffBJetTags_;
+    std::string doubleIVFSVHighEffBJetTags_;
+
+    std::string combinedSVBJetTags_;
+    std::string combinedSVNegBJetTags_;
+    std::string combinedSVPosBJetTags_;
+
+    std::string combinedIVFSVBJetTags_;
+    std::string combinedIVFSVPosBJetTags_;
+
+    std::string softPFMuonBJetTags_;
+    std::string softPFMuonNegBJetTags_;
+    std::string softPFMuonPosBJetTags_;
+
+    std::string softPFElectronBJetTags_;
+    std::string softPFElectronNegBJetTags_;
+    std::string softPFElectronPosBJetTags_;
+
+    std::string ipTagInfos_;
+    std::string svTagInfos_;
+    std::string softPFMuonTagInfos_;
+    std::string softPFElectronTagInfos_;
+
+    std::string   SVComputer_;
+    std::string   SVComputerFatJets_;
+
+    TFile*  rootFile_;
+    double minJetPt_;
+    double maxJetEta_;
+
+    bool isData_;
+
+    // trigger list
+    std::vector<std::string> triggerPathNames_;
+
+    edm::Service<TFileService> fs;
+
+    ///////////////
+    // Ntuple info
+
+    TTree *smalltree;
+
+    //// Event info
+    EventInfoBranches EventInfo;
+
+    //// Jet info
+    JetInfoBranches JetInfo[MAX_JETCOLLECTIONS] ;
+
+    edm::Handle<reco::VertexCollection> primaryVertex;
+
+    const reco::Vertex *pv;
+    const GenericMVAJetTagComputer *computer;
+
+    // Generator/hadronizer type (information stored bitwise)
+    unsigned int hadronizerType_;
+
+    // PF jet ID
+    PFJetIDSelectionFunctor pfjetIDLoose_;
+    PFJetIDSelectionFunctor pfjetIDTight_;
+};
+
+
+template<typename IPTI,typename VTX>
+BTagAnalyzerLiteT<IPTI,VTX>::BTagAnalyzerLiteT(const edm::ParameterSet& iConfig):
   pv(0),
   computer(0),
-  hadronizerType_(0)
+  hadronizerType_(0),
+  pfjetIDLoose_( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE ),
+  pfjetIDTight_( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::TIGHT )
 {
   //now do what ever initialization you need
   std::string module_type  = iConfig.getParameter<std::string>("@module_type");
   std::string module_label = iConfig.getParameter<std::string>("@module_label");
-  cout << "Constructing " << module_type << ":" << module_label << endl;
+  std::cout << "Constructing " << module_type << ":" << module_label << std::endl;
 
   // Parameters
   runSubJets_ = iConfig.getParameter<bool>("runSubJets");
@@ -124,11 +377,11 @@ BTagAnalyzerLite::BTagAnalyzerLite(const edm::ParameterSet& iConfig):
     if ( storeCSVTagVariables_) JetInfo[1].RegisterCSVTagVarTree(smalltree,"FatJetInfo");
   }
 
-  cout << module_type << ":" << module_label << " constructed" << endl;
+  std::cout << module_type << ":" << module_label << " constructed" << std::endl;
 }
 
-
-BTagAnalyzerLite::~BTagAnalyzerLite()
+template<typename IPTI,typename VTX>
+BTagAnalyzerLiteT<IPTI,VTX>::~BTagAnalyzerLiteT()
 {
 }
 
@@ -138,7 +391,8 @@ BTagAnalyzerLite::~BTagAnalyzerLite()
 //
 
 // ------------ method called to for each event  ------------
-void BTagAnalyzerLite::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+template<typename IPTI,typename VTX>
+void BTagAnalyzerLiteT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   using namespace edm;
   using namespace std;
@@ -278,8 +532,8 @@ void BTagAnalyzerLite::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   }
 
   //---------------------------- End MC info ---------------------------------------//
-  //   cout << "EventInfo.Evt:" <<EventInfo.Evt << endl;
-  //   cout << "EventInfo.pthat:" <<EventInfo.pthat << endl;
+  //   std::cout << "EventInfo.Evt:" <<EventInfo.Evt << std::endl;
+  //   std::cout << "EventInfo.pthat:" <<EventInfo.pthat << std::endl;
 
   //------------------------------------------------------
   // Muons
@@ -407,7 +661,8 @@ void BTagAnalyzerLite::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 }
 
 
-void BTagAnalyzerLite::processTrig(const edm::Handle<edm::TriggerResults>& trigRes, const std::vector<std::string>& triggerList)
+template<typename IPTI,typename VTX>
+void BTagAnalyzerLiteT<IPTI,VTX>::processTrig(const edm::Handle<edm::TriggerResults>& trigRes, const std::vector<std::string>& triggerList)
 {
   for (unsigned int i = 0; i < trigRes->size(); ++i) {
 
@@ -427,7 +682,8 @@ void BTagAnalyzerLite::processTrig(const edm::Handle<edm::TriggerResults>& trigR
 }
 
 
-void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl, const edm::Handle<PatJetCollection>& jetsColl2,
+template<typename IPTI,typename VTX>
+void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection>& jetsColl, const edm::Handle<PatJetCollection>& jetsColl2,
                                const edm::Event& iEvent, const edm::EventSetup& iSetup,
                                const edm::Handle<PatJetCollection>& jetsColl3, std::vector<int>& jetIndices, const int iJetColl)
 {
@@ -471,10 +727,11 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
     // available JEC sets
     unsigned int nJECSets = pjet->availableJECSets().size();
     // PF jet ID
+    pat::strbitset retpf = pfjetIDLoose_.getBitTemplate();
     retpf.set(false);
-    JetInfo[iJetColl].Jet_looseID[JetInfo[iJetColl].nJet]  = ( ( nJECSets>0 && pjet->isPFJet() ) ? ( pfjetIDLoose( *pjet, retpf ) ? 1 : 0 ) : 0 );
+    JetInfo[iJetColl].Jet_looseID[JetInfo[iJetColl].nJet]  = ( ( nJECSets>0 && pjet->isPFJet() ) ? ( pfjetIDLoose_( *pjet, retpf ) ? 1 : 0 ) : 0 );
     retpf.set(false);
-    JetInfo[iJetColl].Jet_tightID[JetInfo[iJetColl].nJet]  = ( ( nJECSets>0 && pjet->isPFJet() ) ? ( pfjetIDTight( *pjet, retpf ) ? 1 : 0 ) : 0 );
+    JetInfo[iJetColl].Jet_tightID[JetInfo[iJetColl].nJet]  = ( ( nJECSets>0 && pjet->isPFJet() ) ? ( pfjetIDTight_( *pjet, retpf ) ? 1 : 0 ) : 0 );
 
     JetInfo[iJetColl].Jet_jes[JetInfo[iJetColl].nJet]      = ( nJECSets>0 ? pjet->pt()/pjet->correctedJet("Uncorrected").pt() : 1. );
     JetInfo[iJetColl].Jet_residual[JetInfo[iJetColl].nJet] = ( nJECSets>0 ? pjet->pt()/pjet->correctedJet("L3Absolute").pt() : 1. );
@@ -583,14 +840,14 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
         {
           int subjetIdx = (sj==0 ? subjet1Idx : subjet2Idx); // subjet index
           int compSubjetIdx = (sj==0 ? subjet2Idx : subjet1Idx); // companion subjet index
-          int nTracks = ( jetsColl2->at(subjetIdx).hasTagInfo(ipTagInfos_.c_str()) ? jetsColl2->at(subjetIdx).tagInfoTrackIP(ipTagInfos_.c_str())->selectedTracks().size() : 0 );
+          int nTracks = ( jetsColl2->at(subjetIdx).hasTagInfo(ipTagInfos_.c_str()) ? toIPTagInfo(jetsColl2->at(subjetIdx),ipTagInfos_)->selectedTracks().size() : 0 );
 
           for(int t=0; t<nTracks; ++t)
           {
-            if( reco::deltaR( jetsColl2->at(subjetIdx).tagInfoTrackIP(ipTagInfos_.c_str())->selectedTracks().at(t)->eta(), jetsColl2->at(subjetIdx).tagInfoTrackIP(ipTagInfos_.c_str())->selectedTracks().at(t)->phi(), jetsColl2->at(subjetIdx).eta(), jetsColl2->at(subjetIdx).phi() ) < 0.3 )
+            if( reco::deltaR( toIPTagInfo(jetsColl2->at(subjetIdx),ipTagInfos_)->selectedTracks().at(t)->eta(), toIPTagInfo(jetsColl2->at(subjetIdx),ipTagInfos_)->selectedTracks().at(t)->phi(), jetsColl2->at(subjetIdx).eta(), jetsColl2->at(subjetIdx).phi() ) < 0.3 )
             {
               ++nsubjettracks;
-              if( reco::deltaR( jetsColl2->at(subjetIdx).tagInfoTrackIP(ipTagInfos_.c_str())->selectedTracks().at(t)->eta(), jetsColl2->at(subjetIdx).tagInfoTrackIP(ipTagInfos_.c_str())->selectedTracks().at(t)->phi(), jetsColl2->at(compSubjetIdx).eta(), jetsColl2->at(compSubjetIdx).phi() ) < 0.3 )
+              if( reco::deltaR( toIPTagInfo(jetsColl2->at(subjetIdx),ipTagInfos_)->selectedTracks().at(t)->eta(), toIPTagInfo(jetsColl2->at(subjetIdx),ipTagInfos_)->selectedTracks().at(t)->phi(), jetsColl2->at(compSubjetIdx).eta(), jetsColl2->at(compSubjetIdx).phi() ) < 0.3 )
               {
                 if(sj==0) ++nsharedsubjettracks;
               }
@@ -604,10 +861,10 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
     }
 
     // Get all TagInfo pointers
-    const reco::TrackIPTagInfo *ipTagInfo          = pjet->tagInfoTrackIP(ipTagInfos_.c_str());
-    const reco::SecondaryVertexTagInfo *svTagInfo  = pjet->tagInfoSecondaryVertex(svTagInfos_.c_str());
-    const reco::SoftLeptonTagInfo *softPFMuTagInfo = pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str());
-    const reco::SoftLeptonTagInfo *softPFElTagInfo = pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str());
+    const IPTagInfo *ipTagInfo = toIPTagInfo(*pjet,ipTagInfos_);
+    const SVTagInfo *svTagInfo = toSVTagInfo(*pjet,svTagInfos_);
+    const reco::CandSoftLeptonTagInfo *softPFMuTagInfo = pjet->tagInfoCandSoftLepton(softPFMuonTagInfos_.c_str());
+    const reco::CandSoftLeptonTagInfo *softPFElTagInfo = pjet->tagInfoCandSoftLepton(softPFElectronTagInfos_.c_str());
     //*****************************************************************
     // Taggers
     //*****************************************************************
@@ -620,7 +877,7 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
 
     if ( produceJetTrackTree_ )
     {
-      const reco::TrackRefVector & selectedTracks( ipTagInfo->selectedTracks() );
+      const Tracks & selectedTracks( ipTagInfo->selectedTracks() );
 
       JetInfo[iJetColl].Jet_ntracks[JetInfo[iJetColl].nJet] = selectedTracks.size();
 
@@ -630,8 +887,8 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
 
       for (unsigned int itt=0; itt < trackSize; ++itt)
       {
-        const reco::Track ptrack = *(selectedTracks[itt]);
-        const reco::TrackRef ptrackRef = selectedTracks[itt];
+        const reco::Track & ptrack = *(reco::btag::toTrack(selectedTracks[itt]));
+        const TrackRef ptrackRef = selectedTracks[itt];
 
         //--------------------------------
         float decayLength = (ipTagInfo->impactParameterData()[itt].closestToJetAxis - RecoVertex::convertPos(pv->position())).mag();
@@ -814,8 +1071,8 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
     // TagInfo TaggingVariables
     if ( storeTagVariables_ )
     {
-      TaggingVariableList ipVars = ipTagInfo->taggingVariables();
-      TaggingVariableList svVars = svTagInfo->taggingVariables();
+      reco::TaggingVariableList ipVars = ipTagInfo->taggingVariables();
+      reco::TaggingVariableList svVars = svTagInfo->taggingVariables();
       int nTracks = ipTagInfo->selectedTracks().size();
       int nSVs = svTagInfo->nVertices();
 
@@ -887,7 +1144,7 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
       for(int svIdx=0; svIdx < nSVs; ++svIdx)
       {
         JetInfo[iJetColl].TagVar_vertexMass[JetInfo[iJetColl].nSVTagVar + svIdx]    = svTagInfo->secondaryVertex(svIdx).p4().mass();
-        JetInfo[iJetColl].TagVar_vertexNTracks[JetInfo[iJetColl].nSVTagVar + svIdx] = svTagInfo->secondaryVertex(svIdx).nTracks();
+        //JetInfo[iJetColl].TagVar_vertexNTracks[JetInfo[iJetColl].nSVTagVar + svIdx] = svTagInfo->secondaryVertex(svIdx).nTracks();
       }
       tagValList = svVars.getList(reco::btau::vertexJetDeltaR,false);
       if(tagValList.size()>0) std::copy( tagValList.begin(), tagValList.end(), &JetInfo[iJetColl].TagVar_vertexJetDeltaR[JetInfo[iJetColl].nSVTagVar] );
@@ -912,7 +1169,7 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
       baseTagInfos.push_back( ipTagInfo );
       baseTagInfos.push_back( svTagInfo );
       // TaggingVariables
-      TaggingVariableList vars = computer->taggingVariables(helper);
+      reco::TaggingVariableList vars = computer->taggingVariables(helper);
 
       // per jet
       JetInfo[iJetColl].TagVarCSV_trackJetPt[JetInfo[iJetColl].nJet]                  = ( vars.checkTag(reco::btau::trackJetPt) ? vars.get(reco::btau::trackJetPt) : -9999 );
@@ -994,20 +1251,20 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
     for (int vtx = 0; vtx < JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]; ++vtx )
     {
 
-      JetInfo[iJetColl].SV_x[JetInfo[iJetColl].nSV]    = svTagInfo->secondaryVertex(vtx).x();
-      JetInfo[iJetColl].SV_y[JetInfo[iJetColl].nSV]    = svTagInfo->secondaryVertex(vtx).y();
-      JetInfo[iJetColl].SV_z[JetInfo[iJetColl].nSV]    = svTagInfo->secondaryVertex(vtx).z();
-      JetInfo[iJetColl].SV_ex[JetInfo[iJetColl].nSV]   = svTagInfo->secondaryVertex(vtx).xError();
-      JetInfo[iJetColl].SV_ey[JetInfo[iJetColl].nSV]   = svTagInfo->secondaryVertex(vtx).yError();
-      JetInfo[iJetColl].SV_ez[JetInfo[iJetColl].nSV]   = svTagInfo->secondaryVertex(vtx).zError();
-      JetInfo[iJetColl].SV_chi2[JetInfo[iJetColl].nSV] = svTagInfo->secondaryVertex(vtx).chi2();
-      JetInfo[iJetColl].SV_ndf[JetInfo[iJetColl].nSV]  = svTagInfo->secondaryVertex(vtx).ndof();
+      JetInfo[iJetColl].SV_x[JetInfo[iJetColl].nSV]    = position(svTagInfo->secondaryVertex(vtx)).x();
+      JetInfo[iJetColl].SV_y[JetInfo[iJetColl].nSV]    = position(svTagInfo->secondaryVertex(vtx)).y();
+      JetInfo[iJetColl].SV_z[JetInfo[iJetColl].nSV]    = position(svTagInfo->secondaryVertex(vtx)).z();
+      JetInfo[iJetColl].SV_ex[JetInfo[iJetColl].nSV]   = xError(svTagInfo->secondaryVertex(vtx));
+      JetInfo[iJetColl].SV_ey[JetInfo[iJetColl].nSV]   = yError(svTagInfo->secondaryVertex(vtx));
+      JetInfo[iJetColl].SV_ez[JetInfo[iJetColl].nSV]   = zError(svTagInfo->secondaryVertex(vtx));
+      JetInfo[iJetColl].SV_chi2[JetInfo[iJetColl].nSV] = chi2(svTagInfo->secondaryVertex(vtx));
+      JetInfo[iJetColl].SV_ndf[JetInfo[iJetColl].nSV]  = ndof(svTagInfo->secondaryVertex(vtx));
 
       JetInfo[iJetColl].SV_flight[JetInfo[iJetColl].nSV]      = svTagInfo->flightDistance(vtx).value();
       JetInfo[iJetColl].SV_flightErr[JetInfo[iJetColl].nSV]   = svTagInfo->flightDistance(vtx).error();
       JetInfo[iJetColl].SV_flight2D[JetInfo[iJetColl].nSV]    = svTagInfo->flightDistance(vtx, true).value();
       JetInfo[iJetColl].SV_flight2DErr[JetInfo[iJetColl].nSV] = svTagInfo->flightDistance(vtx, true).error();
-      JetInfo[iJetColl].SV_nTrk[JetInfo[iJetColl].nSV]        = svTagInfo->secondaryVertex(vtx).nTracks();
+      JetInfo[iJetColl].SV_nTrk[JetInfo[iJetColl].nSV]        = nTracks(svTagInfo->secondaryVertex(vtx));
 
 
       const Vertex &vertex = svTagInfo->secondaryVertex(vtx);
@@ -1018,32 +1275,16 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
       JetInfo[iJetColl].SV_mass[JetInfo[iJetColl].nSV]    = vertex.p4().mass();
 
       Int_t totcharge=0;
-      TrackKinematics vertexKinematics;
+      reco::TrackKinematics vertexKinematics;
 
-      Bool_t hasRefittedTracks = vertex.hasRefittedTracks();
+      // get the vertex kinematics and charge
+      vertexKinematicsAndChange(vertex, vertexKinematics, totcharge);
 
-      TrackRefVector vertexTracks = svTagInfo->vertexTracks(vtx);
-      for(TrackRefVector::const_iterator track = vertexTracks.begin();
-          track != vertexTracks.end(); ++track) {
-        Double_t w = svTagInfo->trackWeight(vtx, *track);
-        if (w < 0.5)
-          continue;
-        if (hasRefittedTracks) {
-          Track actualTrack = vertex.refittedTrack(*track);
-          vertexKinematics.add(actualTrack, w);
-          totcharge+=actualTrack.charge();
-        }
-        else {
-          vertexKinematics.add(**track, w);
-          const reco::Track& mytrack = **track;
-          totcharge+=mytrack.charge();
-        }
-      }
       // total charge at the secondary vertex
       JetInfo[iJetColl].SV_totCharge[JetInfo[iJetColl].nSV]=totcharge;
 
       math::XYZTLorentzVector vertexSum = vertexKinematics.weightedVectorSum();
-      edm::RefToBase<Jet> jet = ipTagInfo->jet();
+      edm::RefToBase<reco::Jet> jet = ipTagInfo->jet();
       math::XYZVector jetDir = jet->momentum().Unit();
       GlobalVector flightDir = svTagInfo->flightDirection(vtx);
 
@@ -1051,7 +1292,7 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
       JetInfo[iJetColl].SV_deltaR_sum_jet[JetInfo[iJetColl].nSV] = ( reco::deltaR(vertexSum, jetDir) );
       JetInfo[iJetColl].SV_deltaR_sum_dir[JetInfo[iJetColl].nSV] = ( reco::deltaR(vertexSum, flightDir) );
 
-      Line::PositionType pos(GlobalPoint(vertex.x(),vertex.y(),vertex.z()));
+      Line::PositionType pos(GlobalPoint(position(vertex).x(),position(vertex).y(),position(vertex).z()));
       Line trackline(pos,flightDir);
       // get the Jet  line
       Line::PositionType pos2(GlobalPoint(pv->x(),pv->y(),pv->z()));
@@ -1070,10 +1311,11 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
   } // end loop on jet
 
   return;
-} // BTagAnalyzerLite:: processJets
+} // BTagAnalyzerLiteT:: processJets
 
 
-void BTagAnalyzerLite::setTracksPV( const reco::TrackRef & trackRef, const edm::Handle<reco::VertexCollection> & pvHandle, int & iPV, float & PVweight )
+template<typename IPTI,typename VTX>
+void BTagAnalyzerLiteT<IPTI,VTX>::setTracksPVBase(const reco::TrackRef & trackRef, const edm::Handle<reco::VertexCollection> & pvHandle, int & iPV, float & PVweight)
 {
   iPV = -1;
   PVweight = 0.;
@@ -1104,57 +1346,23 @@ void BTagAnalyzerLite::setTracksPV( const reco::TrackRef & trackRef, const edm::
       }
     }
   }
-
 }
 
-
-void BTagAnalyzerLite::setTracksSV( const reco::TrackRef & trackRef, const reco::SecondaryVertexTagInfo * svTagInfo, int & isFromSV, int & iSV, float & SVweight )
-{
-  isFromSV = 0;
-  iSV = -1;
-  SVweight = 0.;
-
-  const reco::TrackBaseRef trackBaseRef( trackRef );
-
-  typedef reco::Vertex::trackRef_iterator IT;
-
-  size_t nSV = svTagInfo->nVertices();
-  for(size_t iv=0; iv<nSV; ++iv)
-  {
-    const reco::Vertex & vtx = svTagInfo->secondaryVertex(iv);
-    // loop over tracks in vertices
-    for(IT it=vtx.tracks_begin(); it!=vtx.tracks_end(); ++it)
-    {
-      const reco::TrackBaseRef & baseRef = *it;
-      // one of the tracks in the vertex is the same as the track considered in the function
-      if( baseRef == trackBaseRef )
-      {
-        float w = vtx.trackWeight(baseRef);
-        // select the vertex for which the track has the highest weight
-        if( w > SVweight )
-        {
-          SVweight = w;
-          isFromSV = 1;
-          iSV = iv;
-          break;
-        }
-      }
-    }
-  }
-
-}
 
 // ------------ method called once each job just before starting event loop  ------------
-void BTagAnalyzerLite::beginJob() {
+template<typename IPTI,typename VTX>
+void BTagAnalyzerLiteT<IPTI,VTX>::beginJob() {
 }
 
 
 // ------------ method called once each job just after ending the event loop  ------------
-void BTagAnalyzerLite::endJob() {
+template<typename IPTI,typename VTX>
+void BTagAnalyzerLiteT<IPTI,VTX>::endJob() {
 }
 
 
-bool BTagAnalyzerLite::isHardProcess(const int status)
+template<typename IPTI,typename VTX>
+bool BTagAnalyzerLiteT<IPTI,VTX>::isHardProcess(const int status)
 {
   // if Pythia8
   if( hadronizerType_ & (1 << 1) )
@@ -1174,7 +1382,8 @@ bool BTagAnalyzerLite::isHardProcess(const int status)
 // -------------------------------------------------------------------------
 // NameCompatible
 // -------------------------------------------------------------------------
-bool BTagAnalyzerLite::NameCompatible(const std::string& pattern, const std::string& name)
+template<typename IPTI,typename VTX>
+bool BTagAnalyzerLiteT<IPTI,VTX>::NameCompatible(const std::string& pattern, const std::string& name)
 {
   const boost::regex regexp(edm::glob2reg(pattern));
 
@@ -1182,9 +1391,10 @@ bool BTagAnalyzerLite::NameCompatible(const std::string& pattern, const std::str
 }
 
 // ------------ method that matches groomed and original jets based on minimum dR ------------
-void BTagAnalyzerLite::matchGroomedJets(const edm::Handle<PatJetCollection>& jets,
-                                    const edm::Handle<PatJetCollection>& groomedJets,
-                                    std::vector<int>& matchedIndices)
+template<typename IPTI,typename VTX>
+void BTagAnalyzerLiteT<IPTI,VTX>::matchGroomedJets(const edm::Handle<PatJetCollection>& jets,
+                                                   const edm::Handle<PatJetCollection>& groomedJets,
+                                                   std::vector<int>& matchedIndices)
 {
    std::vector<bool> jetLocks(jets->size(),false);
    std::vector<int>  jetIndices;
@@ -1221,7 +1431,176 @@ void BTagAnalyzerLite::matchGroomedJets(const edm::Handle<PatJetCollection>& jet
    }
 }
 
-//define this as a plug-in
+// -------------- template specializations --------------------
+// -------------- toIPTagInfo ----------------
+template<>
+const BTagAnalyzerLiteT<reco::TrackIPTagInfo,reco::Vertex>::IPTagInfo *
+BTagAnalyzerLiteT<reco::TrackIPTagInfo,reco::Vertex>::toIPTagInfo(const pat::Jet & jet, const std::string & tagInfos)
+{
+  return jet.tagInfoTrackIP(tagInfos.c_str());
+}
+
+template<>
+const BTagAnalyzerLiteT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::IPTagInfo *
+BTagAnalyzerLiteT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::toIPTagInfo(const pat::Jet & jet, const std::string & tagInfos)
+{
+  return jet.tagInfoCandIP(tagInfos.c_str());
+}
+
+// -------------- toSVTagInfo ----------------
+template<>
+const BTagAnalyzerLiteT<reco::TrackIPTagInfo,reco::Vertex>::SVTagInfo *
+BTagAnalyzerLiteT<reco::TrackIPTagInfo,reco::Vertex>::toSVTagInfo(const pat::Jet & jet, const std::string & tagInfos)
+{
+  return jet.tagInfoSecondaryVertex(tagInfos.c_str());
+}
+
+template<>
+const BTagAnalyzerLiteT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::SVTagInfo *
+BTagAnalyzerLiteT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::toSVTagInfo(const pat::Jet & jet, const std::string & tagInfos)
+{
+  return jet.tagInfoCandSecondaryVertex(tagInfos.c_str());
+}
+
+// -------------- setTracksPV ----------------
+template<>
+void BTagAnalyzerLiteT<reco::TrackIPTagInfo,reco::Vertex>::setTracksPV(const TrackRef & trackRef, const edm::Handle<reco::VertexCollection> & pvHandle, int & iPV, float & PVweight)
+{
+  setTracksPVBase(trackRef, pvHandle, iPV, PVweight);
+}
+
+template<>
+void BTagAnalyzerLiteT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::setTracksPV(const TrackRef & trackRef, const edm::Handle<reco::VertexCollection> & pvHandle, int & iPV, float & PVweight)
+{
+  iPV = -1;
+  PVweight = 0.;
+
+  const pat::PackedCandidate * pcand = dynamic_cast<const pat::PackedCandidate *>(trackRef.get());
+
+  if(pcand) // MiniAOD case
+  {
+    if( pcand->fromPV() == pat::PackedCandidate::PVUsedInFit )
+    {
+      iPV = 0;
+      PVweight = 1.;
+    }
+  }
+  else
+  {
+    const reco::PFCandidate * pfcand = dynamic_cast<const reco::PFCandidate *>(trackRef.get());
+
+    setTracksPVBase(pfcand->trackRef(), pvHandle, iPV, PVweight);
+  }
+}
+
+// -------------- setTracksSV ----------------
+template<>
+void BTagAnalyzerLiteT<reco::TrackIPTagInfo,reco::Vertex>::setTracksSV(const TrackRef & trackRef, const SVTagInfo * svTagInfo, int & isFromSV, int & iSV, float & SVweight)
+{
+  isFromSV = 0;
+  iSV = -1;
+  SVweight = 0.;
+
+  const reco::TrackBaseRef trackBaseRef( trackRef );
+
+  typedef reco::Vertex::trackRef_iterator IT;
+
+  size_t nSV = svTagInfo->nVertices();
+  for(size_t iv=0; iv<nSV; ++iv)
+  {
+    const reco::Vertex & vtx = svTagInfo->secondaryVertex(iv);
+    // loop over tracks in vertices
+    for(IT it=vtx.tracks_begin(); it!=vtx.tracks_end(); ++it)
+    {
+      const reco::TrackBaseRef & baseRef = *it;
+      // one of the tracks in the vertex is the same as the track considered in the function
+      if( baseRef == trackBaseRef )
+      {
+        float w = vtx.trackWeight(baseRef);
+        // select the vertex for which the track has the highest weight
+        if( w > SVweight )
+        {
+          SVweight = w;
+          isFromSV = 1;
+          iSV = iv;
+          break;
+        }
+      }
+    }
+  }
+}
+
+template<>
+void BTagAnalyzerLiteT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::setTracksSV(const TrackRef & trackRef, const SVTagInfo * svTagInfo, int & isFromSV, int & iSV, float & SVweight)
+{
+  isFromSV = 0;
+  iSV = -1;
+  SVweight = 0.;
+
+  typedef std::vector<reco::CandidatePtr>::const_iterator IT;
+
+  size_t nSV = svTagInfo->nVertices();
+  for(size_t iv=0; iv<nSV; ++iv)
+  {
+    const Vertex & vtx = svTagInfo->secondaryVertex(iv);
+    const std::vector<reco::CandidatePtr> & tracks = vtx.daughterPtrVector();
+
+    // one of the tracks in the vertex is the same as the track considered in the function
+    if( std::find(tracks.begin(),tracks.end(),trackRef) != tracks.end() )
+    {
+      SVweight = 1.;
+      isFromSV = 1;
+      iSV = iv;
+    }
+
+    // select the first vertex for which the track is used in the fit
+    // (reco::VertexCompositePtrCandidate does not store track weights so can't select the vertex for which the track has the highest weight)
+    if(iSV>=0)
+      break;
+  }
+}
+
+// -------------- vertexKinematicsAndChange ----------------
+template<>
+void BTagAnalyzerLiteT<reco::TrackIPTagInfo,reco::Vertex>::vertexKinematicsAndChange(const Vertex & vertex, reco::TrackKinematics & vertexKinematics, Int_t & charge)
+{
+  Bool_t hasRefittedTracks = vertex.hasRefittedTracks();
+
+  for(reco::Vertex::trackRef_iterator track = vertex.tracks_begin();
+      track != vertex.tracks_end(); ++track) {
+    Double_t w = vertex.trackWeight(*track);
+    if (w < 0.5)
+      continue;
+    if (hasRefittedTracks) {
+      reco::Track actualTrack = vertex.refittedTrack(*track);
+      vertexKinematics.add(actualTrack, w);
+      charge+=actualTrack.charge();
+    }
+    else {
+      const reco::Track& mytrack = **track;
+      vertexKinematics.add(mytrack, w);
+      charge+=mytrack.charge();
+    }
+  }
+}
+
+template<>
+void BTagAnalyzerLiteT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::vertexKinematicsAndChange(const Vertex & vertex, reco::TrackKinematics & vertexKinematics, Int_t & charge)
+{
+  const std::vector<reco::CandidatePtr> tracks = vertex.daughterPtrVector();
+
+  for(std::vector<reco::CandidatePtr>::const_iterator track = tracks.begin(); track != tracks.end(); ++track) {
+    const reco::Track& mytrack = *(*track)->bestTrack();
+    vertexKinematics.add(mytrack, 1.0);
+    charge+=mytrack.charge();
+  }
+}
+
+
+// define specific instances of the templated BTagAnalyzerLite
+typedef BTagAnalyzerLiteT<reco::TrackIPTagInfo,reco::Vertex> BTagAnalyzerLiteLegacy;
+typedef BTagAnalyzerLiteT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate> BTagAnalyzerLite;
+
+//define plugins
+DEFINE_FWK_MODULE(BTagAnalyzerLiteLegacy);
 DEFINE_FWK_MODULE(BTagAnalyzerLite);
-
-
