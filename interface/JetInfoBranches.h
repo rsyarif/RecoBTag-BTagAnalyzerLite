@@ -81,6 +81,7 @@ class JetInfoBranches {
     int   Jet_nLastTrkEtaRelTagVarCSV[nMaxJets_];
 
     float Jet_SD_chi[nMaxJets_]; //added by rizki
+    int   Jet_SD_nBtagMicrojets[nMaxJets_]; //added by rizki
 
     int   nSubJet;
     int   SubJetIdx[nMaxJets_];
@@ -542,6 +543,7 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_nsubjettracks").c_str(), Jet_nsubjettracks ,(name+"Jet_nsubjettracks["+name+"nJet]/I").c_str());
       tree->Branch((name+"Jet_nsharedsubjettracks").c_str(), Jet_nsharedsubjettracks ,(name+"Jet_nsharedsubjettracks["+name+"nJet]/I").c_str());
       tree->Branch((name+"Jet_SD_chi").c_str(),      Jet_SD_chi      ,(name+"Jet_SD_chi["+name+"nJet]/F").c_str()); //added by rizki
+      tree->Branch((name+"Jet_SD_nBtagMicrojets").c_str(),      Jet_SD_nBtagMicrojets      ,(name+"Jet_SD_nBtagMicrojets["+name+"nJet]/I").c_str()); //added by rizki
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -599,6 +601,7 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Jet_tightID").c_str(),     Jet_tightID);
 
       tree->SetBranchAddress((name+"Jet_SD_chi").c_str(),     Jet_SD_chi); // added by rizki
+      tree->SetBranchAddress((name+"Jet_SD_nBtagMicrojets").c_str(),     Jet_SD_nBtagMicrojets); // added by rizki
 
       //--------------------------------------
       // secondary vertex information

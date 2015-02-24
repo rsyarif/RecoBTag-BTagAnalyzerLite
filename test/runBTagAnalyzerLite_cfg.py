@@ -163,6 +163,10 @@ process.source = cms.Source(
         #'/store/mc/Summer12_DR53X/QCD_Pt-470to600_TuneZ2star_8TeV_pythia6/AODSIM/PU_S10_START53_V7A-v2/00000/FADB0913-1708-E211-BBB1-00261894383C.root'
         # /TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola/Summer12_DR53X-PU_S10_START53_V7C-v1/AODSIM
         '/store/mc/Summer12_DR53X/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola/AODSIM/PU_S10_START53_V7C-v1/00000/FE7C71D8-DB25-E211-A93B-0025901D4C74.root'
+        #'/store/mc/Summer12_DR53X/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola/AODSIM/PU_S10_START53_V7C-v1/00000/028CFD7A-F425-E211-B9A2-0025901D4D54.root'
+        # /RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+        #'/store/mc/Summer12_DR53X/RadionToHH_4b_M-800_TuneZ2star_8TeV-Madgraph_pythia6/AODSIM/PU_S10_START53_V19-v1/20000/1C85A1F2-C312-E311-8233-0026189438A0.root'
+
     )
 )
 

@@ -68,7 +68,7 @@ btagana = cms.EDAnalyzer("BTagAnalyzerLite",
     svTagInfos               = cms.string('secondaryVertex'), # need to omit the 'TagInfos' part from the label
     softPFMuonTagInfos       = cms.string('softPFMuons'),     # need to omit the 'TagInfos' part from the label
     softPFElectronTagInfos   = cms.string('softPFElectrons'), # need to omit the 'TagInfos' part from the label
-    ivfTagInfos               = cms.string('inclusiveSecondaryVertexFinder'), # need to omit the 'TagInfos' part from the label //added by rizki
+
     TriggerPathNames = cms.vstring(
         "HLT_HT750_v*"
     )

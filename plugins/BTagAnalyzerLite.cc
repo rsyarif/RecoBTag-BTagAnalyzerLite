@@ -87,7 +87,6 @@ BTagAnalyzerLite::BTagAnalyzerLite(const edm::ParameterSet& iConfig):
   svTagInfos_              = iConfig.getParameter<std::string>("svTagInfos");
   softPFMuonTagInfos_      = iConfig.getParameter<std::string>("softPFMuonTagInfos");
   softPFElectronTagInfos_  = iConfig.getParameter<std::string>("softPFElectronTagInfos");
-  ivfTagInfos_              = iConfig.getParameter<std::string>("ivfTagInfos"); //added by rizki
 
   SVComputer_               = iConfig.getParameter<std::string>("svComputer");
   SVComputerFatJets_        = iConfig.getParameter<std::string>("svComputerFatJets");
@@ -476,6 +475,7 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
     JetInfo[iJetColl].Jet_genpt[JetInfo[iJetColl].nJet]     = ( pjet->genJet()!=0 ? pjet->genJet()->pt() : -1. );
 
     JetInfo[iJetColl].Jet_SD_chi[JetInfo[iJetColl].nJet] = -9999; //SD chi added by rizki
+    JetInfo[iJetColl].Jet_SD_nBtagMicrojets[JetInfo[iJetColl].nJet] = -9999; //SD chi added by rizki
 
     // available JEC sets
     unsigned int nJECSets = pjet->availableJECSets().size();
@@ -618,7 +618,7 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
     const reco::SecondaryVertexTagInfo *svTagInfo  = pjet->tagInfoSecondaryVertex(svTagInfos_.c_str());
     const reco::SoftLeptonTagInfo *softPFMuTagInfo = pjet->tagInfoSoftLepton(softPFMuonTagInfos_.c_str());
     const reco::SoftLeptonTagInfo *softPFElTagInfo = pjet->tagInfoSoftLepton(softPFElectronTagInfos_.c_str());
-    const reco::SecondaryVertexTagInfo *ivfTagInfo  = pjet->tagInfoSecondaryVertex(ivfTagInfos_.c_str()); //added by rizki
+
     //*****************************************************************
     // Taggers
     //*****************************************************************
@@ -1049,17 +1049,18 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
 	double mjphi = microjets[mji].phi();
 
 	//if SV present
-	//for (int vtx = 0; vtx < JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]; ++vtx ){
-	for (unsigned int vtx = 0; vtx < ivfTagInfo->nVertices(); ++vtx ){
-	  const Vertex &vertex = ivfTagInfo->secondaryVertex(vtx);
+	for (unsigned int vtx = 0; vtx < svTagInfo->nVertices(); ++vtx ){
+	  const Vertex &vertex = svTagInfo->secondaryVertex(vtx);
 	  double SVeta = vertex.p4().eta();
 	  double SVphi = vertex.p4().phi();
 
-	  double mjdeltaR = sqrt((mjeta-SVeta)*(mjeta-SVeta) + (mjphi-SVphi)*(mjphi-SVphi));
-	  //std::cout<<"mjdeltaR = "<<mjdeltaR<< endl;
+	  double mjdeltaR = reco::deltaR(mjeta,mjphi,SVeta,SVphi);
+	  //double mjdeltaR = sqrt((mjeta-SVeta)*(mjeta-SVeta) + (mjphi-SVphi)*(mjphi-SVphi));
+	  std::cout<<"mjdeltaR = "<<mjdeltaR<< endl;
 	  if(std::fabs(mjdeltaR < microjetConesize_)){
 	    //std::cout<< " Microjet Btagged ! ----> we have a microjet-SV match! " << endl;
 	    microjets[mji].set_user_index(1);
+	    break;
 	  }
 	}
 
@@ -1070,11 +1071,11 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
 	//std::cout<< " Microjet no."<< mji << " user index = "<< microjets[mji].user_index() << endl;
 	if(microjets[mji].user_index()==1) nmj++;
       }
+      JetInfo[iJetColl].Jet_SD_nBtagMicrojets[JetInfo[iJetColl].nJet] = nmj;
 
-      //require two btagged microjets & min fatjet pT , comment: what should be the appropriate min fatjet pT?
-      std::cout << "# btagged microjets = " << nmj << std::endl;
-      if(nmj >=2 && pjet->pt()>100){
-
+      //require two btagged microjets & min fatjet pT ~ 2m/deltaR
+      //std::cout << "# btagged microjets = " << nmj << std::endl;
+      if(nmj >=2 && pjet->pt()>200){
 	cout << endl;
 	//cout << "FatJet pT = " << pjet->pt()<< endl; //debug -rizki
 	//cout << "microjet size = " << microjets.size() << " , microjet cone size = " << microjetConesize_ << endl; // debug - rizki
