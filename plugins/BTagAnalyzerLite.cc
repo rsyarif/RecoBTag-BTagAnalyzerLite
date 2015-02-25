@@ -196,16 +196,13 @@ class BTagAnalyzerLiteT : public edm::EDAnalyzer
     std::string simpleSVHighPurBJetTags_;
     std::string simpleSVNegHighPurBJetTags_;
 
-    std::string simpleIVFSVHighPurBJetTags_;
-    std::string simpleIVFSVHighEffBJetTags_;
-    std::string doubleIVFSVHighEffBJetTags_;
-
     std::string combinedSVBJetTags_;
-    std::string combinedSVNegBJetTags_;
     std::string combinedSVPosBJetTags_;
+    std::string combinedSVNegBJetTags_;
 
     std::string combinedIVFSVBJetTags_;
     std::string combinedIVFSVPosBJetTags_;
+    std::string combinedIVFSVNegBJetTags_;
 
     std::string softPFMuonBJetTags_;
     std::string softPFMuonNegBJetTags_;
@@ -220,8 +217,8 @@ class BTagAnalyzerLiteT : public edm::EDAnalyzer
     std::string softPFMuonTagInfos_;
     std::string softPFElectronTagInfos_;
 
-    std::string   SVComputer_;
-    std::string   SVComputerFatJets_;
+    std::string SVComputer_;
+    std::string SVComputerFatJets_;
 
     TFile*  rootFile_;
     double minJetPt_;
@@ -315,16 +312,13 @@ BTagAnalyzerLiteT<IPTI,VTX>::BTagAnalyzerLiteT(const edm::ParameterSet& iConfig)
   simpleSVHighPurBJetTags_      = iConfig.getParameter<std::string>("simpleSVHighPurBJetTags");
   simpleSVNegHighPurBJetTags_   = iConfig.getParameter<std::string>("simpleSVNegHighPurBJetTags");
 
-  simpleIVFSVHighPurBJetTags_ = iConfig.getParameter<std::string>("simpleIVFSVHighPurBJetTags");
-  simpleIVFSVHighEffBJetTags_ = iConfig.getParameter<std::string>("simpleIVFSVHighEffBJetTags");
-  doubleIVFSVHighEffBJetTags_ = iConfig.getParameter<std::string>("doubleIVFSVHighEffBJetTags");
-
   combinedSVBJetTags_     = iConfig.getParameter<std::string>("combinedSVBJetTags");
-  combinedSVNegBJetTags_  = iConfig.getParameter<std::string>("combinedSVNegBJetTags");
   combinedSVPosBJetTags_  = iConfig.getParameter<std::string>("combinedSVPosBJetTags");
+  combinedSVNegBJetTags_  = iConfig.getParameter<std::string>("combinedSVNegBJetTags");
 
   combinedIVFSVBJetTags_      = iConfig.getParameter<std::string>("combinedIVFSVBJetTags");
   combinedIVFSVPosBJetTags_   = iConfig.getParameter<std::string>("combinedIVFSVPosBJetTags");
+  combinedIVFSVNegBJetTags_   = iConfig.getParameter<std::string>("combinedIVFSVNegBJetTags");
 
   softPFMuonBJetTags_       = iConfig.getParameter<std::string>("softPFMuonBJetTags");
   softPFMuonNegBJetTags_    = iConfig.getParameter<std::string>("softPFMuonNegBJetTags");
@@ -1023,16 +1017,13 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
     float SvtxHP  = pjet->bDiscriminator(simpleSVHighPurBJetTags_.c_str());
     float SvtxNHP = pjet->bDiscriminator(simpleSVNegHighPurBJetTags_.c_str());
 
-    float SimpleIVF_HP    = pjet->bDiscriminator(simpleIVFSVHighPurBJetTags_.c_str());
-    float SimpleIVF_HE    = pjet->bDiscriminator(simpleIVFSVHighEffBJetTags_.c_str());
-    float DoubleIVF_HE    = pjet->bDiscriminator(doubleIVFSVHighEffBJetTags_.c_str());
-
     float CombinedSvtx  = pjet->bDiscriminator(combinedSVBJetTags_.c_str());
-    float CombinedSvtxN = pjet->bDiscriminator(combinedSVNegBJetTags_.c_str());
     float CombinedSvtxP = pjet->bDiscriminator(combinedSVPosBJetTags_.c_str());
+    float CombinedSvtxN = pjet->bDiscriminator(combinedSVNegBJetTags_.c_str());
 
     float CombinedIVF     = pjet->bDiscriminator(combinedIVFSVBJetTags_.c_str());
     float CombinedIVF_P   = pjet->bDiscriminator(combinedIVFSVPosBJetTags_.c_str());
+    float CombinedIVF_N   = pjet->bDiscriminator(combinedIVFSVNegBJetTags_.c_str());
 
     float SoftM  = pjet->bDiscriminator(softPFMuonBJetTags_.c_str());
     float SoftMN = pjet->bDiscriminator(softPFMuonNegBJetTags_.c_str());
@@ -1053,14 +1044,12 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
     JetInfo[iJetColl].Jet_Svx[JetInfo[iJetColl].nJet]      = Svtx;
     JetInfo[iJetColl].Jet_SvxNHP[JetInfo[iJetColl].nJet]   = SvtxNHP;
     JetInfo[iJetColl].Jet_SvxHP[JetInfo[iJetColl].nJet]    = SvtxHP;
-    JetInfo[iJetColl].Jet_SimpIVF_HP[JetInfo[iJetColl].nJet]  = SimpleIVF_HP;
-    JetInfo[iJetColl].Jet_SimpIVF_HE[JetInfo[iJetColl].nJet]  = SimpleIVF_HE;
-    JetInfo[iJetColl].Jet_DoubIVF_HE[JetInfo[iJetColl].nJet]  = DoubleIVF_HE;
     JetInfo[iJetColl].Jet_CombSvxN[JetInfo[iJetColl].nJet] = CombinedSvtxN;
     JetInfo[iJetColl].Jet_CombSvxP[JetInfo[iJetColl].nJet] = CombinedSvtxP;
     JetInfo[iJetColl].Jet_CombSvx[JetInfo[iJetColl].nJet]  = CombinedSvtx;
-    JetInfo[iJetColl].Jet_CombIVF[JetInfo[iJetColl].nJet]     = CombinedIVF;
-    JetInfo[iJetColl].Jet_CombIVF_P[JetInfo[iJetColl].nJet]   = CombinedIVF_P;
+    JetInfo[iJetColl].Jet_CombIVF[JetInfo[iJetColl].nJet]   = CombinedIVF;
+    JetInfo[iJetColl].Jet_CombIVF_P[JetInfo[iJetColl].nJet] = CombinedIVF_P;
+    JetInfo[iJetColl].Jet_CombIVF_N[JetInfo[iJetColl].nJet] = CombinedIVF_N;
     JetInfo[iJetColl].Jet_SoftMuN[JetInfo[iJetColl].nJet]  = SoftMN;
     JetInfo[iJetColl].Jet_SoftMuP[JetInfo[iJetColl].nJet]  = SoftMP;
     JetInfo[iJetColl].Jet_SoftMu[JetInfo[iJetColl].nJet]   = SoftM;
