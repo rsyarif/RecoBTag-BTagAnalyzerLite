@@ -177,6 +177,11 @@ bTagDiscriminators = [
     ,'negativeSoftPFElectronBJetTags'
 ]
 
+## Legacy taggers not supported with MiniAOD
+if options.miniAOD and options.useLegacyTaggers:
+    print "WARNING: Legacy taggers not supported with MiniAOD"
+    options.useLegacyTaggers = False
+
 ## If using legacy taggers
 if options.useLegacyTaggers:
    bTagInfos = bTagInfosLegacy
@@ -193,17 +198,23 @@ postfix = "PFlow"
 genParticles = 'genParticles'
 jetSource = 'pfJetsPFBRECO'+postfix
 genJetCollection = 'ak4GenJetsNoNu'+postfix
+pfCandidates = 'particleFlow'
 pvSource = 'offlinePrimaryVertices'
 svSource = 'inclusiveCandidateSecondaryVertices'
-muons = 'selectedPatMuons'
+muSource = 'muons'
+elSource = 'gedGsfElectrons'
+patMuons = 'selectedPatMuons'
 ## If running on miniAOD
 if options.miniAOD:
     genParticles = 'prunedGenParticles'
     jetSource = 'ak4PFJets'
     genJetCollection = 'ak4GenJetsNoNu'
+    pfCandidates = 'packedPFCandidates'
     pvSource = 'offlineSlimmedPrimaryVertices'
     svSource = 'slimmedSecondaryVertices'
-    muons = 'selectedMuons'
+    muSource = 'slimmedMuons'
+    elSource = 'slimmedElectrons'
+    patMuons = 'selectedMuons'
 
 process = cms.Process("BTagAna")
 
@@ -296,8 +307,6 @@ if not options.miniAOD:
     getattr(process,"pfNoTau"+postfix).enable = False
     getattr(process,"pfNoJet"+postfix).enable = False
 else:
-    ## Recreate tracks and PVs for b tagging
-    process.load('PhysicsTools.PatAlgos.slimming.unpackedTracksAndVertices_cfi')
     from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets
     from RecoJets.JetProducers.ak4GenJets_cfi import ak4GenJets
     ## Select isolated collections
@@ -318,10 +327,10 @@ else:
     ## Do projections
     process.pfCHS = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandidates"), cut = cms.string("fromPV"))
     process.pfNoMuonCHS =  cms.EDProducer("CandPtrProjector", src = cms.InputTag("pfCHS"), veto = cms.InputTag("selectedMuons"))
-    process.pfNoElectronsCHS = cms.EDProducer("CandPtrProjector", src = cms.InputTag("pfNoMuonCHS"), veto =  cms.InputTag("selectedElectrons"))
+    process.pfNoElectronsCHS = cms.EDProducer("CandPtrProjector", src = cms.InputTag("pfNoMuonCHS"), veto = cms.InputTag("selectedElectrons"))
 
     process.pfNoMuon =  cms.EDProducer("CandPtrProjector", src = cms.InputTag("packedPFCandidates"), veto = cms.InputTag("selectedMuons"))
-    process.pfNoElectrons = cms.EDProducer("CandPtrProjector", src = cms.InputTag("pfNoMuon"), veto =  cms.InputTag("selectedElectrons"))
+    process.pfNoElectrons = cms.EDProducer("CandPtrProjector", src = cms.InputTag("pfNoMuon"), veto = cms.InputTag("selectedElectrons"))
 
     process.packedGenParticlesForJetsNoNu = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedGenParticles"), cut = cms.string("abs(pdgId) != 12 && abs(pdgId) != 14 && abs(pdgId) != 16"))
     process.ak4GenJetsNoNu = ak4GenJets.clone(src = 'packedGenParticlesForJetsNoNu')
@@ -342,8 +351,11 @@ from PhysicsTools.PatAlgos.tools.jetTools import *
 switchJetCollection(
     process,
     jetSource = cms.InputTag(jetSource),
+    pfCandidates = cms.InputTag(pfCandidates),
     pvSource = cms.InputTag(pvSource),
     svSource = cms.InputTag(svSource),
+    muSource = cms.InputTag(muSource),
+    elSource = cms.InputTag(elSource),
     btagInfos = bTagInfos,
     btagDiscriminators = bTagDiscriminators,
     jetCorrections = jetCorrectionsAK4,
@@ -403,8 +415,11 @@ if options.runSubJets:
         jetSource=cms.InputTag('PFJetsCHS'),
         algo=algoLabel,           # needed for jet flavor clustering
         rParam=options.jetRadius, # needed for jet flavor clustering
+        pfCandidates = cms.InputTag(pfCandidates),
         pvSource = cms.InputTag(pvSource),
         svSource = cms.InputTag(svSource),
+        muSource = cms.InputTag(muSource),
+        elSource = cms.InputTag(elSource),
         btagInfos = bTagInfos,
         btagDiscriminators = bTagDiscriminators,
         jetCorrections = jetCorrectionsAK8,
@@ -432,8 +447,11 @@ if options.runSubJets:
         jetSource=cms.InputTag('PFJetsCHSPruned','SubJets'),
         algo=algoLabel,           # needed for subjet flavor clustering
         rParam=options.jetRadius, # needed for subjet flavor clustering
+        pfCandidates = cms.InputTag(pfCandidates),
         pvSource = cms.InputTag(pvSource),
         svSource = cms.InputTag(svSource),
+        muSource = cms.InputTag(muSource),
+        elSource = cms.InputTag(elSource),
         btagInfos = bTagInfos,
         btagDiscriminators = bTagDiscriminators,
         jetCorrections = jetCorrectionsAK4,
@@ -592,7 +610,7 @@ process.btagana.storeTagVariables      = False ## True if you want to keep TagIn
 process.btagana.storeCSVTagVariables   = True  ## True if you want to keep CSV TaggingVariables
 process.btagana.primaryVertexColl      = cms.InputTag(pvSource)
 process.btagana.Jets                   = cms.InputTag('selectedPatJets'+postfix)
-process.btagana.muonCollectionName     = cms.InputTag(muons)
+process.btagana.muonCollectionName     = cms.InputTag(patMuons)
 process.btagana.triggerTable           = cms.InputTag('TriggerResults::HLT') # Data and MC
 
 if options.runSubJets:
