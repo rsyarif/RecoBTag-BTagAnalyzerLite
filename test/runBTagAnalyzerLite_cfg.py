@@ -55,7 +55,7 @@ options.register('useTopProjections', False,
     VarParsing.varType.bool,
     "Use top projections"
 )
-options.register('miniAOD', False,
+options.register('miniAOD', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Running on miniAOD"

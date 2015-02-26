@@ -13,4 +13,4 @@ scram b -j8
 
 cd RecoBTag/BTagAnalyzerLite/test/
 
-cmsRun runBTagAnalyzerLite_cfg.py maxEvents=100 reportEvery=1 wantSummary=True
+cmsRun runBTagAnalyzerLite_cfg.py miniAOD=True maxEvents=100 reportEvery=1 wantSummary=True
