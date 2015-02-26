@@ -1,13 +1,15 @@
 RecoBTag-BTagAnalyzerLite
 =========================
-cmsrel CMSSW_7_3_0_pre3
-cd CMSSW_7_3_0_pre3/src
+cmsrel CMSSW_7_4_0_pre7
+cd CMSSW_7_4_0_pre7/src
 cmsenv
 
-git clone -b V00-00-01 git://github.com/cms-btv-pog/cms-EventCounter.git MyAnalysis/EventCounter
-git clone -b 7_3_X_v1.02 git@github.com:cms-btv-pog/RecoBTag-BTagAnalyzerLite.git RecoBTag/BTagAnalyzerLite
+git cms-merge-topic -u cms-btv-pog:PATBTaggingUpdates_from-CMSSW_7_4_0_pre7
 
-scram b -j5
+git clone -b V00-00-01 git://github.com/cms-btv-pog/cms-EventCounter.git MyAnalysis/EventCounter
+git clone -b 7_4_X_dev git@github.com:cms-btv-pog/RecoBTag-BTagAnalyzerLite.git RecoBTag/BTagAnalyzerLite
+
+scram b -j8
 
 cd RecoBTag/BTagAnalyzerLite/test/
 
