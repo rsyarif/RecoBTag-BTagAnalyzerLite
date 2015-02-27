@@ -1071,7 +1071,6 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
       for (unsigned mji=0; mji< microjets.size(); mji++) {
 	//std::cout<< " Microjet no."<< mji << " user index = "<< microjets[mji].user_index() << endl;
 	if(microjets[mji].user_index()==1) nmj++;
-	JetInfo[iJetColl].Jet_SD_Microjets_pt[JetInfo[iJetColl].nJet] = microjets[mji].pt();
       }
       JetInfo[iJetColl].Jet_SD_nMicrojets[JetInfo[iJetColl].nJet] = microjets.size();
       JetInfo[iJetColl].Jet_SD_nBtagMicrojets[JetInfo[iJetColl].nJet] = nmj;
