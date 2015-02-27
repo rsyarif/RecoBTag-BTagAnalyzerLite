@@ -164,6 +164,10 @@ class JetInfoBranches {
     float SV_mass[nMaxSVs_];
     float SV_vtx_eta[nMaxSVs_];
     float SV_vtx_phi[nMaxSVs_];
+    float SV_EnergyRatio[nMaxSVs_];
+    float SV_dir_x[nMaxSVs_];
+    float SV_dir_y[nMaxSVs_];
+    float SV_dir_z[nMaxSVs_]; 	  
 
     // TagInfo TaggingVariables
     // per jet
