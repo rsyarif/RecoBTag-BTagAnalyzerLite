@@ -1068,43 +1068,47 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
 
       //microjet loop
       int nmj = 0;
+      bool mjleadbtag = false;
       for (unsigned mji=0; mji< microjets.size(); mji++) {
 	//std::cout<< " Microjet no."<< mji << " user index = "<< microjets[mji].user_index() << endl;
 	if(microjets[mji].user_index()==1) nmj++;
+	if(microjets[0].user_index()==1) mjleadbtag = true;
       }
       JetInfo[iJetColl].Jet_SD_nMicrojets[JetInfo[iJetColl].nJet] = microjets.size();
       JetInfo[iJetColl].Jet_SD_nBtagMicrojets[JetInfo[iJetColl].nJet] = nmj;
+      JetInfo[iJetColl].Jet_SD_isLeadMicrojetBtag[JetInfo[iJetColl].nJet] = mjleadbtag;
 
-      //require two btagged microjets & min fatjet pT ~ 2m/deltaR
-      //std::cout << "# btagged microjets = " << nmj << std::endl;
-      if(nmj >=2 && pjet->pt()>200){
-	cout << endl;
-	//cout << "FatJet pT = " << pjet->pt()<< endl; //debug -rizki
-	//cout << "microjet size = " << microjets.size() << " , microjet cone size = " << microjetConesize_ << endl; // debug - rizki
+      //set condition for btagged microjets & min fatjet pT ~ 2m/deltaR
+      //std::cout << "# btagged microjets = " << nmj << ", is leading mj btagged = " << mjleadbtag <<std::endl;
+      //if(nmj >=2 && pjet->pt()>200){
+      //if(mjleadbtag == true && pjet->pt()>200){
+      cout << endl;
+      //cout << "FatJet pT = " << pjet->pt()<< endl; //debug -rizki
+      //cout << "microjet size = " << microjets.size() << " , microjet cone size = " << microjetConesize_ << endl; // debug - rizki
 
-	double Psignal = 0.0;
-	double Pbackground = 0.0;
+      double Psignal = 0.0;
+      double Pbackground = 0.0;
 
-	LOGLEVEL(INFO); //DEBUG to turn on, INFO to turn off.  - rizki
-	double chi= -100;
-	try {
-	  chi = deconstruct->deconstruct(microjets, Psignal, Pbackground); //call SD
-	}
-	catch(Deconstruction::Exception &e) {
-	  std::cout << "Exception while running SD: " << e.what() << std::endl;
-	}
-
-	std::cout << "--- Shower Deconstruction calc ----" << endl;
-	std::cout << "Psig = "<< Psignal << endl;
-	std::cout << "Pbkg =  "<< Pbackground << endl;
-	std::cout << "Chi = "<< chi << endl;
-	std::cout << " "<< endl;
-
-	if(chi != -0 && chi != -100){ //only keep ones that is calculable
-	  std::cout<<"!!!!!!  -----> im recording chi !!!" << std::endl;
-	  JetInfo[iJetColl].Jet_SD_chi[JetInfo[iJetColl].nJet] = chi;
-	}
+      LOGLEVEL(INFO); //DEBUG to turn on, INFO to turn off.  - rizki
+      double chi= -100;
+      try {
+	chi = deconstruct->deconstruct(microjets, Psignal, Pbackground); //call SD
       }
+      catch(Deconstruction::Exception &e) {
+	std::cout << "Exception while running SD: " << e.what() << std::endl;
+      }
+
+      std::cout << "--- Shower Deconstruction calc ----" << endl;
+      std::cout << "Psig = "<< Psignal << endl;
+      std::cout << "Pbkg =  "<< Pbackground << endl;
+      std::cout << "Chi = "<< chi << endl;
+      std::cout << " "<< endl;
+
+      if(chi != -0 && chi != -100){ //only keep ones that is calculable
+	std::cout<<"!!!!!!  -----> im recording chi !!!" << std::endl;
+	JetInfo[iJetColl].Jet_SD_chi[JetInfo[iJetColl].nJet] = chi;
+      }
+
 
       //Deleting ShowerDeconstruction pointers - added by rizki - start
       delete signal;
