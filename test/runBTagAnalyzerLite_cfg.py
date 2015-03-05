@@ -55,7 +55,7 @@ options.register('useTopProjections', False,
     VarParsing.varType.bool,
     "Use top projections"
 )
-options.register('miniAOD', True,
+options.register('miniAOD', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Running on miniAOD"
@@ -82,7 +82,7 @@ options.register('useLegacyTaggers', False,
 )
 
 ## 'maxEvents' is already registered by the Framework, changing default value
-options.setDefault('maxEvents', 100)
+options.setDefault('maxEvents', -1)
 
 options.parseArguments()
 
@@ -203,7 +203,7 @@ pvSource = 'offlinePrimaryVertices'
 svSource = 'inclusiveCandidateSecondaryVertices'
 muSource = 'muons'
 elSource = 'gedGsfElectrons'
-patMuons = 'selectedPatMuons'
+patMuons = 'selectedPatMuons'+postfix
 ## If running on miniAOD
 if options.miniAOD:
     genParticles = 'prunedGenParticles'
@@ -230,7 +230,8 @@ process.source = cms.Source(
     "PoolSource",
     fileNames = cms.untracked.vstring(
         # /RelValProdTTbar_13/CMSSW_7_4_0_pre7-MCRUN2_74_V7-v1/AODSIM
-        '/store/relval/CMSSW_7_4_0_pre7/RelValProdTTbar_13/AODSIM/MCRUN2_74_V7-v1/00000/22E552FD-23B7-E411-B680-002618943911.root'
+        '/store/user/cvernier/boostedGen/Rad_HHto4b_M800_13TeV/AODSIM/150303_223019/0000/step4_1.root'
+	#'/store/relval/CMSSW_7_4_0_pre7/RelValProdTTbar_13/AODSIM/MCRUN2_74_V7-v1/00000/22E552FD-23B7-E411-B680-002618943911.root'
     )
 )
 
@@ -362,7 +363,8 @@ switchJetCollection(
     genJetCollection = cms.InputTag(genJetCollection),
     genParticles = cms.InputTag(genParticles),
     explicitJTA = options.useExplicitJTA,
-    postfix = postfix
+    postfix = postfix,
+    runIVF = True	
 )
 
 #-------------------------------------
@@ -426,7 +428,9 @@ if options.runSubJets:
         genJetCollection = cms.InputTag('genJetsNoNu'),
         genParticles = cms.InputTag(genParticles),
         explicitJTA = options.useExplicitJTA,
-        postfix = postfix
+        postfix = postfix,
+	runIVF = True
+	
     )
     addJetCollection(
         process,
@@ -439,7 +443,8 @@ if options.runSubJets:
         genJetCollection = cms.InputTag('genJetsNoNu'),
         genParticles = cms.InputTag(genParticles),
         getJetMCFlavour = False, # jet flavor disabled
-        postfix = postfix
+        postfix = postfix,
+	runIVF = True
     )
     addJetCollection(
         process,
@@ -461,7 +466,8 @@ if options.runSubJets:
         svClustering = True, # needed for subjet b tagging
         fatJets = cms.InputTag('PFJetsCHS'),              # needed for subjet flavor clustering
         groomedFatJets = cms.InputTag('PFJetsCHSPruned'), # needed for subjet flavor clustering
-        postfix = postfix
+        postfix = postfix,
+	runIVF = True
     )
 
     ## Establish references between PATified fat jets and subjets using the BoostedJetMerger
@@ -603,14 +609,14 @@ from RecoBTag.BTagAnalyzerLite.bTagAnalyzerLite_cff import *
 process.btagana = bTagAnalyzerLite.clone()
 if options.useLegacyTaggers:
     process.btagana = bTagAnalyzerLiteLegacy.clone()
-process.btagana.produceJetTrackTree    = False ## True if you want to keep info for tracks associated to jets
-process.btagana.produceJetPFLeptonTree = False ## True if you want to keep PF lepton info
+process.btagana.produceJetTrackTree    = True ## True if you want to keep info for tracks associated to jets
+process.btagana.produceJetPFLeptonTree = True ## True if you want to keep PF lepton info
 process.btagana.storeMuonInfo          = False ## True if you want to keep muon info
 process.btagana.storeTagVariables      = False ## True if you want to keep TagInfo TaggingVariables
 process.btagana.storeCSVTagVariables   = True  ## True if you want to keep CSV TaggingVariables
 process.btagana.primaryVertexColl      = cms.InputTag(pvSource)
 process.btagana.Jets                   = cms.InputTag('selectedPatJets'+postfix)
-process.btagana.muonCollectionName     = cms.InputTag(patMuons)
+process.btagana.muonCollectionName     = cms.InputTag(muSource)
 process.btagana.triggerTable           = cms.InputTag('TriggerResults::HLT') # Data and MC
 
 if options.runSubJets:
