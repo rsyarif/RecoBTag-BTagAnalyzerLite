@@ -32,9 +32,9 @@ bTagAnalyzerLiteLegacy = cms.EDAnalyzer("BTagAnalyzerLiteLegacy",
     simpleSVHighEffBJetTags    = cms.string('simpleSecondaryVertexHighEffBJetTags'),
     simpleSVNegHighEffBJetTags = cms.string('negativeSimpleSecondaryVertexHighEffBJetTags'),
 
-    combinedSVBJetTags    = cms.string('combinedSecondaryVertexBJetTags'),
-    combinedSVPosBJetTags = cms.string('positiveCombinedSecondaryVertexBJetTags'),
-    combinedSVNegBJetTags = cms.string('negativeCombinedSecondaryVertexBJetTags'),
+    combinedSVBJetTags    = cms.string('combinedSecondaryVertexV2BJetTags'),
+    combinedSVPosBJetTags = cms.string('positiveCombinedSecondaryVertexV2BJetTags'),
+    combinedSVNegBJetTags = cms.string('negativeCombinedSecondaryVertexV2BJetTags'),
 
     combinedIVFSVBJetTags    = cms.string('combinedInclusiveSecondaryVertexV2BJetTags'),
     combinedIVFSVPosBJetTags = cms.string('positiveCombinedInclusiveSecondaryVertexV2BJetTags'),
