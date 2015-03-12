@@ -334,7 +334,6 @@ class JetInfoBranches {
       tree->Branch((name+"SV_dir_x").c_str()  ,SV_dir_x  ,(name+"SV_dir_x ["+name+"nSV]/F").c_str());
       tree->Branch((name+"SV_dir_y").c_str()  ,SV_dir_y  ,(name+"SV_dir_y ["+name+"nSV]/F").c_str());
       tree->Branch((name+"SV_dir_z").c_str()  ,SV_dir_z  ,(name+"SV_dir_z ["+name+"nSV]/F").c_str());	
-	
       tree->Branch((name+"SV_nTrk").c_str()            ,SV_nTrk            ,(name+"SV_nTrk["+name+"nSV]/I").c_str());
       tree->Branch((name+"SV_mass").c_str()            ,SV_mass            ,(name+"SV_mass["+name+"nSV]/F").c_str());
       tree->Branch((name+"SV_vtx_eta").c_str()         ,SV_vtx_eta         ,(name+"SV_vtx_eta["+name+"nSV]/F").c_str());
@@ -620,6 +619,10 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"SV_flight2DErr").c_str()     ,SV_flight2DErr     ) ;
       tree->SetBranchAddress((name+"SV_totCharge").c_str()       ,SV_totCharge       ) ;
       tree->SetBranchAddress((name+"SV_vtxDistJetAxis").c_str()  ,SV_vtxDistJetAxis  ) ;
+      tree->SetBranchAddress((name+"SV_EnergyRatio").c_str()     ,SV_EnergyRatio     ) ;
+      tree->SetBranchAddress((name+"SV_dir_x").c_str()           ,SV_dir_x           ) ;
+      tree->SetBranchAddress((name+"SV_dir_y").c_str()           ,SV_dir_y           ) ;
+      tree->SetBranchAddress((name+"SV_dir_z").c_str()           ,SV_dir_z           ) ;
       tree->SetBranchAddress((name+"SV_nTrk").c_str()            ,SV_nTrk            ) ;
       tree->SetBranchAddress((name+"SV_mass").c_str()            ,SV_mass            ) ;
       tree->SetBranchAddress((name+"SV_vtx_eta").c_str()         ,SV_vtx_eta         ) ;
