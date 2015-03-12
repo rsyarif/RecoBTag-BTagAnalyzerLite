@@ -80,9 +80,14 @@ options.register('useLegacyTaggers', False,
     VarParsing.varType.bool,
     "Use legacy taggers"
 )
+options.register('runIVF', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Run IVF"
+)
 
 ## 'maxEvents' is already registered by the Framework, changing default value
-options.setDefault('maxEvents', -1)
+options.setDefault('maxEvents', 100)
 
 options.parseArguments()
 
@@ -363,8 +368,8 @@ switchJetCollection(
     genJetCollection = cms.InputTag(genJetCollection),
     genParticles = cms.InputTag(genParticles),
     explicitJTA = options.useExplicitJTA,
-    postfix = postfix,
-    runIVF = True	
+    runIVF = options.runIVF,
+    postfix = postfix
 )
 
 #-------------------------------------
@@ -428,9 +433,8 @@ if options.runSubJets:
         genJetCollection = cms.InputTag('genJetsNoNu'),
         genParticles = cms.InputTag(genParticles),
         explicitJTA = options.useExplicitJTA,
-        postfix = postfix,
-	runIVF = True
-	
+        runIVF = options.runIVF,
+        postfix = postfix
     )
     addJetCollection(
         process,
@@ -443,8 +447,7 @@ if options.runSubJets:
         genJetCollection = cms.InputTag('genJetsNoNu'),
         genParticles = cms.InputTag(genParticles),
         getJetMCFlavour = False, # jet flavor disabled
-        postfix = postfix,
-	runIVF = True
+        postfix = postfix
     )
     addJetCollection(
         process,
@@ -466,8 +469,8 @@ if options.runSubJets:
         svClustering = True, # needed for subjet b tagging
         fatJets = cms.InputTag('PFJetsCHS'),              # needed for subjet flavor clustering
         groomedFatJets = cms.InputTag('PFJetsCHSPruned'), # needed for subjet flavor clustering
-        postfix = postfix,
-	runIVF = True
+        runIVF = options.runIVF,
+        postfix = postfix
     )
 
     ## Establish references between PATified fat jets and subjets using the BoostedJetMerger
@@ -616,7 +619,7 @@ process.btagana.storeTagVariables      = False ## True if you want to keep TagIn
 process.btagana.storeCSVTagVariables   = True  ## True if you want to keep CSV TaggingVariables
 process.btagana.primaryVertexColl      = cms.InputTag(pvSource)
 process.btagana.Jets                   = cms.InputTag('selectedPatJets'+postfix)
-process.btagana.muonCollectionName     = cms.InputTag(muSource)
+process.btagana.muonCollectionName     = cms.InputTag(patMuons)
 process.btagana.triggerTable           = cms.InputTag('TriggerResults::HLT') # Data and MC
 
 if options.runSubJets:
