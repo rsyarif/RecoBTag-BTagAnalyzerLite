@@ -234,9 +234,9 @@ process.MessageLogger.cerr.default.limit = 10
 process.source = cms.Source(
     "PoolSource",
     fileNames = cms.untracked.vstring(
+        #'/store/user/cvernier/boostedGen/Rad_HHto4b_M800_13TeV/AODSIM/150303_223019/0000/step4_1.root'
         # /RelValProdTTbar_13/CMSSW_7_4_0_pre7-MCRUN2_74_V7-v1/AODSIM
-        '/store/user/cvernier/boostedGen/Rad_HHto4b_M800_13TeV/AODSIM/150303_223019/0000/step4_1.root'
-	#'/store/relval/CMSSW_7_4_0_pre7/RelValProdTTbar_13/AODSIM/MCRUN2_74_V7-v1/00000/22E552FD-23B7-E411-B680-002618943911.root'
+        '/store/relval/CMSSW_7_4_0_pre7/RelValProdTTbar_13/AODSIM/MCRUN2_74_V7-v1/00000/22E552FD-23B7-E411-B680-002618943911.root'
     )
 )
 
@@ -576,7 +576,7 @@ if options.runSubJets:
         process.combinedSecondaryVertexComputerFat = process.combinedSecondaryVertexComputer.clone()
         process.combinedSecondaryVertexComputerFat.trackSelection.jetDeltaRMax = cms.double(options.jetRadius) # default is 0.3
         process.combinedSecondaryVertexComputerFat.trackPseudoSelection.jetDeltaRMax = cms.double(options.jetRadius) # default is 0.3
-        getattr(process,'combinedSecondaryVertexBJetTagsPFCHS'+postfix).jetTagComputer = cms.string('combinedSecondaryVertexComputerFat')
+        getattr(process,'combinedSecondaryVertexV2BJetTagsPFCHS'+postfix).jetTagComputer = cms.string('combinedSecondaryVertexComputerFat')
         # Set the CSVv2 track dR cut to the jet radius
         process.combinedSecondaryVertexV2ComputerFat = process.combinedSecondaryVertexV2Computer.clone()
         process.combinedSecondaryVertexV2ComputerFat.trackSelection.jetDeltaRMax = cms.double(options.jetRadius) # default is 0.3
@@ -600,7 +600,7 @@ if options.runSubJets:
         process.candidateCombinedSecondaryVertexComputerFat = process.candidateCombinedSecondaryVertexComputer.clone()
         process.candidateCombinedSecondaryVertexComputerFat.trackSelection.jetDeltaRMax = cms.double(options.jetRadius) # default is 0.3
         process.candidateCombinedSecondaryVertexComputerFat.trackPseudoSelection.jetDeltaRMax = cms.double(options.jetRadius) # default is 0.3
-        getattr(process,'pfCombinedSecondaryVertexBJetTagsPFCHS'+postfix).jetTagComputer = cms.string('candidateCombinedSecondaryVertexComputerFat')
+        getattr(process,'pfCombinedSecondaryVertexV2BJetTagsPFCHS'+postfix).jetTagComputer = cms.string('candidateCombinedSecondaryVertexComputerFat')
         # Set the CSVv2 track dR cut to the jet radius
         process.candidateCombinedSecondaryVertexV2ComputerFat = process.candidateCombinedSecondaryVertexV2Computer.clone()
         process.candidateCombinedSecondaryVertexV2ComputerFat.trackSelection.jetDeltaRMax = cms.double(options.jetRadius) # default is 0.3
