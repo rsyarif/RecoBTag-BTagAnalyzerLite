@@ -66,6 +66,8 @@ Implementation:
 #include "RecoBTag/SecondaryVertex/interface/TrackKinematics.h"
 #include "RecoVertex/VertexPrimitives/interface/ConvertToFromReco.h"
 
+#include "fastjet/contrib/Njettiness.hh"
+
 #include "TFile.h"
 #include "TTree.h"
 
@@ -146,6 +148,8 @@ class BTagAnalyzerLiteT : public edm::EDAnalyzer
     void processJets(const edm::Handle<PatJetCollection>&, const edm::Handle<PatJetCollection>&,
                      const edm::Event&, const edm::EventSetup&,
                      const edm::Handle<PatJetCollection>&, std::vector<int>&, const int) ;
+
+    void recalcNsubjettiness(const pat::Jet & jet, const SVTagInfo & svTagInfo, float & tau1, float & tau2);
 
     bool isHardProcess(const int status);
 
@@ -253,6 +257,9 @@ class BTagAnalyzerLiteT : public edm::EDAnalyzer
     // PF jet ID
     PFJetIDSelectionFunctor pfjetIDLoose_;
     PFJetIDSelectionFunctor pfjetIDTight_;
+
+    // N-subjettiness calculator
+    fastjet::contrib::Njettiness njettiness_;
 };
 
 
@@ -262,7 +269,8 @@ BTagAnalyzerLiteT<IPTI,VTX>::BTagAnalyzerLiteT(const edm::ParameterSet& iConfig)
   computer(0),
   hadronizerType_(0),
   pfjetIDLoose_( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE ),
-  pfjetIDTight_( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::TIGHT )
+  pfjetIDTight_( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::TIGHT ),
+  njettiness_(fastjet::contrib::OnePass_KT_Axes(), fastjet::contrib::NormalizedMeasure(1.0,0.8))
 {
   //now do what ever initialization you need
   std::string module_type  = iConfig.getParameter<std::string>("@module_type");
@@ -770,8 +778,8 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
     if ( runSubJets_ && iJetColl == 1 )
     {
       // N-subjettiness
-      JetInfo[iJetColl].Jet_tau1[JetInfo[iJetColl].nJet] = pjet->userFloat("Njettiness:tau1");;
-      JetInfo[iJetColl].Jet_tau2[JetInfo[iJetColl].nJet] = pjet->userFloat("Njettiness:tau2");;
+      JetInfo[iJetColl].Jet_tau1[JetInfo[iJetColl].nJet] = pjet->userFloat("Njettiness:tau1");
+      JetInfo[iJetColl].Jet_tau2[JetInfo[iJetColl].nJet] = pjet->userFloat("Njettiness:tau2");
 
       int gfjIdx = jetIndices.at( pjet - jetsColl->begin() );
       int nSJ = 0;
@@ -859,6 +867,21 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
     const SVTagInfo *svTagInfo = toSVTagInfo(*pjet,svTagInfos_);
     const reco::CandSoftLeptonTagInfo *softPFMuTagInfo = pjet->tagInfoCandSoftLepton(softPFMuonTagInfos_.c_str());
     const reco::CandSoftLeptonTagInfo *softPFElTagInfo = pjet->tagInfoCandSoftLepton(softPFElectronTagInfos_.c_str());
+
+    // Re-calculate N-subjettiness using IVF vertices as composite b candidates
+    if ( runSubJets_ && iJetColl == 1 )
+    {
+      float tau1IVF = JetInfo[iJetColl].Jet_tau1[JetInfo[iJetColl].nJet];
+      float tau2IVF = JetInfo[iJetColl].Jet_tau2[JetInfo[iJetColl].nJet];
+
+      // re-calculate N-subjettiness
+      recalcNsubjettiness(*pjet,*svTagInfo,tau1IVF,tau2IVF);
+
+      // store re-calculated N-subjettiness
+      JetInfo[iJetColl].Jet_tau1IVF[JetInfo[iJetColl].nJet] = tau1IVF;
+      JetInfo[iJetColl].Jet_tau2IVF[JetInfo[iJetColl].nJet] = tau2IVF;
+    }
+
     //*****************************************************************
     // Taggers
     //*****************************************************************
@@ -1593,13 +1616,59 @@ void BTagAnalyzerLiteT<reco::TrackIPTagInfo,reco::Vertex>::vertexKinematicsAndCh
 template<>
 void BTagAnalyzerLiteT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::vertexKinematicsAndChange(const Vertex & vertex, reco::TrackKinematics & vertexKinematics, Int_t & charge)
 {
-  const std::vector<reco::CandidatePtr> tracks = vertex.daughterPtrVector();
+  const std::vector<reco::CandidatePtr> & tracks = vertex.daughterPtrVector();
 
   for(std::vector<reco::CandidatePtr>::const_iterator track = tracks.begin(); track != tracks.end(); ++track) {
     const reco::Track& mytrack = *(*track)->bestTrack();
     vertexKinematics.add(mytrack, 1.0);
     charge+=mytrack.charge();
   }
+}
+
+// -------------- recalcNsubjettiness ----------------
+template<>
+void BTagAnalyzerLiteT<reco::TrackIPTagInfo,reco::Vertex>::recalcNsubjettiness(const pat::Jet & jet, const SVTagInfo & svTagInfo, float & tau1, float & tau2)
+{
+  // need candidate-based IVF vertices so do nothing here
+}
+
+template<>
+void BTagAnalyzerLiteT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::recalcNsubjettiness(const pat::Jet & jet, const SVTagInfo & svTagInfo, float & tau1, float & tau2)
+{
+  std::vector<fastjet::PseudoJet> fjParticles;
+  std::vector<reco::CandidatePtr> svDaughters;
+
+  // loop over IVF vertices and push them in the vector of FastJet constituents and also collect their daughters
+  for(size_t i=0; i<svTagInfo.nVertices(); ++i)
+  {
+    const reco::VertexCompositePtrCandidate & vtx = svTagInfo.secondaryVertex(i);
+
+    fjParticles.push_back( fastjet::PseudoJet( vtx.px(), vtx.py(), vtx.pz(), vtx.energy() ) );
+
+    const std::vector<reco::CandidatePtr> & daughters = vtx.daughterPtrVector();
+    svDaughters.insert(svDaughters.end(), daughters.begin(), daughters.end());
+  }
+
+  // loop over jet constituents and select those that are not daughters of IVF vertices
+  std::vector<reco::CandidatePtr> constituentsOther;
+  for(const reco::CandidatePtr & daughter : jet.daughterPtrVector())
+  {
+    if (std::find(svDaughters.begin(), svDaughters.end(), daughter) == svDaughters.end())
+      constituentsOther.push_back( daughter );
+  }
+
+  // loop over jet constituents that are not daughters of IVF vertices and push them in the vector of FastJet constituents
+  for(const reco::CandidatePtr & constit : constituentsOther)
+  {
+    if ( constit.isNonnull() && constit.isAvailable() )
+      fjParticles.push_back( fastjet::PseudoJet( constit->px(), constit->py(), constit->pz(), constit->energy() ) );
+    else
+      edm::LogWarning("MissingJetConstituent") << "Jet constituent required for N-subjettiness computation is missing!";
+  }
+
+  // re-calculate N-subjettiness
+  tau1 = njettiness_.getTau(1, fjParticles);
+  tau2 = njettiness_.getTau(2, fjParticles);
 }
 
 
