@@ -101,6 +101,10 @@ class JetInfoBranches {
     int   Jet_nFirstTrkEtaRelTagVarCSV[nMaxJets_];
     int   Jet_nLastTrkEtaRelTagVarCSV[nMaxJets_];
 
+    float Jet_SD_chi[nMaxJets_]; //added by rizki
+    int   Jet_SD_nMicrojets[nMaxJets_]; //added by rizki
+    int   Jet_SD_nBtagMicrojets[nMaxJets_]; //added by rizki
+
     int   nTrack;
     float Track_dxy[nMaxTrk_];
     float Track_dz[nMaxTrk_];
@@ -605,6 +609,10 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_SV_mass_0").c_str(),        Jet_SV_mass_0        ,(name+"Jet_SV_mass_0["+name+"nJet]/F").c_str()       );
       tree->Branch((name+"Jet_SV_EnergyRatio_0").c_str(), Jet_SV_EnergyRatio_0 ,(name+"Jet_SV_EnergyRatio_0["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_SV_EnergyRatio_1").c_str(), Jet_SV_EnergyRatio_1 ,(name+"Jet_SV_EnergyRatio_1["+name+"nJet]/F").c_str());
+
+      tree->Branch((name+"Jet_SD_chi").c_str(),      Jet_SD_chi      ,(name+"Jet_SD_chi["+name+"nJet]/F").c_str()); //added by rizki
+      tree->Branch((name+"Jet_SD_nMicrojets").c_str(),      Jet_SD_nMicrojets      ,(name+"Jet_SD_nMicrojets["+name+"nJet]/I").c_str()); //added by rizki
+      tree->Branch((name+"Jet_SD_nBtagMicrojets").c_str(),      Jet_SD_nBtagMicrojets      ,(name+"Jet_SD_nBtagMicrojets["+name+"nJet]/I").c_str()); //added by rizki
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -666,6 +674,10 @@ class JetInfoBranches {
 
       tree->SetBranchAddress((name+"Jet_looseID").c_str(),     Jet_looseID);
       tree->SetBranchAddress((name+"Jet_tightID").c_str(),     Jet_tightID);
+
+      tree->SetBranchAddress((name+"Jet_SD_chi").c_str(),     Jet_SD_chi); // added by rizki
+      tree->SetBranchAddress((name+"Jet_SD_nMicrojets").c_str(),     Jet_SD_nMicrojets); // added by rizki
+      tree->SetBranchAddress((name+"Jet_SD_nBtagMicrojets").c_str(),     Jet_SD_nBtagMicrojets); // added by rizki
 
       //--------------------------------------
       // secondary vertex information

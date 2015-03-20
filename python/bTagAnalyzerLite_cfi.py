@@ -7,6 +7,11 @@ bTagAnalyzerLite = cms.EDAnalyzer("BTagAnalyzerLite",
     # computers
     svComputer        = cms.string('candidateCombinedSecondaryVertexV2Computer'),
     svComputerSubJets = cms.string('candidateCombinedSecondaryVertexV2Computer'),
+
+    # Shower Deconstruction
+    SDinputcard              = cms.FileInPath('ShowerDeconstruction/inputdata/input_card.dat'), #SD parameter added by rizki
+    microjetConesize         = cms.double(0.15), #SD parameter added by rizki
+
     # TagInfos (need to omit the 'TagInfos' part from the label)
     ipTagInfos             = cms.string('pfImpactParameter'),
     svTagInfos             = cms.string('pfInclusiveSecondaryVertexFinder'),
