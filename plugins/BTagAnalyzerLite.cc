@@ -31,6 +31,7 @@ Implementation:
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "FWCore/Utilities/interface/RegexMatch.h"
+#include "FWCore/ParameterSet/interface/FileInPath.h" //added by rizki
 
 #include "DataFormats/Candidate/interface/VertexCompositePtrCandidate.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
@@ -67,6 +68,25 @@ Implementation:
 #include "RecoVertex/VertexPrimitives/interface/ConvertToFromReco.h"
 
 #include "fastjet/contrib/Njettiness.hh"
+
+//added by rizki - start
+#include <fastjet/PseudoJet.hh>
+#include <fastjet/FunctionOfPseudoJet.hh>
+#include "fastjet/tools/Filter.hh"
+#include "fastjet/tools/Pruner.hh"
+#include "fastjet/tools/MassDropTagger.hh"
+#include "fastjet/ClusterSequenceArea.hh"
+#include "ShowerDeconstruction/SDAlgorithm/interface/Exception.h"
+#include "ShowerDeconstruction/SDAlgorithm/interface/AnalysisParameters.h"
+#include "ShowerDeconstruction/SDAlgorithm/interface/HBBModel.h"
+#include "ShowerDeconstruction/SDAlgorithm/interface/BackgroundModel.h"
+#include "ShowerDeconstruction/SDAlgorithm/interface/ISRModel.h"
+#include "ShowerDeconstruction/SDAlgorithm/interface/Deconstruct.h"
+#include "ShowerDeconstruction/SDAlgorithm/interface/Message.h"
+#include "ShowerDeconstruction/SDAlgorithm/interface/Parameters.h"
+#include "ShowerDeconstruction/SDAlgorithm/interface/ParseUtils.h"
+using namespace Deconstruction;
+//added by rizki - end
 
 #include "TFile.h"
 #include "TTree.h"
@@ -169,6 +189,9 @@ class BTagAnalyzerLiteT : public edm::EDAnalyzer
     bool storeMuonInfo_;
     bool storeTagVariables_;
     bool storeCSVTagVariables_;
+
+    double microjetConesize_; //SD parameter added by rizki
+    edm::FileInPath SDinputcard_; //added by rizki
 
     edm::InputTag src_;  // Generator/handronizer module label
     edm::InputTag muonCollectionName_;
@@ -897,6 +920,7 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
       }
     }
 
+
     //*****************************************************************
     // Taggers
     //*****************************************************************
@@ -907,7 +931,7 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
     int nseltracks = 0;
     int nsharedtracks = 0;
     reco::TrackKinematics allKinematics;
-	
+
 
     if ( produceJetTrackTree_ )
     {
@@ -980,7 +1004,7 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
         setTracksPV(ptrackRef, primaryVertex,
                     JetInfo[iJetColl].Track_PV[JetInfo[iJetColl].nTrack],
                     JetInfo[iJetColl].Track_PVweight[JetInfo[iJetColl].nTrack]);
-	
+
 	if(JetInfo[iJetColl].Track_PVweight[JetInfo[iJetColl].nTrack]>0) { allKinematics.add(ptrack, JetInfo[iJetColl].Track_PVweight[JetInfo[iJetColl].nTrack]); }
 
         if( pjet->hasTagInfo(svTagInfos_.c_str()) )
@@ -1313,8 +1337,8 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
 
       // total charge at the secondary vertex
       JetInfo[iJetColl].SV_totCharge[JetInfo[iJetColl].nSV]=totcharge;
-	
-	
+
+
 
       math::XYZTLorentzVector vertexSum = vertexKinematics.weightedVectorSum();
       edm::RefToBase<reco::Jet> jet = ipTagInfo->jet();
@@ -1337,11 +1361,11 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
 
       math::XYZTLorentzVector allSum =  allKinematics.weightedVectorSum() ; //allKinematics.vectorSum()
       JetInfo[iJetColl].SV_EnergyRatio[JetInfo[iJetColl].nSV]= vertexSum.E() / allSum.E();
-	
+
 
       JetInfo[iJetColl].SV_dir_x[JetInfo[iJetColl].nSV]= flightDir.x();
-      JetInfo[iJetColl].SV_dir_y[JetInfo[iJetColl].nSV]= flightDir.y();		
-      JetInfo[iJetColl].SV_dir_z[JetInfo[iJetColl].nSV]= flightDir.z(); 
+      JetInfo[iJetColl].SV_dir_y[JetInfo[iJetColl].nSV]= flightDir.y();
+      JetInfo[iJetColl].SV_dir_z[JetInfo[iJetColl].nSV]= flightDir.z();
 
 
 
@@ -1350,6 +1374,119 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
 
     } //// if secondary vertices present
     JetInfo[iJetColl].Jet_nLastSV[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nSV;
+
+
+    //---------------------- ShowerDeconstruction added by rizki - part 1/1 - start --------------------------
+    if(runSubJets_ && iJetColl==1){
+
+      //ShowerDeconstruction initialization - added by rizki - start
+      if(jetsColl->size()!=0 && JetInfo[iJetColl].nJet==0)    std::cout<<"Fatjet size = " << jetsColl->size() << ", leading pt = "<< jetsColl->begin()->pt() << std::endl;
+      AnalysisParameters param(SDinputcard_.fullPath());   //load ShowerDeconstruction config file
+      std::cout << "MARKER" << std::endl ; // DEBUGG
+      HBBModel *signal = 0;
+      BackgroundModel *background = 0;
+      ISRModel *isr = 0;
+      Deconstruct *deconstruct = 0;
+
+      signal = new HBBModel(param);
+      background = new BackgroundModel(param);
+      isr = new ISRModel(param);
+      deconstruct = new Deconstruct(param, *signal, *background, *isr);
+      //ShowerDeconstruction initialization - added by rizki - end
+
+      reco::Jet::Constituents constituents=pjet->getJetConstituents();
+
+      std::vector<fastjet::PseudoJet> fjConstituents;
+      for(auto constituentItr=constituents.begin(); constituentItr!=constituents.end(); ++constituentItr){
+	edm::Ptr<reco::Candidate> constituent=*constituentItr;
+	fjConstituents.push_back(fastjet::PseudoJet(constituent->px(),
+						    constituent->py(),
+						    constituent->pz(),
+						    constituent->energy()));
+	//ATTENTION: need to make sure microjets are not exactly massless, otherwise SD breaks! But maybe dnt need to worry about this here. Not sure yet. (not yet implemented) - rizki
+      }
+
+      fastjet::JetDefinition microjet_def(fastjet::kt_algorithm, microjetConesize_);
+      fastjet::ClusterSequence clust_seq_microjet(fjConstituents, microjet_def);
+      std::vector<fastjet::PseudoJet> microjets = sorted_by_pt(clust_seq_microjet.inclusive_jets(15));
+
+      if (microjets.size() > 9) {
+	microjets.erase(microjets.begin() + (int) 9,
+			microjets.begin() + microjets.size());
+      } //remove low pt micro jets if there are more than 9 microjets
+
+        //Microjet  btag & status check - rizki , comment: is there a situation when b tag is not possible?
+      for (unsigned mji=0; mji< microjets.size(); mji++) { //loop microjet
+	if(microjets[mji].user_index()==1) continue;
+
+	double mjeta = microjets[mji].eta();
+	double mjphi = microjets[mji].phi();
+
+	//if SV present
+	for (unsigned int vtx = 0; vtx < svTagInfo->nVertices(); ++vtx ){
+	  const Vertex &vertex = svTagInfo->secondaryVertex(vtx);
+	  double SVeta = vertex.p4().eta();
+	  double SVphi = vertex.p4().phi();
+
+	  double mjdeltaR = reco::deltaR(mjeta,mjphi,SVeta,SVphi);
+	  //std::cout<<"mjdeltaR = "<<mjdeltaR<< endl;
+	  if(std::fabs(mjdeltaR < microjetConesize_)){
+	    std::cout<< " Microjet Btagged ! ----> we have a microjet-SV match! " << std::endl;
+	    microjets[mji].set_user_index(1);
+	    break;
+	  }
+	}
+
+      }// Microjet btag end
+
+      int nmj = 0;
+      for (unsigned mji=0; mji< microjets.size(); mji++) {
+	std::cout<< " Microjet no."<< mji << " user index = "<< microjets[mji].user_index() << std::endl;
+	if(microjets[mji].user_index()==1) nmj++;
+      }
+      JetInfo[iJetColl].Jet_SD_nMicrojets[JetInfo[iJetColl].nJet] = microjets.size();
+      JetInfo[iJetColl].Jet_SD_nBtagMicrojets[JetInfo[iJetColl].nJet] = nmj;
+
+      //require two btagged microjets & min fatjet pT , comment: what should be the appropriate min fatjet pT?
+      //std::cout << "# btagged microjets = " << nmj << std::endl;
+      //if(nmj >=2 && pjet->pt()>100){
+
+      //cout << endl;
+      //cout << "FatJet pT = " << pjet->pt()<< endl; //debug -rizki
+      //cout << "microjet size = " << microjets.size() << " , microjet cone size = " << microjetConesize_ << endl; // debug - rizki
+
+      double Psignal = 0.0;
+      double Pbackground = 0.0;
+
+      LOGLEVEL(INFO); //DEBUG to turn on, INFO to turn off.  - rizki
+      double chi= -100;
+      try {
+	chi = deconstruct->deconstruct(microjets, Psignal, Pbackground); //call SD
+      }
+      catch(Deconstruction::Exception &e) {
+	std::cout << "Exception while running SD: " << e.what() << std::endl;
+      }
+
+      std::cout << "--- Shower Deconstruction calc ----" << std::endl;
+      std::cout << "Psig = "<< Psignal << std::endl;
+      std::cout << "Pbkg =  "<< Pbackground << std::endl;
+      std::cout << "Chi = "<< chi << std::endl;
+      std::cout << " "<< std::endl;
+
+      if(chi != -0 && chi != -100){ //only keep ones that is calculable
+	std::cout<<"!!!!!!  -----> im recording chi !!!" << std::endl;
+	JetInfo[iJetColl].Jet_SD_chi[JetInfo[iJetColl].nJet] = chi;
+      }
+      //Deleting ShowerDeconstruction pointers - added by rizki - start
+      delete signal;
+      delete background;
+      delete isr;
+      delete deconstruct;
+      //Deleting ShowerDeconstruction pointers - added by rizki - end
+    }
+
+    //------------------ ShowerDeconstruction added by rizki - part 1/1 - end -----------------------
+
 
     ++JetInfo[iJetColl].nJet;
   } // end loop on jet

@@ -87,6 +87,10 @@ class JetInfoBranches {
     int   Jet_nFirstTrkEtaRelTagVarCSV[nMaxJets_];
     int   Jet_nLastTrkEtaRelTagVarCSV[nMaxJets_];
 
+    float Jet_SD_chi[nMaxJets_]; //added by rizki
+    int  Jet_SD_nMicrojets[nMaxJets_]; //added by rizki
+    int   Jet_SD_nBtagMicrojets[nMaxJets_]; //added by rizki
+
     int   nSubJet;
     int   SubJetIdx[nMaxJets_];
 
@@ -176,7 +180,7 @@ class JetInfoBranches {
     float SV_EnergyRatio[nMaxSVs_];
     float SV_dir_x[nMaxSVs_];
     float SV_dir_y[nMaxSVs_];
-    float SV_dir_z[nMaxSVs_]; 	  
+    float SV_dir_z[nMaxSVs_];
 
     // TagInfo TaggingVariables
     // per jet
@@ -339,10 +343,10 @@ class JetInfoBranches {
       tree->Branch((name+"SV_flight2DErr").c_str()     ,SV_flight2DErr     ,(name+"SV_flight2DErr["+name+"nSV]/F").c_str());
       tree->Branch((name+"SV_totCharge").c_str()       ,SV_totCharge       ,(name+"SV_totCharge ["+name+"nSV]/F").c_str());
       tree->Branch((name+"SV_vtxDistJetAxis").c_str()  ,SV_vtxDistJetAxis  ,(name+"SV_vtxDistJetAxis ["+name+"nSV]/F").c_str());
-      tree->Branch((name+"SV_EnergyRatio").c_str()  ,SV_EnergyRatio  ,(name+"SV_EnergyRatio ["+name+"nSV]/F").c_str());	
+      tree->Branch((name+"SV_EnergyRatio").c_str()  ,SV_EnergyRatio  ,(name+"SV_EnergyRatio ["+name+"nSV]/F").c_str());
       tree->Branch((name+"SV_dir_x").c_str()  ,SV_dir_x  ,(name+"SV_dir_x ["+name+"nSV]/F").c_str());
       tree->Branch((name+"SV_dir_y").c_str()  ,SV_dir_y  ,(name+"SV_dir_y ["+name+"nSV]/F").c_str());
-      tree->Branch((name+"SV_dir_z").c_str()  ,SV_dir_z  ,(name+"SV_dir_z ["+name+"nSV]/F").c_str());	
+      tree->Branch((name+"SV_dir_z").c_str()  ,SV_dir_z  ,(name+"SV_dir_z ["+name+"nSV]/F").c_str());
       tree->Branch((name+"SV_nTrk").c_str()            ,SV_nTrk            ,(name+"SV_nTrk["+name+"nSV]/I").c_str());
       tree->Branch((name+"SV_mass").c_str()            ,SV_mass            ,(name+"SV_mass["+name+"nSV]/F").c_str());
       tree->Branch((name+"SV_vtx_eta").c_str()         ,SV_vtx_eta         ,(name+"SV_vtx_eta["+name+"nSV]/F").c_str());
@@ -561,6 +565,9 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_nsharedtracks").c_str(), Jet_nsharedtracks ,(name+"Jet_nsharedtracks["+name+"nJet]/I").c_str());
       tree->Branch((name+"Jet_nsubjettracks").c_str(), Jet_nsubjettracks ,(name+"Jet_nsubjettracks["+name+"nJet]/I").c_str());
       tree->Branch((name+"Jet_nsharedsubjettracks").c_str(), Jet_nsharedsubjettracks ,(name+"Jet_nsharedsubjettracks["+name+"nJet]/I").c_str());
+      tree->Branch((name+"Jet_SD_chi").c_str(),      Jet_SD_chi      ,(name+"Jet_SD_chi["+name+"nJet]/F").c_str()); //added by rizki
+      tree->Branch((name+"Jet_SD_nMicrojets").c_str(),      Jet_SD_nMicrojets      ,(name+"Jet_SD_nMicrojets["+name+"nJet]/I").c_str()); //added by rizki
+      tree->Branch((name+"Jet_SD_nBtagMicrojets").c_str(),      Jet_SD_nBtagMicrojets      ,(name+"Jet_SD_nBtagMicrojets["+name+"nJet]/I").c_str()); //added by rizki
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -614,6 +621,10 @@ class JetInfoBranches {
 
       tree->SetBranchAddress((name+"Jet_looseID").c_str(),     Jet_looseID);
       tree->SetBranchAddress((name+"Jet_tightID").c_str(),     Jet_tightID);
+
+      tree->SetBranchAddress((name+"Jet_SD_chi").c_str(),     Jet_SD_chi); // added by rizki
+      tree->SetBranchAddress((name+"Jet_SD_nMicrojets").c_str(),     Jet_SD_nMicrojets); // added by rizki
+      tree->SetBranchAddress((name+"Jet_SD_nBtagMicrojets").c_str(),     Jet_SD_nBtagMicrojets); // added by rizki
 
       //--------------------------------------
       // secondary vertex information

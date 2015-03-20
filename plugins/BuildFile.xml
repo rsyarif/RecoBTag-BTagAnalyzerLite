@@ -10,6 +10,7 @@
   <use name="CommonTools/UtilAlgos"/>
   <use name="fastjet"/>
   <use name="fastjet-contrib"/>
+  <use name="ShowerDeconstruction/SDAlgorithm"/>
   <flags EDM_PLUGIN="1"/>
   #<flags CXXFLAGS="-O0 -g -fno-inline"/>
 </library>
