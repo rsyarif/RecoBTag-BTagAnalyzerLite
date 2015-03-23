@@ -329,6 +329,8 @@ BTagAnalyzerLiteT<IPTI,VTX>::BTagAnalyzerLiteT(const edm::ParameterSet& iConfig)
   storeCSVTagVariables_ = iConfig.getParameter<bool>("storeCSVTagVariables");
   minJetPt_  = iConfig.getParameter<double>("MinPt");
   maxJetEta_ = iConfig.getParameter<double>("MaxEta");
+  microjetConesize_ = iConfig.getParameter<double>("microjetConesize"); //added by rizki
+  SDinputcard_             = iConfig.getParameter<edm::FileInPath>("SDinputcard"); //added by rizki
 
   // Modules
   src_                 = iConfig.getParameter<edm::InputTag>("src");
@@ -1480,9 +1482,8 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
     if(runFatJets_ && iJetColl == 0){
 
       //ShowerDeconstruction initialization - added by rizki - start
-      if(jetsColl->size()!=0 && JetInfo[iJetColl].nJet==0)    std::cout<<"Fatjet size = " << jetsColl->size() << ", leading pt = "<< jetsColl->begin()->pt() << std::endl;
+      //if(jetsColl->size()!=0 && JetInfo[iJetColl].nJet==0)    std::cout<<"Fatjet size = " << jetsColl->size() << ", leading pt = "<< jetsColl->begin()->pt() << std::endl;
       AnalysisParameters param(SDinputcard_.fullPath());   //load ShowerDeconstruction config file
-      std::cout << "MARKER" << std::endl ; // DEBUGG
       HBBModel *signal = 0;
       BackgroundModel *background = 0;
       ISRModel *isr = 0;
@@ -1502,7 +1503,7 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
 	fjConstituents.push_back(fastjet::PseudoJet(constituent->px(),
 						    constituent->py(),
 						    constituent->pz(),
-						    constituent->energy()));
+						    constituent->energy()+0.1));
 	//ATTENTION: need to make sure microjets are not exactly massless, otherwise SD breaks! But maybe dnt need to worry about this here. Not sure yet. (not yet implemented) - rizki
       }
 
@@ -1515,7 +1516,7 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
 			microjets.begin() + microjets.size());
       } //remove low pt micro jets if there are more than 9 microjets
 
-        //Microjet  btag & status check - rizki , comment: is there a situation when b tag is not possible?
+      //Microjet  btag & status check - rizki , comment: is there a situation when b tag is not possible?
       for (unsigned mji=0; mji< microjets.size(); mji++) { //loop microjet
 	if(microjets[mji].user_index()==1) continue;
 
@@ -1529,9 +1530,9 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
 	  double SVphi = vertex.p4().phi();
 
 	  double mjdeltaR = reco::deltaR(mjeta,mjphi,SVeta,SVphi);
-	  //std::cout<<"mjdeltaR = "<<mjdeltaR<< endl;
+	  //std::cout<<"mjdeltaR = "<<mjdeltaR<< ", microjetconesize = "<<microjetConesize_<< std::endl;
 	  if(std::fabs(mjdeltaR < microjetConesize_)){
-	    std::cout<< " Microjet Btagged ! ----> we have a microjet-SV match! " << std::endl;
+	    //std::cout<< " Microjet Btagged ! ----> we have a microjet-SV match! " << std::endl;
 	    microjets[mji].set_user_index(1);
 	    break;
 	  }
@@ -1541,7 +1542,7 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
 
       int nmj = 0;
       for (unsigned mji=0; mji< microjets.size(); mji++) {
-	std::cout<< " Microjet no."<< mji << " user index = "<< microjets[mji].user_index() << std::endl;
+	//std::cout<< " Microjet no."<< mji << " user index = "<< microjets[mji].user_index() << std::endl;
 	if(microjets[mji].user_index()==1) nmj++;
       }
       JetInfo[iJetColl].Jet_SD_nMicrojets[JetInfo[iJetColl].nJet] = microjets.size();
@@ -1567,16 +1568,16 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
 	std::cout << "Exception while running SD: " << e.what() << std::endl;
       }
 
-      std::cout << "--- Shower Deconstruction calc ----" << std::endl;
-      std::cout << "Psig = "<< Psignal << std::endl;
-      std::cout << "Pbkg =  "<< Pbackground << std::endl;
-      std::cout << "Chi = "<< chi << std::endl;
-      std::cout << " "<< std::endl;
+      //std::cout << "--- Shower Deconstruction calc ----" << std::endl;
+      //std::cout << "Psig = "<< Psignal << std::endl;
+      //std::cout << "Pbkg =  "<< Pbackground << std::endl;
+      //std::cout << "Chi = "<< chi << std::endl;
+      //std::cout << " "<< std::endl;
 
-      if(chi != -0 && chi != -100){ //only keep ones that is calculable
-	std::cout<<"!!!!!!  -----> im recording chi !!!" << std::endl;
-	JetInfo[iJetColl].Jet_SD_chi[JetInfo[iJetColl].nJet] = chi;
-      }
+      //if(chi != -0 && chi != -100){ //only keep ones that is calculable
+      //std::cout<<"!!!!!!  -----> im recording chi !!!" << std::endl;
+      JetInfo[iJetColl].Jet_SD_chi[JetInfo[iJetColl].nJet] = chi;
+      // }
       //Deleting ShowerDeconstruction pointers - added by rizki - start
       delete signal;
       delete background;
