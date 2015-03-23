@@ -727,6 +727,9 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
   JetInfo[iJetColl].nTrkEtaRelTagVarCSV = 0;
   JetInfo[iJetColl].nSubJet = 0;
 
+  JetInfo[iJetColl].nMicrojet = 0; //added by rizki
+
+
   //// Loop over the jets
   for ( PatJetCollection::const_iterator pjet = jetsColl->begin(); pjet != jetsColl->end(); ++pjet ) {
 
@@ -1428,10 +1431,19 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
       int nmj = 0;
       for (unsigned mji=0; mji< microjets.size(); mji++) {
 	//std::cout<< " Microjet no."<< mji << " user index = "<< microjets[mji].user_index() << std::endl;
+	//std::cout<< " Microjet no."<< mji << " pt = "<< microjets[mji].pt() << std::endl;
 	if(microjets[mji].user_index()==1) nmj++;
+
+	JetInfo[iJetColl].Jet_SD_Microjet_pt[JetInfo[iJetColl].nMicrojet + mji] = microjets[mji].pt();
+	JetInfo[iJetColl].Jet_SD_Microjet_isBtag[JetInfo[iJetColl].nMicrojet + mji] = microjets[mji].user_index();
+
       }
       JetInfo[iJetColl].Jet_SD_nMicrojets[JetInfo[iJetColl].nJet] = microjets.size();
       JetInfo[iJetColl].Jet_SD_nBtagMicrojets[JetInfo[iJetColl].nJet] = nmj;
+
+      JetInfo[iJetColl].Jet_SD_nFirstMicrojet[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nMicrojet;
+      JetInfo[iJetColl].nMicrojet += microjets.size();
+      JetInfo[iJetColl].Jet_SD_nLastMicrojet[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nMicrojet;
 
       //require two btagged microjets & min fatjet pT , comment: what should be the appropriate min fatjet pT?
       //std::cout << "# btagged microjets = " << nmj << std::endl;
