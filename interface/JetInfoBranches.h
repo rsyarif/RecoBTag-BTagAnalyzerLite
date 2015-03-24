@@ -558,7 +558,7 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_SD_Microjet_pt").c_str(),      Jet_SD_Microjet_pt      ,(name+"Jet_SD_Microjet_pt["+name+"nMicrojet]/F").c_str()); //added by rizki
       tree->Branch((name+"Jet_SD_Microjet_isBtag").c_str(),      Jet_SD_Microjet_isBtag      ,(name+"Jet_SD_Microjet_isBtag["+name+"nMicrojet]/I").c_str()); //added by rizki
       tree->Branch((name+"Jet_SD_nFirstMicrojet").c_str(),      Jet_SD_nFirstMicrojet      ,(name+"Jet_SD_nFirstMicrojet["+name+"nJet]/I").c_str()); //added by rizki
-      tree->Branch((name+"Jet_SD_nLasttMicrojet").c_str(),      Jet_SD_nLastMicrojet      ,(name+"Jet_SD_nLastMicrojet["+name+"nJet]/I").c_str()); //added by rizki
+      tree->Branch((name+"Jet_SD_nLastMicrojet").c_str(),      Jet_SD_nLastMicrojet      ,(name+"Jet_SD_nLastMicrojet["+name+"nJet]/I").c_str()); //added by rizki
     }
 
     //------------------------------------------------------------------------------------------------------------------
