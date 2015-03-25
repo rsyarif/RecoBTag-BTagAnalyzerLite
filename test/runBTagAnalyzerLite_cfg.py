@@ -310,8 +310,6 @@ if not options.miniAOD:
     getattr(process,"pfNoPileUpJME"+postfix).enable = options.usePFchs
     getattr(process,"pfNoMuonJME"+postfix).enable = options.useTopProjections
     getattr(process,"pfNoElectronJME"+postfix).enable = options.useTopProjections
-    getattr(process,"pfNoTau"+postfix).enable = False
-    getattr(process,"pfNoJet"+postfix).enable = False
 else:
     from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets
     from RecoJets.JetProducers.ak4GenJets_cfi import ak4GenJets
