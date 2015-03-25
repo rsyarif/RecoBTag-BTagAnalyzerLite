@@ -628,7 +628,7 @@ if options.runSubJets:
     process.btaganaSubJets = process.btagana.clone(
         storeEventInfo      = cms.bool(not options.processStdAK4Jets),
         allowJetSkipping    = cms.bool(False),
-        Jets                = cms.InputTag('selectedPatJetsPrunedSubjetsPFCHS'+postfix),
+        Jets                = cms.InputTag('selectedPatJetsPrunedPFCHSPacked','SubJets'),
         FatJets             = cms.InputTag('selectedPatJetsPFCHS'+postfix),
         GroomedFatJets      = cms.InputTag('selectedPatJetsPrunedPFCHSPacked'),
         runSubJets          = options.runSubJets,
