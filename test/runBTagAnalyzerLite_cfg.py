@@ -50,7 +50,7 @@ options.register('fatJetPtMin', 150.0,
     VarParsing.varType.float,
     "Minimum pT for fat jets (default is 150 GeV)"
 )
-options.register('useTopProjections', False,
+options.register('useTopProjections', True,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Use top projections"
@@ -308,8 +308,8 @@ if not options.miniAOD:
     ## Top projections in PF2PAT
     getattr(process,"pfPileUpJME"+postfix).checkClosestZVertex = False
     getattr(process,"pfNoPileUpJME"+postfix).enable = options.usePFchs
-    getattr(process,"pfNoMuonJME"+postfix).enable = options.useTopProjections
-    getattr(process,"pfNoElectronJME"+postfix).enable = options.useTopProjections
+    getattr(process,"pfNoMuonJMEPFBRECO"+postfix).enable = options.useTopProjections
+    getattr(process,"pfNoElectronJMEPFBRECO"+postfix).enable = options.useTopProjections
 else:
     from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJets
     from RecoJets.JetProducers.ak4GenJets_cfi import ak4GenJets
