@@ -80,7 +80,7 @@ options.register('useLegacyTaggers', False,
     VarParsing.varType.bool,
     "Use legacy taggers"
 )
-options.register('runIVF', False,
+options.register('runIVF', False, # needs to be set to True when running over 7XY AOD where 2<=X<4
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
     "Run IVF"
