@@ -208,7 +208,7 @@ pvSource = 'offlinePrimaryVertices'
 svSource = 'inclusiveCandidateSecondaryVertices'
 muSource = 'muons'
 elSource = 'gedGsfElectrons'
-patMuons = 'selectedPatMuons'+postfix
+patMuons = 'selectedPatMuons'
 ## If running on miniAOD
 if options.miniAOD:
     genParticles = 'prunedGenParticles'
@@ -219,7 +219,7 @@ if options.miniAOD:
     svSource = 'slimmedSecondaryVertices'
     muSource = 'slimmedMuons'
     elSource = 'slimmedElectrons'
-    patMuons = 'selectedMuons'
+    patMuons = 'slimmedMuons'
 
 process = cms.Process("BTagAna")
 
@@ -349,6 +349,10 @@ else:
             process.ak4PFJets = ak4PFJets.clone(src = 'pfNoElectrons', doAreaFastjet = True)
         else:
             process.ak4PFJets = ak4PFJets.clone(src = 'packedPFCandidates', doAreaFastjet = True)
+
+## Load standard PAT objects (here we only need PAT muons but the framework will figure out what it needs to run using the unscheduled mode)
+process.load("PhysicsTools.PatAlgos.producersLayer1.patCandidates_cff")
+process.load("PhysicsTools.PatAlgos.selectionLayer1.selectedPatCandidates_cff")
 
 from PhysicsTools.PatAlgos.tools.jetTools import *
 ## Switch the default jet collection (done in order to use the above specified b-tag infos and discriminators)
