@@ -1,4 +1,4 @@
-RecoBTag-BTagAnalyzerLite
+RecoBTag-BTagAnalyzerLite - Implementing Shower Deconstruction (http://arxiv.org/abs/1211.3140, http://arxiv.org/abs/1102.3480)
 =========================
 cmsrel CMSSW_7_4_0_pre8
 cd CMSSW_7_4_0_pre8/src
@@ -8,6 +8,11 @@ git cms-merge-topic -u cms-btv-pog:PATBTaggingUpdates_from-CMSSW_7_4_0_pre7
 
 git clone -b V00-00-01 git://github.com/cms-btv-pog/cms-EventCounter.git MyAnalysis/EventCounter
 git clone -b 7_4_X_v1.01 git@github.com:cms-btv-pog/RecoBTag-BTagAnalyzerLite.git RecoBTag/BTagAnalyzerLite
+
+copy SD files ( ShowerDeconstruction/ ) in  working area CMSSW_X/src
+
+make sure folder inputdata/ exist under ShowerDeconstruction/ 
+and has the file input_data.dat in inputdata/ for SD configurations
 
 scram b -j8
 
