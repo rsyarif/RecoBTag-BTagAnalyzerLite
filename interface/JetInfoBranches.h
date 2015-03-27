@@ -93,6 +93,12 @@ class JetInfoBranches {
     int   Jet_SD_nBtagMicrojets[nMaxJets_]; //added by rizki
     int   nMicrojet; //added by rizki
     float Jet_SD_Microjet_pt[nMaxMicroJets_]; //added by rizki
+    float Jet_SD_Microjet_eta[nMaxMicroJets_]; //added by rizki
+    float Jet_SD_Microjet_phi[nMaxMicroJets_]; //added by rizki
+    float Jet_SD_Microjet_energy[nMaxMicroJets_]; //added by rizki
+    float Jet_SD_Microjet_px[nMaxMicroJets_]; //added by rizki
+    float Jet_SD_Microjet_py[nMaxMicroJets_]; //added by rizki
+    float Jet_SD_Microjet_pz[nMaxMicroJets_]; //added by rizki
     int Jet_SD_Microjet_isBtag[nMaxMicroJets_]; //added by rizki
     int Jet_SD_nFirstMicrojet[nMaxJets_]; //added by rizki
     int Jet_SD_nLastMicrojet[nMaxJets_]; //added by rizki
@@ -571,14 +577,20 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_nsharedtracks").c_str(), Jet_nsharedtracks ,(name+"Jet_nsharedtracks["+name+"nJet]/I").c_str());
       tree->Branch((name+"Jet_nsubjettracks").c_str(), Jet_nsubjettracks ,(name+"Jet_nsubjettracks["+name+"nJet]/I").c_str());
       tree->Branch((name+"Jet_nsharedsubjettracks").c_str(), Jet_nsharedsubjettracks ,(name+"Jet_nsharedsubjettracks["+name+"nJet]/I").c_str());
-      tree->Branch((name+"Jet_SD_chi").c_str(),      Jet_SD_chi      ,(name+"Jet_SD_chi["+name+"nJet]/F").c_str()); //added by rizki
-      tree->Branch((name+"Jet_SD_nMicrojets").c_str(),      Jet_SD_nMicrojets      ,(name+"Jet_SD_nMicrojets["+name+"nJet]/I").c_str()); //added by rizki
-      tree->Branch((name+"Jet_SD_nBtagMicrojets").c_str(),      Jet_SD_nBtagMicrojets      ,(name+"Jet_SD_nBtagMicrojets["+name+"nJet]/I").c_str()); //added by rizki
-      tree->Branch((name+"nMicrojet").c_str(),      &nMicrojet      ,(name+"nMicrojet/I").c_str()); //added by rizki
-      tree->Branch((name+"Jet_SD_Microjet_pt").c_str(),      Jet_SD_Microjet_pt      ,(name+"Jet_SD_Microjet_pt["+name+"nMicrojet]/F").c_str()); //added by rizki
-      tree->Branch((name+"Jet_SD_Microjet_isBtag").c_str(),      Jet_SD_Microjet_isBtag      ,(name+"Jet_SD_Microjet_isBtag["+name+"nMicrojet]/I").c_str()); //added by rizki
-      tree->Branch((name+"Jet_SD_nFirstMicrojet").c_str(),      Jet_SD_nFirstMicrojet      ,(name+"Jet_SD_nFirstMicrojet["+name+"nJet]/I").c_str()); //added by rizki
-      tree->Branch((name+"Jet_SD_nLasttMicrojet").c_str(),      Jet_SD_nLastMicrojet      ,(name+"Jet_SD_nLastMicrojet["+name+"nJet]/I").c_str()); //added by rizki
+      tree->Branch((name+"Jet_SD_chi").c_str(),            Jet_SD_chi              ,(name+"Jet_SD_chi["+name+"nJet]/F").c_str()); //added by rizki
+      tree->Branch((name+"Jet_SD_nMicrojets").c_str(),     Jet_SD_nMicrojets       ,(name+"Jet_SD_nMicrojets["+name+"nJet]/I").c_str()); //added by rizki
+      tree->Branch((name+"Jet_SD_nBtagMicrojets").c_str(), Jet_SD_nBtagMicrojets   ,(name+"Jet_SD_nBtagMicrojets["+name+"nJet]/I").c_str()); //added by rizki
+      tree->Branch((name+"nMicrojet").c_str(),             &nMicrojet              ,(name+"nMicrojet/I").c_str()); //added by rizki
+      tree->Branch((name+"Jet_SD_Microjet_pt").c_str(),    Jet_SD_Microjet_pt      ,(name+"Jet_SD_Microjet_pt["+name+"nMicrojet]/F").c_str()); //added by rizki
+      tree->Branch((name+"Jet_SD_Microjet_eta").c_str(),   Jet_SD_Microjet_eta     ,(name+"Jet_SD_Microjet_eta["+name+"nMicrojet]/F").c_str()); //added by rizki
+      tree->Branch((name+"Jet_SD_Microjet_phi").c_str(),   Jet_SD_Microjet_phi     ,(name+"Jet_SD_Microjet_phi["+name+"nMicrojet]/F").c_str()); //added by rizki
+      tree->Branch((name+"Jet_SD_Microjet_energy").c_str(),Jet_SD_Microjet_energy  ,(name+"Jet_SD_Microjet_energy["+name+"nMicrojet]/F").c_str()); //added by rizki
+      tree->Branch((name+"Jet_SD_Microjet_px").c_str(),    Jet_SD_Microjet_px      ,(name+"Jet_SD_Microjet_px["+name+"nMicrojet]/F").c_str()); //added by rizki
+      tree->Branch((name+"Jet_SD_Microjet_py").c_str(),    Jet_SD_Microjet_py      ,(name+"Jet_SD_Microjet_py["+name+"nMicrojet]/F").c_str()); //added by rizki
+      tree->Branch((name+"Jet_SD_Microjet_pz").c_str(),    Jet_SD_Microjet_pz      ,(name+"Jet_SD_Microjet_pz["+name+"nMicrojet]/F").c_str()); //added by rizki
+      tree->Branch((name+"Jet_SD_Microjet_isBtag").c_str(),Jet_SD_Microjet_isBtag  ,(name+"Jet_SD_Microjet_isBtag["+name+"nMicrojet]/I").c_str()); //added by rizki
+      tree->Branch((name+"Jet_SD_nFirstMicrojet").c_str(), Jet_SD_nFirstMicrojet   ,(name+"Jet_SD_nFirstMicrojet["+name+"nJet]/I").c_str()); //added by rizki
+      tree->Branch((name+"Jet_SD_nLasttMicrojet").c_str(), Jet_SD_nLastMicrojet    ,(name+"Jet_SD_nLastMicrojet["+name+"nJet]/I").c_str()); //added by rizki
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -633,14 +645,20 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Jet_looseID").c_str(),     Jet_looseID);
       tree->SetBranchAddress((name+"Jet_tightID").c_str(),     Jet_tightID);
 
-      tree->SetBranchAddress((name+"Jet_SD_chi").c_str(),     Jet_SD_chi); // added by rizki
-      tree->SetBranchAddress((name+"Jet_SD_nMicrojets").c_str(),     Jet_SD_nMicrojets); // added by rizki
-      tree->SetBranchAddress((name+"Jet_SD_nBtagMicrojets").c_str(),     Jet_SD_nBtagMicrojets); // added by rizki
-      tree->SetBranchAddress((name+"nMicrojet").c_str(),     &nMicrojet); // added by rizki
+      tree->SetBranchAddress((name+"Jet_SD_chi").c_str(),             Jet_SD_chi); // added by rizki
+      tree->SetBranchAddress((name+"Jet_SD_nMicrojets").c_str(),      Jet_SD_nMicrojets); // added by rizki
+      tree->SetBranchAddress((name+"Jet_SD_nBtagMicrojets").c_str(),  Jet_SD_nBtagMicrojets); // added by rizki
+      tree->SetBranchAddress((name+"nMicrojet").c_str(),              &nMicrojet); // added by rizki
       tree->SetBranchAddress((name+"Jet_SD_Microjet_pt").c_str(),     Jet_SD_Microjet_pt); // added by rizki
-      tree->SetBranchAddress((name+"Jet_SD_Microjet_isBtag").c_str(),     Jet_SD_Microjet_isBtag); // added by rizki
-      tree->SetBranchAddress((name+"Jet_SD_nFirstMicrojet").c_str(),     Jet_SD_nFirstMicrojet); // added by rizki
-      tree->SetBranchAddress((name+"Jet_SD_nLastMicrojet").c_str(),     Jet_SD_nLastMicrojet); // added by rizki
+      tree->SetBranchAddress((name+"Jet_SD_Microjet_eta").c_str(),    Jet_SD_Microjet_eta); // added by rizki
+      tree->SetBranchAddress((name+"Jet_SD_Microjet_phi").c_str(),    Jet_SD_Microjet_phi); // added by rizki
+      tree->SetBranchAddress((name+"Jet_SD_Microjet_energy").c_str(), Jet_SD_Microjet_energy); // added by rizki
+      tree->SetBranchAddress((name+"Jet_SD_Microjet_px").c_str(),     Jet_SD_Microjet_px); // added by rizki
+      tree->SetBranchAddress((name+"Jet_SD_Microjet_py").c_str(),     Jet_SD_Microjet_py); // added by rizki
+      tree->SetBranchAddress((name+"Jet_SD_Microjet_pz").c_str(),     Jet_SD_Microjet_pz); // added by rizki
+      tree->SetBranchAddress((name+"Jet_SD_Microjet_isBtag").c_str(), Jet_SD_Microjet_isBtag); // added by rizki
+      tree->SetBranchAddress((name+"Jet_SD_nFirstMicrojet").c_str(),  Jet_SD_nFirstMicrojet); // added by rizki
+      tree->SetBranchAddress((name+"Jet_SD_nLastMicrojet").c_str(),   Jet_SD_nLastMicrojet); // added by rizki
 
       //--------------------------------------
       // secondary vertex information
