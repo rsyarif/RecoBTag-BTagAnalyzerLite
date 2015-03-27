@@ -64,6 +64,7 @@ class JetInfoBranches {
     float Jet_etaGroomed[nMaxJets_];
     float Jet_phiGroomed[nMaxJets_];
     float Jet_massGroomed[nMaxJets_];
+    float Jet_qvol[nMaxJets_];
     float Jet_tau1[nMaxJets_];
     float Jet_tau2[nMaxJets_];
     float Jet_tau1IVF[nMaxJets_];
@@ -535,6 +536,7 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_etaGroomed").c_str(),  Jet_etaGroomed  ,(name+"Jet_etaGroomed["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_phiGroomed").c_str(),  Jet_phiGroomed  ,(name+"Jet_phiGroomed["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_massGroomed").c_str(), Jet_massGroomed ,(name+"Jet_massGroomed["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_qvol").c_str(),        Jet_qvol        ,(name+"Jet_qvol["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_tau1").c_str(),        Jet_tau1        ,(name+"Jet_tau1["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_tau2").c_str(),        Jet_tau2        ,(name+"Jet_tau2["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_tau1IVF").c_str(),     Jet_tau1IVF     ,(name+"Jet_tau1IVF["+name+"nJet]/F").c_str());
@@ -827,6 +829,7 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Jet_etaGroomed").c_str(),  Jet_etaGroomed   );
       tree->SetBranchAddress((name+"Jet_phiGroomed").c_str(),  Jet_phiGroomed   );
       tree->SetBranchAddress((name+"Jet_massGroomed").c_str(), Jet_massGroomed  );
+      tree->SetBranchAddress((name+"Jet_qvol").c_str(),        Jet_qvol        );
       tree->SetBranchAddress((name+"Jet_tau1").c_str(),        Jet_tau1        );
       tree->SetBranchAddress((name+"Jet_tau2").c_str(),        Jet_tau2        );
       tree->SetBranchAddress((name+"Jet_tau1IVF").c_str(),     Jet_tau1IVF     );

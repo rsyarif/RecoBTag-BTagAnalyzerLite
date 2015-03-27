@@ -492,6 +492,27 @@ if options.runSubJets:
 
     getattr(process,'patJetsPFCHS'+postfix).userData.userFloats.src += ['Njettiness:tau1','Njettiness:tau2','Njettiness:tau3']
 
+
+    #-------------------------------------
+    ## Q-Jet Volatility
+    from RecoJets.JetProducers.qjetsadder_cfi import QJetsAdder
+
+    # Qjets need a RNG
+    process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService")
+
+
+    process.Qjets = QJetsAdder.clone(
+        src = cms.InputTag("PFJetsCHS"),
+        jetRad = cms.double(options.jetRadius),
+        jetAlgo = cms.string("AK"),
+    )
+
+    getattr(process,'patJetsPFCHS'+postfix).userData.userFloats.src += ['Qjets:QjetsVolatility']
+
+    setattr(process.RandomNumberGeneratorService, "Qjets", cms.PSet(initialSeed = cms.untracked.uint32(42),
+                                                                    engineName = cms.untracked.string('TRandom3')))
+
+
     #-------------------------------------
     ## Grooming ValueMaps
     process.Pruned = cms.EDProducer("RecoJetDeltaRValueMapProducer",

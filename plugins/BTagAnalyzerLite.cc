@@ -780,6 +780,7 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
       // N-subjettiness
       JetInfo[iJetColl].Jet_tau1[JetInfo[iJetColl].nJet] = pjet->userFloat("Njettiness:tau1");
       JetInfo[iJetColl].Jet_tau2[JetInfo[iJetColl].nJet] = pjet->userFloat("Njettiness:tau2");
+      JetInfo[iJetColl].Jet_qvol[JetInfo[iJetColl].nJet] = pjet->userFloat("Qjets:QjetsVolatility");
 
       int gfjIdx = jetIndices.at( pjet - jetsColl->begin() );
       int nSJ = 0;
