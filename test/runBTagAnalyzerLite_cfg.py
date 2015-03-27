@@ -85,6 +85,11 @@ options.register('runIVF', False, # needs to be set to True when running over 7X
     VarParsing.varType.bool,
     "Run IVF"
 )
+options.register('runQjets', True,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Run Qjets"
+)
 
 ## 'maxEvents' is already registered by the Framework, changing default value
 options.setDefault('maxEvents', 100)
@@ -507,7 +512,8 @@ if options.runSubJets:
         jetAlgo = cms.string("AK"),
     )
 
-    getattr(process,'patJetsPFCHS'+postfix).userData.userFloats.src += ['Qjets:QjetsVolatility']
+    if options.runQjets:
+        getattr(process,'patJetsPFCHS'+postfix).userData.userFloats.src += ['Qjets:QjetsVolatility']
 
     setattr(process.RandomNumberGeneratorService, "Qjets", cms.PSet(initialSeed = cms.untracked.uint32(42),
                                                                     engineName = cms.untracked.string('TRandom3')))
