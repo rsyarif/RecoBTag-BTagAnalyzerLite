@@ -14,18 +14,18 @@ bTagAnalyzerLiteLegacy = cms.EDAnalyzer("BTagAnalyzerLiteLegacy",
     softPFElectronTagInfos = cms.string('softPFElectrons'),
     # taggers
     trackCHEBJetTags    = cms.string('trackCountingHighEffBJetTags'),
-    trackCNegHEBJetTags = cms.string('negativeTrackCountingHighEffJetTags'),
+    trackCNegHEBJetTags = cms.string('negativeTrackCountingHighEffBJetTags'),
 
     trackCHPBJetTags    = cms.string('trackCountingHighPurBJetTags'),
-    trackCNegHPBJetTags = cms.string('negativeTrackCountingHighPurJetTags'),
+    trackCNegHPBJetTags = cms.string('negativeTrackCountingHighPurBJetTags'),
 
     jetBPBJetTags    = cms.string('jetBProbabilityBJetTags'),
-    jetBPNegBJetTags = cms.string('negativeOnlyJetBProbabilityJetTags'),
-    jetBPPosBJetTags = cms.string('positiveOnlyJetBProbabilityJetTags'),
+    jetBPNegBJetTags = cms.string('negativeOnlyJetBProbabilityBJetTags'),
+    jetBPPosBJetTags = cms.string('positiveOnlyJetBProbabilityBJetTags'),
 
     jetPBJetTags     = cms.string('jetProbabilityBJetTags'),
-    jetPNegBJetTags  = cms.string('negativeOnlyJetProbabilityJetTags'),
-    jetPPosBJetTags  = cms.string('positiveOnlyJetProbabilityJetTags'),
+    jetPNegBJetTags  = cms.string('negativeOnlyJetProbabilityBJetTags'),
+    jetPPosBJetTags  = cms.string('positiveOnlyJetProbabilityBJetTags'),
 
     simpleSVHighPurBJetTags    = cms.string('simpleSecondaryVertexHighPurBJetTags'),
     simpleSVNegHighPurBJetTags = cms.string('negativeSimpleSecondaryVertexHighPurBJetTags'),
