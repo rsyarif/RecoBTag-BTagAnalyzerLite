@@ -1077,6 +1077,12 @@ void BTagAnalyzerLite::processJets(const edm::Handle<PatJetCollection>& jetsColl
 	if(microjets[0].user_index()==1) mjleadbtag = 1;
 
 	JetInfo[iJetColl].Jet_SD_Microjet_pt[JetInfo[iJetColl].nMicrojet + mji] = microjets[mji].pt();
+	JetInfo[iJetColl].Jet_SD_Microjet_eta[JetInfo[iJetColl].nMicrojet + mji] = microjets[mji].eta();
+	JetInfo[iJetColl].Jet_SD_Microjet_phi[JetInfo[iJetColl].nMicrojet + mji] = microjets[mji].phi();
+	JetInfo[iJetColl].Jet_SD_Microjet_energy[JetInfo[iJetColl].nMicrojet + mji] = microjets[mji].E();
+	JetInfo[iJetColl].Jet_SD_Microjet_px[JetInfo[iJetColl].nMicrojet + mji] = microjets[mji].px();
+	JetInfo[iJetColl].Jet_SD_Microjet_py[JetInfo[iJetColl].nMicrojet + mji] = microjets[mji].py();
+	JetInfo[iJetColl].Jet_SD_Microjet_pz[JetInfo[iJetColl].nMicrojet + mji] = microjets[mji].pz();
 	JetInfo[iJetColl].Jet_SD_Microjet_isBtag[JetInfo[iJetColl].nMicrojet + mji] = microjets[mji].user_index();
       }
       JetInfo[iJetColl].Jet_SD_nMicrojets[JetInfo[iJetColl].nJet] = microjets.size();
