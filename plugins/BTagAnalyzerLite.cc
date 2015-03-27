@@ -149,7 +149,7 @@ class BTagAnalyzerLiteT : public edm::EDAnalyzer
                      const edm::Event&, const edm::EventSetup&,
                      const edm::Handle<PatJetCollection>&, std::vector<int>&, const int) ;
 
-    void recalcNsubjettiness(const pat::Jet & jet, const SVTagInfo & svTagInfo, float & tau1, float & tau2);
+    void recalcNsubjettiness(const pat::Jet & jet, const SVTagInfo & svTagInfo, float & tau1, float & tau2, std::vector<fastjet::PseudoJet> & currentAxes);
 
     bool isHardProcess(const int status);
 
@@ -874,13 +874,27 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
     {
       float tau1IVF = JetInfo[iJetColl].Jet_tau1[JetInfo[iJetColl].nJet];
       float tau2IVF = JetInfo[iJetColl].Jet_tau2[JetInfo[iJetColl].nJet];
+      std::vector<fastjet::PseudoJet> currentAxes;
 
       // re-calculate N-subjettiness
-      recalcNsubjettiness(*pjet,*svTagInfo,tau1IVF,tau2IVF);
+      recalcNsubjettiness(*pjet,*svTagInfo,tau1IVF,tau2IVF,currentAxes);
 
       // store re-calculated N-subjettiness
       JetInfo[iJetColl].Jet_tau1IVF[JetInfo[iJetColl].nJet] = tau1IVF;
       JetInfo[iJetColl].Jet_tau2IVF[JetInfo[iJetColl].nJet] = tau2IVF;
+
+      if(currentAxes.size()>0)
+      {
+        JetInfo[iJetColl].Jet_tauAxis1_px[JetInfo[iJetColl].nJet] = currentAxes[0].px();
+        JetInfo[iJetColl].Jet_tauAxis1_py[JetInfo[iJetColl].nJet] = currentAxes[0].py();
+        JetInfo[iJetColl].Jet_tauAxis1_pz[JetInfo[iJetColl].nJet] = currentAxes[0].pz();
+      }
+      if(currentAxes.size()>1)
+      {
+        JetInfo[iJetColl].Jet_tauAxis2_px[JetInfo[iJetColl].nJet] = currentAxes[1].px();
+        JetInfo[iJetColl].Jet_tauAxis2_py[JetInfo[iJetColl].nJet] = currentAxes[1].py();
+        JetInfo[iJetColl].Jet_tauAxis2_pz[JetInfo[iJetColl].nJet] = currentAxes[1].pz();
+      }
     }
 
     //*****************************************************************
@@ -1628,13 +1642,13 @@ void BTagAnalyzerLiteT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::v
 
 // -------------- recalcNsubjettiness ----------------
 template<>
-void BTagAnalyzerLiteT<reco::TrackIPTagInfo,reco::Vertex>::recalcNsubjettiness(const pat::Jet & jet, const SVTagInfo & svTagInfo, float & tau1, float & tau2)
+void BTagAnalyzerLiteT<reco::TrackIPTagInfo,reco::Vertex>::recalcNsubjettiness(const pat::Jet & jet, const SVTagInfo & svTagInfo, float & tau1, float & tau2, std::vector<fastjet::PseudoJet> & currentAxes)
 {
   // need candidate-based IVF vertices so do nothing here
 }
 
 template<>
-void BTagAnalyzerLiteT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::recalcNsubjettiness(const pat::Jet & jet, const SVTagInfo & svTagInfo, float & tau1, float & tau2)
+void BTagAnalyzerLiteT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::recalcNsubjettiness(const pat::Jet & jet, const SVTagInfo & svTagInfo, float & tau1, float & tau2, std::vector<fastjet::PseudoJet> & currentAxes)
 {
   std::vector<fastjet::PseudoJet> fjParticles;
   std::vector<reco::CandidatePtr> svDaughters;
@@ -1670,6 +1684,7 @@ void BTagAnalyzerLiteT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::r
   // re-calculate N-subjettiness
   tau1 = njettiness_.getTau(1, fjParticles);
   tau2 = njettiness_.getTau(2, fjParticles);
+  currentAxes = njettiness_.currentAxes();
 }
 
 
