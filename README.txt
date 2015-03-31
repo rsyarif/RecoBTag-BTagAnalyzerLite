@@ -11,8 +11,8 @@ git clone -b 7_4_X_v1.01 git@github.com:cms-btv-pog/RecoBTag-BTagAnalyzerLite.gi
 
 copy SD files ( ShowerDeconstruction/ ) in  working area CMSSW_X/src
 
-make sure folder inputdata/ exist under ShowerDeconstruction/ 
-and has the file input_data.dat in inputdata/ for SD configurations
+make sure folder data/ exist under ShowerDeconstruction/
+and has the file input_data.dat in data/ for SD configurations
 
 scram b -j8
 
