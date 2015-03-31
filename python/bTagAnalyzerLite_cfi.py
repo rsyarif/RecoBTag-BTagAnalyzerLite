@@ -9,7 +9,7 @@ bTagAnalyzerLite = cms.EDAnalyzer("BTagAnalyzerLite",
     svComputerSubJets = cms.string('candidateCombinedSecondaryVertexV2Computer'),
 
     # Shower Deconstruction
-    SDinputcard              = cms.FileInPath('ShowerDeconstruction/inputdata/input_card.dat'), #SD parameter added by rizki
+    SDinputcard              = cms.FileInPath('ShowerDeconstruction/data/input_card.dat'), #SD parameter added by rizki
     microjetConesize         = cms.double(0.15), #SD parameter added by rizki
 
     # TagInfos (need to omit the 'TagInfos' part from the label)
