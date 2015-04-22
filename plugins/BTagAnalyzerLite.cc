@@ -1421,7 +1421,8 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
 
       //Microjet  btag & status check - rizki , comment: is there a situation when b tag is not possible?
       for (unsigned mji=0; mji< microjets.size(); mji++) { //loop microjet
-	if(microjets[mji].user_index()==1) continue;
+	microjets[mji].set_user_index(-1); //set default to -1.
+	//if(microjets[mji].pt()<=40){microjets[mji].set_user_index(0);continue;} //Not Applying Btag to Mj_pt<40
 
 	double mjeta = microjets[mji].eta();
 	double mjphi = microjets[mji].phi();
