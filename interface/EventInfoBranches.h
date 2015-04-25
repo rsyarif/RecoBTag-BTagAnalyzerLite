@@ -52,25 +52,6 @@ class EventInfoBranches {
     int   GenPruned_pdgID[1000];
     int   GenPruned_mother[1000];
 
-    int   nMuon;
-    int   Muon_isGlobal[1000];
-    int   Muon_isPF[1000];
-    int   Muon_nTkHit[1000];
-    int   Muon_nPixHit[1000];
-    int   Muon_nOutHit[1000];
-    int   Muon_nMuHit[1000];
-    int   Muon_nMatched[1000];
-    float Muon_chi2[1000];
-    float Muon_chi2Tk[1000];
-    float Muon_pt[1000];
-    float Muon_eta[1000];
-    float Muon_phi[1000];
-    float Muon_vz[1000];
-    float Muon_IP[1000];
-    float Muon_IPsig[1000];
-    float Muon_IP2D[1000];
-    float Muon_IP2Dsig[1000];
-
 
     void RegisterTree(TTree *tree) {
       tree->Branch("nBitTrigger", &nBitTrigger,  "nBitTrigger/I");
@@ -115,27 +96,6 @@ class EventInfoBranches {
       tree->Branch("PV_ndf"   , PV_ndf   , "PV_ndf[nPV]/F");
       tree->Branch("PV_isgood", PV_isgood, "PV_isgood[nPV]/I");
       tree->Branch("PV_isfake", PV_isfake, "PV_isfake[nPV]/I");
-    }
-
-    void RegisterMuonTree(TTree *tree) {
-      tree->Branch("nMuon"        , &nMuon       , "nMuon/I");
-      tree->Branch("Muon_nMuHit"  , Muon_nMuHit  , "Muon_nMuHit[nMuon]/I");
-      tree->Branch("Muon_nTkHit"  , Muon_nTkHit  , "Muon_nTkHit[nMuon]/I");
-      tree->Branch("Muon_nPixHit" , Muon_nPixHit , "Muon_nPixHit[nMuon]/I");
-      tree->Branch("Muon_nOutHit" , Muon_nOutHit , "Muon_nOutHit[nMuon]/I");
-      tree->Branch("Muon_isGlobal", Muon_isGlobal, "Muon_isGlobal[nMuon]/I");
-      tree->Branch("Muon_isPF"    , Muon_isPF    , "Muon_isPF[nMuon]/I");
-      tree->Branch("Muon_nMatched", Muon_nMatched, "Muon_nMatched[nMuon]/I");
-      tree->Branch("Muon_chi2"    , Muon_chi2    , "Muon_chi2[nMuon]/F");
-      tree->Branch("Muon_chi2Tk"  , Muon_chi2Tk  , "Muon_chi2Tk[nMuon]/F");
-      tree->Branch("Muon_pt"      , Muon_pt      , "Muon_pt[nMuon]/F");
-      tree->Branch("Muon_eta"     , Muon_eta     , "Muon_eta[nMuon]/F");
-      tree->Branch("Muon_phi"     , Muon_phi     , "Muon_phi[nMuon]/F");
-      tree->Branch("Muon_vz"      , Muon_vz      , "Muon_vz[nMuon]/F");
-      tree->Branch("Muon_IP"      , Muon_IP      , "Muon_IP[nMuon]/F");
-      tree->Branch("Muon_IPsig"   , Muon_IPsig   , "Muon_IPsig[nMuon]/F");
-      tree->Branch("Muon_IP2D"    , Muon_IP2D    , "Muon_IP2D[nMuon]/F");
-      tree->Branch("Muon_IP2Dsig" , Muon_IP2Dsig , "Muon_IP2Dsig[nMuon]/F");
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -183,27 +143,6 @@ class EventInfoBranches {
       tree->SetBranchAddress("PV_ndf"   , PV_ndf   );
       tree->SetBranchAddress("PV_isgood", PV_isgood);
       tree->SetBranchAddress("PV_isfake", PV_isfake);
-    }
-
-    void ReadMuonTree(TTree *tree) {
-      tree->SetBranchAddress("nMuon"        , &nMuon       );
-      tree->SetBranchAddress("Muon_nMuHit"  , Muon_nMuHit  );
-      tree->SetBranchAddress("Muon_nTkHit"  , Muon_nTkHit  );
-      tree->SetBranchAddress("Muon_nPixHit" , Muon_nPixHit );
-      tree->SetBranchAddress("Muon_nOutHit" , Muon_nOutHit );
-      tree->SetBranchAddress("Muon_isGlobal", Muon_isGlobal);
-      tree->SetBranchAddress("Muon_isPF"    , Muon_isPF    );
-      tree->SetBranchAddress("Muon_nMatched", Muon_nMatched);
-      tree->SetBranchAddress("Muon_chi2"    , Muon_chi2    );
-      tree->SetBranchAddress("Muon_chi2Tk"  , Muon_chi2Tk  );
-      tree->SetBranchAddress("Muon_pt"      , Muon_pt      );
-      tree->SetBranchAddress("Muon_eta"     , Muon_eta     );
-      tree->SetBranchAddress("Muon_phi"     , Muon_phi     );
-      tree->SetBranchAddress("Muon_vz"      , Muon_vz      );
-      tree->SetBranchAddress("Muon_IP"      , Muon_IP      );
-      tree->SetBranchAddress("Muon_IPsig"   , Muon_IPsig   );
-      tree->SetBranchAddress("Muon_IP2D"    , Muon_IP2D    );
-      tree->SetBranchAddress("Muon_IP2Dsig" , Muon_IP2Dsig );
     }
 };
 

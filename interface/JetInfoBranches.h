@@ -139,16 +139,27 @@ class JetInfoBranches {
     float PFElectron_IP2D[nMaxElectrons_];
 
     int   nPFMuon;
-    int   PFMuon_IdxJet[nMaxElectrons_];
-    float PFMuon_pt[nMaxElectrons_];
-    float PFMuon_eta[nMaxElectrons_];
-    float PFMuon_phi[nMaxElectrons_];
-    float PFMuon_ptrel[nMaxElectrons_];
-    float PFMuon_ratio[nMaxElectrons_];
-    float PFMuon_ratioRel[nMaxElectrons_];
-    float PFMuon_deltaR[nMaxElectrons_];
-    float PFMuon_IP[nMaxElectrons_];
-    float PFMuon_IP2D[nMaxElectrons_];
+    int   PFMuon_IdxJet[nMaxMuons_];
+    int   PFMuon_nMuHit[nMaxMuons_];
+    int   PFMuon_nTkHit[nMaxMuons_];
+    int   PFMuon_nPixHit[nMaxMuons_];
+    int   PFMuon_nOutHit[nMaxMuons_];
+    int   PFMuon_nTkLwM[nMaxMuons_];
+    int   PFMuon_nPixLwM[nMaxMuons_];
+    int   PFMuon_nMatched[nMaxMuons_];
+    float PFMuon_chi2[nMaxMuons_];
+    float PFMuon_chi2Tk[nMaxMuons_];
+    int   PFMuon_isGlobal[nMaxMuons_];
+    float PFMuon_pt[nMaxMuons_];
+    float PFMuon_eta[nMaxMuons_];
+    float PFMuon_phi[nMaxMuons_];
+    float PFMuon_ptrel[nMaxMuons_];
+    float PFMuon_ratio[nMaxMuons_];
+    float PFMuon_ratioRel[nMaxMuons_];
+    float PFMuon_deltaR[nMaxMuons_];
+    float PFMuon_IP[nMaxMuons_];
+    float PFMuon_IP2D[nMaxMuons_];
+    float PFMuon_dz[nMaxMuons_];
 
     int   nSV;
     float SV_x[nMaxSVs_];
@@ -354,7 +365,7 @@ class JetInfoBranches {
       //--------------------------------------
       // pf electron information
       //--------------------------------------
-      tree->Branch((name+"nPFElectron").c_str()         ,&nPFElectron   ,(name+"nPFElectron/I").c_str());
+      tree->Branch((name+"nPFElectron").c_str()         ,&nPFElectron        ,(name+"nPFElectron/I").c_str());
       tree->Branch((name+"PFElectron_IdxJet").c_str()   ,PFElectron_IdxJet   ,(name+"PFElectron_IdxJet["+name+"nPFElectron]/I").c_str());
       tree->Branch((name+"PFElectron_pt").c_str()       ,PFElectron_pt       ,(name+"PFElectron_pt["+name+"nPFElectron]/F").c_str());
       tree->Branch((name+"PFElectron_eta").c_str()      ,PFElectron_eta      ,(name+"PFElectron_eta["+name+"nPFElectron]/F").c_str());
@@ -371,6 +382,16 @@ class JetInfoBranches {
       //--------------------------------------
       tree->Branch((name+"nPFMuon").c_str()            ,&nPFMuon            ,(name+"nPFMuon/I").c_str());
       tree->Branch((name+"PFMuon_IdxJet").c_str()      ,PFMuon_IdxJet       ,(name+"PFMuon_IdxJet["+name+"nPFMuon]/I").c_str());
+      tree->Branch((name+"PFMuon_nMuHit").c_str()      ,PFMuon_nMuHit       ,(name+"PFMuon_nMuHit["+name+"nPFMuon]/I").c_str());
+      tree->Branch((name+"PFMuon_nTkHit").c_str()      ,PFMuon_nTkHit       ,(name+"PFMuon_nTkHit["+name+"nPFMuon]/I").c_str());
+      tree->Branch((name+"PFMuon_nPixHit").c_str()     ,PFMuon_nPixHit      ,(name+"PFMuon_nPixHit["+name+"nPFMuon]/I").c_str());
+      tree->Branch((name+"PFMuon_nOutHit").c_str()     ,PFMuon_nOutHit      ,(name+"PFMuon_nOutHit["+name+"nPFMuon]/I").c_str());
+      tree->Branch((name+"PFMuon_nTkLwM").c_str()      ,PFMuon_nTkLwM       ,(name+"PFMuon_nTkLwM["+name+"nPFMuon]/I").c_str());
+      tree->Branch((name+"PFMuon_nPixLwM").c_str()     ,PFMuon_nPixLwM      ,(name+"PFMuon_nPixLwM["+name+"nPFMuon]/I").c_str());
+      tree->Branch((name+"PFMuon_nMatched").c_str()    ,PFMuon_nMatched     ,(name+"PFMuon_nMatched["+name+"nPFMuon]/I").c_str());
+      tree->Branch((name+"PFMuon_chi2").c_str()        ,PFMuon_chi2         ,(name+"PFMuon_chi2["+name+"nPFMuon]/F").c_str());
+      tree->Branch((name+"PFMuon_chi2Tk").c_str()      ,PFMuon_chi2Tk       ,(name+"PFMuon_chi2Tk["+name+"nPFMuon]/F").c_str());
+      tree->Branch((name+"PFMuon_isGlobal").c_str()    ,PFMuon_isGlobal     ,(name+"PFMuon_isGlobal["+name+"nPFMuon]/I").c_str());
       tree->Branch((name+"PFMuon_pt").c_str()          ,PFMuon_pt           ,(name+"PFMuon_pt["+name+"nPFMuon]/F").c_str());
       tree->Branch((name+"PFMuon_eta").c_str()         ,PFMuon_eta          ,(name+"PFMuon_eta["+name+"nPFMuon]/F").c_str());
       tree->Branch((name+"PFMuon_phi").c_str()         ,PFMuon_phi          ,(name+"PFMuon_phi["+name+"nPFMuon]/F").c_str());
@@ -380,6 +401,7 @@ class JetInfoBranches {
       tree->Branch((name+"PFMuon_ratioRel").c_str()    ,PFMuon_ratioRel     ,(name+"PFMuon_ratioRel["+name+"nPFMuon]/F").c_str());
       tree->Branch((name+"PFMuon_IP").c_str()          ,PFMuon_IP           ,(name+"PFMuon_IP["+name+"nPFMuon]/F").c_str());
       tree->Branch((name+"PFMuon_IP2D").c_str()        ,PFMuon_IP2D         ,(name+"PFMuon_IP2D["+name+"nPFMuon]/F").c_str());
+      tree->Branch((name+"PFMuon_dz").c_str()          ,PFMuon_dz           ,(name+"PFMuon_dz["+name+"nPFMuon]/F").c_str());
     }
 
     void RegisterJetTrackTree(TTree *tree, std::string name="") {
@@ -669,6 +691,16 @@ class JetInfoBranches {
       //--------------------------------------
       tree->SetBranchAddress((name+"nPFMuon").c_str()            ,&nPFMuon            ) ;
       tree->SetBranchAddress((name+"PFMuon_IdxJet").c_str()      ,PFMuon_IdxJet       ) ;
+      tree->SetBranchAddress((name+"PFMuon_nMuHit").c_str()      ,PFMuon_nMuHit       ) ;
+      tree->SetBranchAddress((name+"PFMuon_nTkHit").c_str()      ,PFMuon_nTkHit       ) ;
+      tree->SetBranchAddress((name+"PFMuon_nPixHit").c_str()     ,PFMuon_nPixHit      ) ;
+      tree->SetBranchAddress((name+"PFMuon_nOutHit").c_str()     ,PFMuon_nOutHit      ) ;
+      tree->SetBranchAddress((name+"PFMuon_nTkLwM").c_str()      ,PFMuon_nTkLwM       ) ;
+      tree->SetBranchAddress((name+"PFMuon_nPixLwM").c_str()     ,PFMuon_nPixLwM      ) ;
+      tree->SetBranchAddress((name+"PFMuon_nMatched").c_str()    ,PFMuon_nMatched     ) ;
+      tree->SetBranchAddress((name+"PFMuon_chi2").c_str()        ,PFMuon_chi2         ) ;
+      tree->SetBranchAddress((name+"PFMuon_chi2Tk").c_str()      ,PFMuon_chi2Tk       ) ;
+      tree->SetBranchAddress((name+"PFMuon_isGlobal").c_str()    ,PFMuon_isGlobal     ) ;
       tree->SetBranchAddress((name+"PFMuon_pt").c_str()          ,PFMuon_pt           ) ;
       tree->SetBranchAddress((name+"PFMuon_eta").c_str()         ,PFMuon_eta          ) ;
       tree->SetBranchAddress((name+"PFMuon_phi").c_str()         ,PFMuon_phi          ) ;
@@ -678,6 +710,7 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"PFMuon_ratioRel").c_str()    ,PFMuon_ratioRel     ) ;
       tree->SetBranchAddress((name+"PFMuon_IP").c_str()          ,PFMuon_IP           ) ;
       tree->SetBranchAddress((name+"PFMuon_IP2D").c_str()        ,PFMuon_IP2D         ) ;
+      tree->SetBranchAddress((name+"PFMuon_dz").c_str()          ,PFMuon_dz           ) ;
     }
 
     void ReadJetTrackTree(TTree *tree, std::string name="") {

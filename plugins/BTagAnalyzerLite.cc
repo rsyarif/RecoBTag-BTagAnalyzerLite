@@ -33,6 +33,7 @@ Implementation:
 #include "FWCore/Utilities/interface/RegexMatch.h"
 
 #include "DataFormats/Candidate/interface/VertexCompositePtrCandidate.h"
+#include "DataFormats/Common/interface/RefToPtr.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/BTauReco/interface/JetTag.h"
 #include "DataFormats/BTauReco/interface/CandIPTagInfo.h"
@@ -134,6 +135,8 @@ class BTagAnalyzerLiteT : public edm::EDAnalyzer
     const IPTagInfo * toIPTagInfo(const pat::Jet & jet, const std::string & tagInfos);
     const SVTagInfo * toSVTagInfo(const pat::Jet & jet, const std::string & tagInfos);
 
+    const edm::Ptr<reco::Muon> matchMuon(const edm::Ptr<reco::Candidate>& theMuon, const edm::View<reco::Muon>& muons);
+
     void setTracksPVBase(const reco::TrackRef & trackRef, const edm::Handle<reco::VertexCollection> & pvHandle, int & iPV, float & PVweight);
     void setTracksPV(const TrackRef & trackRef, const edm::Handle<reco::VertexCollection> & pvHandle, int & iPV, float & PVweight);
 
@@ -166,7 +169,6 @@ class BTagAnalyzerLiteT : public edm::EDAnalyzer
     bool storeEventInfo_;
     bool produceJetTrackTree_;
     bool produceJetPFLeptonTree_;
-    bool storeMuonInfo_;
     bool storeTagVariables_;
     bool storeCSVTagVariables_;
 
@@ -251,6 +253,8 @@ class BTagAnalyzerLiteT : public edm::EDAnalyzer
     const reco::Vertex *pv;
     const GenericMVAJetTagComputer *computer;
 
+    edm::View<reco::Muon> muons ;
+
     // Generator/hadronizer type (information stored bitwise)
     unsigned int hadronizerType_;
 
@@ -283,7 +287,6 @@ BTagAnalyzerLiteT<IPTI,VTX>::BTagAnalyzerLiteT(const edm::ParameterSet& iConfig)
   storeEventInfo_ = iConfig.getParameter<bool>("storeEventInfo");
   produceJetTrackTree_  = iConfig.getParameter<bool> ("produceJetTrackTree");
   produceJetPFLeptonTree_  = iConfig.getParameter<bool> ("produceJetPFLeptonTree");
-  storeMuonInfo_ = iConfig.getParameter<bool>("storeMuonInfo");
   storeTagVariables_ = iConfig.getParameter<bool>("storeTagVariables");
   storeCSVTagVariables_ = iConfig.getParameter<bool>("storeCSVTagVariables");
   minJetPt_  = iConfig.getParameter<double>("MinPt");
@@ -359,7 +362,6 @@ BTagAnalyzerLiteT<IPTI,VTX>::BTagAnalyzerLiteT(const edm::ParameterSet& iConfig)
     EventInfo.RegisterTree(smalltree);
     if ( produceJetTrackTree_ ) EventInfo.RegisterJetTrackTree(smalltree);
   }
-  if ( storeMuonInfo_ ) EventInfo.RegisterMuonTree(smalltree);
 
   //--------------------------------------
   // jet information
@@ -459,7 +461,6 @@ void BTagAnalyzerLiteT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::E
   EventInfo.nPUtrue    = -1.;
   EventInfo.nPU        = 0;
   EventInfo.nGenPruned = 0;
-  EventInfo.nMuon   = 0;
   EventInfo.mcweight   = 1.;
 
   //---------------------------- Start MC info ---------------------------------------//
@@ -540,36 +541,9 @@ void BTagAnalyzerLiteT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::E
   //------------------------------------------------------
   // Muons
   //------------------------------------------------------
-  edm::Handle<std::vector<pat::Muon> >  muonsHandle;
-  if( storeMuonInfo_ )
-  {
-    iEvent.getByLabel(muonCollectionName_,muonsHandle);
-
-    for( std::vector<pat::Muon>::const_iterator it = muonsHandle->begin(); it != muonsHandle->end(); ++it )
-    {
-      if( !it->isGlobalMuon() ) continue;
-
-      EventInfo.Muon_isGlobal[EventInfo.nMuon] = 1;
-      EventInfo.Muon_isPF[EventInfo.nMuon]     = it->isPFMuon();
-      EventInfo.Muon_nTkHit[EventInfo.nMuon]   = it->innerTrack()->hitPattern().numberOfValidHits();
-      EventInfo.Muon_nPixHit[EventInfo.nMuon]  = it->innerTrack()->hitPattern().numberOfValidPixelHits();
-      EventInfo.Muon_nOutHit[EventInfo.nMuon]  = it->innerTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_OUTER_HITS);
-      EventInfo.Muon_nMuHit[EventInfo.nMuon]   = it->outerTrack()->hitPattern().numberOfValidMuonHits();
-      EventInfo.Muon_nMatched[EventInfo.nMuon] = it->numberOfMatches();
-      EventInfo.Muon_chi2[EventInfo.nMuon]     = it->globalTrack()->normalizedChi2();
-      EventInfo.Muon_chi2Tk[EventInfo.nMuon]   = it->innerTrack()->normalizedChi2();
-      EventInfo.Muon_pt[EventInfo.nMuon]       = it->pt();
-      EventInfo.Muon_eta[EventInfo.nMuon]      = it->eta();
-      EventInfo.Muon_phi[EventInfo.nMuon]      = it->phi();
-      EventInfo.Muon_vz[EventInfo.nMuon]       = it->vz();
-      EventInfo.Muon_IP[EventInfo.nMuon]       = it->dB(pat::Muon::PV3D);
-      EventInfo.Muon_IPsig[EventInfo.nMuon]    = (it->dB(pat::Muon::PV3D))/(it->edB(pat::Muon::PV3D));
-      EventInfo.Muon_IP2D[EventInfo.nMuon]     = it->dB(pat::Muon::PV2D);
-      EventInfo.Muon_IP2Dsig[EventInfo.nMuon]  = (it->dB(pat::Muon::PV2D))/(it->edB(pat::Muon::PV2D));
-
-      ++EventInfo.nMuon;
-    }
-  }
+  edm::Handle<edm::View<reco::Muon> >  muonsHandle;
+  iEvent.getByLabel(muonCollectionName_,muonsHandle);
+  muons = *muonsHandle;
 
   //------------------
   // Primary vertex
@@ -1024,6 +998,34 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
         JetInfo[iJetColl].PFMuon_IP[JetInfo[iJetColl].nPFMuon]        = (softPFMuTagInfo->properties(leptIdx).sip3d);
         JetInfo[iJetColl].PFMuon_IP2D[JetInfo[iJetColl].nPFMuon]      = (softPFMuTagInfo->properties(leptIdx).sip2d);
 
+        JetInfo[iJetColl].PFMuon_nMuHit[JetInfo[iJetColl].nPFMuon] = 0;
+        JetInfo[iJetColl].PFMuon_nTkHit[JetInfo[iJetColl].nPFMuon] = 0;
+        JetInfo[iJetColl].PFMuon_nPixHit[JetInfo[iJetColl].nPFMuon] = 0;
+        JetInfo[iJetColl].PFMuon_nOutHit[JetInfo[iJetColl].nPFMuon] = 0;
+        JetInfo[iJetColl].PFMuon_nTkLwM[JetInfo[iJetColl].nPFMuon] = 0;
+        JetInfo[iJetColl].PFMuon_nPixLwM[JetInfo[iJetColl].nPFMuon] = 0;
+        JetInfo[iJetColl].PFMuon_nMatched[JetInfo[iJetColl].nPFMuon] = 0;
+        JetInfo[iJetColl].PFMuon_chi2[JetInfo[iJetColl].nPFMuon] = 99;
+        JetInfo[iJetColl].PFMuon_chi2Tk[JetInfo[iJetColl].nPFMuon]= 99;
+        JetInfo[iJetColl].PFMuon_isGlobal[JetInfo[iJetColl].nPFMuon] = 0;
+        JetInfo[iJetColl].PFMuon_dz[JetInfo[iJetColl].nPFMuon] = 99;
+
+        const edm::Ptr<reco::Muon> muonPtr = matchMuon( softPFMuTagInfo->lepton(leptIdx), muons );
+        if ( muonPtr.isNonnull() && muonPtr.isAvailable() && muonPtr->isGlobalMuon() ) {
+
+          JetInfo[iJetColl].PFMuon_nMuHit[JetInfo[iJetColl].nPFMuon] = muonPtr->outerTrack()->hitPattern().numberOfValidMuonHits();
+          JetInfo[iJetColl].PFMuon_nTkHit[JetInfo[iJetColl].nPFMuon] = muonPtr->innerTrack()->hitPattern().numberOfValidHits();
+          JetInfo[iJetColl].PFMuon_nPixHit[JetInfo[iJetColl].nPFMuon] = muonPtr->innerTrack()->hitPattern().numberOfValidPixelHits();
+          JetInfo[iJetColl].PFMuon_nOutHit[JetInfo[iJetColl].nPFMuon] = muonPtr->innerTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_OUTER_HITS);
+          JetInfo[iJetColl].PFMuon_nTkLwM[JetInfo[iJetColl].nPFMuon] = muonPtr->innerTrack()->hitPattern().trackerLayersWithMeasurement();
+          JetInfo[iJetColl].PFMuon_nPixLwM[JetInfo[iJetColl].nPFMuon] = muonPtr->innerTrack()->hitPattern().pixelLayersWithMeasurement();
+          JetInfo[iJetColl].PFMuon_nMatched[JetInfo[iJetColl].nPFMuon] = muonPtr->numberOfMatchedStations();
+          JetInfo[iJetColl].PFMuon_chi2[JetInfo[iJetColl].nPFMuon] = muonPtr->globalTrack()->normalizedChi2();
+          JetInfo[iJetColl].PFMuon_chi2Tk[JetInfo[iJetColl].nPFMuon]= muonPtr->innerTrack()->normalizedChi2();
+          JetInfo[iJetColl].PFMuon_isGlobal[JetInfo[iJetColl].nPFMuon] = 1;
+          JetInfo[iJetColl].PFMuon_dz[JetInfo[iJetColl].nPFMuon] = muonPtr->muonBestTrack()->dz(pv->position());
+        }
+
         ++JetInfo[iJetColl].nPFMuon;
       }
 
@@ -1404,6 +1406,32 @@ template<typename IPTI,typename VTX>
 void BTagAnalyzerLiteT<IPTI,VTX>::endJob() {
 }
 
+template<typename IPTI,typename VTX>
+const edm::Ptr<reco::Muon> BTagAnalyzerLiteT<IPTI,VTX>::matchMuon(const edm::Ptr<reco::Candidate>& theMuon, const edm::View<reco::Muon>& muons ){
+
+  const pat::PackedCandidate * pcand = dynamic_cast<const pat::PackedCandidate *>(theMuon.get());
+
+  if(pcand) // MiniAOD case
+  {
+    for(edm::View<reco::Muon>::const_iterator muon = muons.begin(); muon != muons.end(); ++muon )
+    {
+       const pat::Muon * patmuon = dynamic_cast<const pat::Muon *>(&(*muon));
+
+       if(patmuon)
+       {
+         if(patmuon->originalObjectRef()==theMuon)
+           return muons.ptrAt(muon - muons.begin());
+       }
+    }
+    return edm::Ptr<reco::Muon>();
+  }
+  else
+  {
+    const reco::PFCandidate * pfcand = dynamic_cast<const reco::PFCandidate *>(theMuon.get());
+
+    return edm::refToPtr( pfcand->muonRef() );
+  }
+}
 
 template<typename IPTI,typename VTX>
 bool BTagAnalyzerLiteT<IPTI,VTX>::isHardProcess(const int status)

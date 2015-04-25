@@ -218,7 +218,6 @@ pvSource = 'offlinePrimaryVertices'
 svSource = 'inclusiveCandidateSecondaryVertices'
 muSource = 'muons'
 elSource = 'gedGsfElectrons'
-patMuons = 'selectedPatMuons'
 ## If running on miniAOD
 if options.miniAOD:
     genParticles = 'prunedGenParticles'
@@ -229,7 +228,6 @@ if options.miniAOD:
     svSource = 'slimmedSecondaryVertices'
     muSource = 'slimmedMuons'
     elSource = 'slimmedElectrons'
-    patMuons = 'slimmedMuons'
 
 process = cms.Process("BTagAna")
 
@@ -724,12 +722,11 @@ if options.useLegacyTaggers:
     process.btagana = bTagAnalyzerLiteLegacy.clone()
 process.btagana.produceJetTrackTree    = True ## True if you want to keep info for tracks associated to jets
 process.btagana.produceJetPFLeptonTree = True ## True if you want to keep PF lepton info
-process.btagana.storeMuonInfo          = False ## True if you want to keep muon info
 process.btagana.storeTagVariables      = False ## True if you want to keep TagInfo TaggingVariables
 process.btagana.storeCSVTagVariables   = True  ## True if you want to keep CSV TaggingVariables
 process.btagana.primaryVertexColl      = cms.InputTag(pvSource)
 process.btagana.Jets                   = cms.InputTag('selectedPatJets'+postfix)
-process.btagana.muonCollectionName     = cms.InputTag(patMuons)
+process.btagana.muonCollectionName     = cms.InputTag(muSource)
 process.btagana.triggerTable           = cms.InputTag('TriggerResults::HLT') # Data and MC
 
 if options.runSubJets:
