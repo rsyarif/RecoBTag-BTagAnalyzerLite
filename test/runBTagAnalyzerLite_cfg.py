@@ -580,7 +580,7 @@ if options.runSubJets:
     process.Qjets = QJetsAdder.clone(
         src = cms.InputTag("PFJetsCHS"),
         jetRad = cms.double(options.jetRadius),
-        jetAlgo = cms.string("AK"),
+        jetAlgo = cms.string(algoLabel),
     )
 
     if options.runQjets:
