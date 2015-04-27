@@ -9,6 +9,7 @@ const UInt_t nMaxMuons_= 10000;
 const UInt_t nMaxElectrons_= 10000;
 const UInt_t nMaxSVs_= 10000;
 
+
 class JetInfoBranches {
 
   public :
@@ -45,9 +46,6 @@ class JetInfoBranches {
     float Jet_SoftEl[nMaxJets_];
     int   Jet_ntracks[nMaxJets_];
     int   Jet_nseltracks[nMaxJets_];
-    int   Jet_nsharedtracks[nMaxJets_];
-    int   Jet_nsubjettracks[nMaxJets_];
-    int   Jet_nsharedsubjettracks[nMaxJets_];
     int   Jet_flavour[nMaxJets_];
     int   Jet_nbHadrons[nMaxJets_];
     int   Jet_ncHadrons[nMaxJets_];
@@ -59,11 +57,16 @@ class JetInfoBranches {
     int   Jet_looseID[nMaxJets_];
     int   Jet_tightID[nMaxJets_];
     int   Jet_FatJetIdx[nMaxJets_];
-    float Jet_ptGroomed[nMaxJets_];
-    float Jet_jesGroomed[nMaxJets_];
-    float Jet_etaGroomed[nMaxJets_];
-    float Jet_phiGroomed[nMaxJets_];
-    float Jet_massGroomed[nMaxJets_];
+    float Jet_ptSoftDrop[nMaxJets_];
+    float Jet_etaSoftDrop[nMaxJets_];
+    float Jet_phiSoftDrop[nMaxJets_];
+    float Jet_massSoftDrop[nMaxJets_];
+    float Jet_jecF0SoftDrop[nMaxJets_];
+    float Jet_ptPruned[nMaxJets_];
+    float Jet_etaPruned[nMaxJets_];
+    float Jet_phiPruned[nMaxJets_];
+    float Jet_massPruned[nMaxJets_];
+    float Jet_jecF0Pruned[nMaxJets_];
     float Jet_qvol[nMaxJets_];
     float Jet_tau1[nMaxJets_];
     float Jet_tau2[nMaxJets_];
@@ -75,9 +78,6 @@ class JetInfoBranches {
     float Jet_tauAxis2_px[nMaxJets_];
     float Jet_tauAxis2_py[nMaxJets_];
     float Jet_tauAxis2_pz[nMaxJets_];
-    int   Jet_nSubJets[nMaxJets_];
-    int   Jet_nFirstSJ[nMaxJets_];
-    int   Jet_nLastSJ[nMaxJets_];
     int   Jet_nFirstTrkTagVar[nMaxJets_];
     int   Jet_nLastTrkTagVar[nMaxJets_];
     int   Jet_nFirstSVTagVar[nMaxJets_];
@@ -86,9 +86,6 @@ class JetInfoBranches {
     int   Jet_nLastTrkTagVarCSV[nMaxJets_];
     int   Jet_nFirstTrkEtaRelTagVarCSV[nMaxJets_];
     int   Jet_nLastTrkEtaRelTagVarCSV[nMaxJets_];
-
-    int   nSubJet;
-    int   SubJetIdx[nMaxJets_];
 
     int   nTrack;
     float Track_dxy[nMaxTrk_];
@@ -559,11 +556,16 @@ class JetInfoBranches {
 
     void RegisterFatJetSpecificTree(TTree *tree, std::string name="") {
       if(name!="") name += ".";
-      tree->Branch((name+"Jet_ptGroomed").c_str(),   Jet_ptGroomed   ,(name+"Jet_ptGroomed["+name+"nJet]/F").c_str());
-      tree->Branch((name+"Jet_jesGroomed").c_str(),  Jet_jesGroomed  ,(name+"Jet_jesGroomed["+name+"nJet]/F").c_str());
-      tree->Branch((name+"Jet_etaGroomed").c_str(),  Jet_etaGroomed  ,(name+"Jet_etaGroomed["+name+"nJet]/F").c_str());
-      tree->Branch((name+"Jet_phiGroomed").c_str(),  Jet_phiGroomed  ,(name+"Jet_phiGroomed["+name+"nJet]/F").c_str());
-      tree->Branch((name+"Jet_massGroomed").c_str(), Jet_massGroomed ,(name+"Jet_massGroomed["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_ptSoftDrop").c_str(),    Jet_ptSoftDrop    ,(name+"Jet_ptSoftDrop["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_etaSoftDrop").c_str(),   Jet_etaSoftDrop   ,(name+"Jet_etaSoftDrop["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_phiSoftDrop").c_str(),   Jet_phiSoftDrop   ,(name+"Jet_phiSoftDrop["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_massSoftDrop").c_str(),  Jet_massSoftDrop  ,(name+"Jet_massSoftDrop["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_jecF0SoftDrop").c_str(), Jet_jecF0SoftDrop ,(name+"Jet_jecF0SoftDrop["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_ptPruned").c_str(),    Jet_ptPruned    ,(name+"Jet_ptPruned["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_etaPruned").c_str(),   Jet_etaPruned   ,(name+"Jet_etaPruned["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_phiPruned").c_str(),   Jet_phiPruned   ,(name+"Jet_phiPruned["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_massPruned").c_str(),  Jet_massPruned  ,(name+"Jet_massPruned["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_jecF0Pruned").c_str(), Jet_jecF0Pruned ,(name+"Jet_jecF0Pruned["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_qvol").c_str(),        Jet_qvol        ,(name+"Jet_qvol["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_tau1").c_str(),        Jet_tau1        ,(name+"Jet_tau1["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_tau2").c_str(),        Jet_tau2        ,(name+"Jet_tau2["+name+"nJet]/F").c_str());
@@ -575,14 +577,6 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_tauAxis2_px").c_str(), Jet_tauAxis2_px ,(name+"Jet_tauAxis2_px["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_tauAxis2_py").c_str(), Jet_tauAxis2_py ,(name+"Jet_tauAxis2_py["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_tauAxis2_pz").c_str(), Jet_tauAxis2_pz ,(name+"Jet_tauAxis2_pz["+name+"nJet]/F").c_str());
-      tree->Branch((name+"Jet_nSubJets").c_str(),    Jet_nSubJets    ,(name+"Jet_nSubJets["+name+"nJet]/I").c_str());
-      tree->Branch((name+"Jet_nFirstSJ").c_str(),    Jet_nFirstSJ    ,(name+"Jet_nFirstSJ["+name+"nJet]/I").c_str());
-      tree->Branch((name+"Jet_nLastSJ").c_str(),     Jet_nLastSJ     ,(name+"Jet_nLastSJ["+name+"nJet]/I").c_str());
-      tree->Branch((name+"nSubJet").c_str(),         &nSubJet        ,(name+"nSubJet/I").c_str());
-      tree->Branch((name+"SubJetIdx").c_str(),       SubJetIdx       ,(name+"SubJetIdx["+name+"nSubJet]/I").c_str());
-      tree->Branch((name+"Jet_nsharedtracks").c_str(), Jet_nsharedtracks ,(name+"Jet_nsharedtracks["+name+"nJet]/I").c_str());
-      tree->Branch((name+"Jet_nsubjettracks").c_str(), Jet_nsubjettracks ,(name+"Jet_nsubjettracks["+name+"nJet]/I").c_str());
-      tree->Branch((name+"Jet_nsharedsubjettracks").c_str(), Jet_nsharedsubjettracks ,(name+"Jet_nsharedsubjettracks["+name+"nJet]/I").c_str());
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -869,11 +863,16 @@ class JetInfoBranches {
 
     void ReadFatJetSpecificTree(TTree *tree, std::string name="") {
       if(name!="") name += ".";
-      tree->SetBranchAddress((name+"Jet_ptGroomed").c_str(),   Jet_ptGroomed    );
-      tree->SetBranchAddress((name+"Jet_jesGroomed").c_str(),  Jet_jesGroomed   );
-      tree->SetBranchAddress((name+"Jet_etaGroomed").c_str(),  Jet_etaGroomed   );
-      tree->SetBranchAddress((name+"Jet_phiGroomed").c_str(),  Jet_phiGroomed   );
-      tree->SetBranchAddress((name+"Jet_massGroomed").c_str(), Jet_massGroomed  );
+      tree->SetBranchAddress((name+"Jet_ptSoftDrop").c_str(),    Jet_ptSoftDrop    );
+      tree->SetBranchAddress((name+"Jet_etaSoftDrop").c_str(),   Jet_etaSoftDrop   );
+      tree->SetBranchAddress((name+"Jet_phiSoftDrop").c_str(),   Jet_phiSoftDrop   );
+      tree->SetBranchAddress((name+"Jet_massSoftDrop").c_str(),  Jet_massSoftDrop  );
+      tree->SetBranchAddress((name+"Jet_jecF0SoftDrop").c_str(), Jet_jecF0SoftDrop );
+      tree->SetBranchAddress((name+"Jet_ptPruned").c_str(),    Jet_ptPruned    );
+      tree->SetBranchAddress((name+"Jet_etaPruned").c_str(),   Jet_etaPruned   );
+      tree->SetBranchAddress((name+"Jet_phiPruned").c_str(),   Jet_phiPruned   );
+      tree->SetBranchAddress((name+"Jet_massPruned").c_str(),  Jet_massPruned  );
+      tree->SetBranchAddress((name+"Jet_jecF0Pruned").c_str(), Jet_jecF0Pruned );
       tree->SetBranchAddress((name+"Jet_qvol").c_str(),        Jet_qvol        );
       tree->SetBranchAddress((name+"Jet_tau1").c_str(),        Jet_tau1        );
       tree->SetBranchAddress((name+"Jet_tau2").c_str(),        Jet_tau2        );
@@ -885,14 +884,55 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Jet_tauAxis2_px").c_str(),  Jet_tauAxis2_px  );
       tree->SetBranchAddress((name+"Jet_tauAxis2_py").c_str(),  Jet_tauAxis2_py  );
       tree->SetBranchAddress((name+"Jet_tauAxis2_pz").c_str(),  Jet_tauAxis2_pz  );
-      tree->SetBranchAddress((name+"Jet_nSubJets").c_str(),    Jet_nSubJets    );
-      tree->SetBranchAddress((name+"Jet_nFirstSJ").c_str(),    Jet_nFirstSJ    );
-      tree->SetBranchAddress((name+"Jet_nLastSJ").c_str(),     Jet_nLastSJ     );
-      tree->SetBranchAddress((name+"nSubJet").c_str(),         &nSubJet        );
-      tree->SetBranchAddress((name+"SubJetIdx").c_str(),       SubJetIdx       );
-      tree->SetBranchAddress((name+"Jet_nsharedtracks").c_str(), Jet_nsharedtracks );
-      tree->SetBranchAddress((name+"Jet_nsubjettracks").c_str(), Jet_nsubjettracks );
-      tree->SetBranchAddress((name+"Jet_nsharedsubjettracks").c_str(), Jet_nsharedsubjettracks );
+    }
+};
+
+
+class SubJetInfoBranches {
+
+  public :
+
+    int   Jet_nSubJets[nMaxJets_];
+    int   Jet_nFirstSJ[nMaxJets_];
+    int   Jet_nLastSJ[nMaxJets_];
+    int   Jet_nsharedtracks[nMaxJets_];
+    int   Jet_nsubjettracks[nMaxJets_];
+    int   Jet_nsharedsubjettracks[nMaxJets_];
+
+    int   nSubJet;
+    int   SubJetIdx[nMaxJets_];
+
+
+    void RegisterTree(TTree *tree, std::string name="", std::string postfix="") {
+      if(name!="") name += ".";
+      if(postfix!="") postfix = "_" + postfix;
+
+      tree->Branch((name+"Jet_nSubJets"+postfix).c_str(),            Jet_nSubJets            ,(name+"Jet_nSubJets"+postfix+"["+name+"nJet]/I").c_str());
+      tree->Branch((name+"Jet_nFirstSJ"+postfix).c_str(),            Jet_nFirstSJ            ,(name+"Jet_nFirstSJ"+postfix+"["+name+"nJet]/I").c_str());
+      tree->Branch((name+"Jet_nLastSJ"+postfix).c_str(),             Jet_nLastSJ             ,(name+"Jet_nLastSJ"+postfix+"["+name+"nJet]/I").c_str());
+      tree->Branch((name+"Jet_nsharedtracks"+postfix).c_str(),       Jet_nsharedtracks       ,(name+"Jet_nsharedtracks"+postfix+"["+name+"nJet]/I").c_str());
+      tree->Branch((name+"Jet_nsubjettracks"+postfix).c_str(),       Jet_nsubjettracks       ,(name+"Jet_nsubjettracks"+postfix+"["+name+"nJet]/I").c_str());
+      tree->Branch((name+"Jet_nsharedsubjettracks"+postfix).c_str(), Jet_nsharedsubjettracks ,(name+"Jet_nsharedsubjettracks"+postfix+"["+name+"nJet]/I").c_str());
+
+      tree->Branch((name+"nSubJet"+postfix).c_str(),                 &nSubJet                ,(name+"nSubJet"+postfix+"/I").c_str());
+      tree->Branch((name+"SubJetIdx"+postfix).c_str(),               SubJetIdx               ,(name+"SubJetIdx"+postfix+"["+name+"nSubJet"+postfix+"]/I").c_str());
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+
+    void ReadTree(TTree *tree, std::string name="", std::string postfix="") {
+      if (name!="") name += ".";
+      if(postfix!="") postfix = "_" + postfix;
+
+      tree->SetBranchAddress((name+"Jet_nSubJets"+postfix).c_str(),            Jet_nSubJets    );
+      tree->SetBranchAddress((name+"Jet_nFirstSJ"+postfix).c_str(),            Jet_nFirstSJ    );
+      tree->SetBranchAddress((name+"Jet_nLastSJ"+postfix).c_str(),             Jet_nLastSJ     );
+      tree->SetBranchAddress((name+"Jet_nsharedtracks"+postfix).c_str(),       Jet_nsharedtracks );
+      tree->SetBranchAddress((name+"Jet_nsubjettracks"+postfix).c_str(),       Jet_nsubjettracks );
+      tree->SetBranchAddress((name+"Jet_nsharedsubjettracks"+postfix).c_str(), Jet_nsharedsubjettracks );
+
+      tree->SetBranchAddress((name+"nSubJet"+postfix).c_str(),                 &nSubJet        );
+      tree->SetBranchAddress((name+"SubJetIdx"+postfix).c_str(),               SubJetIdx       );
     }
 };
 

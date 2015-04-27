@@ -1,6 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 bTagAnalyzerLiteCommon = cms.PSet(
+    runFatJets               = cms.bool(False),
     runSubJets               = cms.bool(False),
     allowJetSkipping         = cms.bool(True),
     storeEventInfo           = cms.bool(True),
@@ -11,9 +12,10 @@ bTagAnalyzerLiteCommon = cms.PSet(
     MaxEta                   = cms.double(2.5),
     MinPt                    = cms.double(20.0),
     src                      = cms.InputTag('generator'),
+    BranchNamePrefix         = cms.string(''),
     Jets                     = cms.InputTag('selectedPatJets'),
-    FatJets                  = cms.InputTag('selectedPatJets'),
-    GroomedFatJets           = cms.InputTag('selectedPatJetsAK8PrunedPFPacked'),
+    SubJets                  = cms.VInputTag(),
+    SubJetLabels             = cms.vstring(),
     muonCollectionName       = cms.InputTag('muons'),
     triggerTable             = cms.InputTag('TriggerResults'),
     prunedGenParticles       = cms.InputTag('prunedGenParticlesBoost'),
