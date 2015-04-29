@@ -697,6 +697,7 @@ for m in ['patJets'+postfix, 'patJetsPFCHS'+postfix, 'patJetsSoftDropSubjetsPFCH
 #-------------------------------------
 ## Adapt fat jet b tagging
 if options.runFatJets:
+    getattr(process,'softPFElectronsTagInfosPFCHS'+postfix).DeltaRElectronJet = cms.double(options.jetRadius) # default is 0.4
     if options.useLegacyTaggers:
         # Set the cone size for the jet-track association to the jet radius
         getattr(process,'jetTracksAssociatorAtVertexPFCHS'+postfix).coneSize = cms.double(options.jetRadius) # default is 0.4
