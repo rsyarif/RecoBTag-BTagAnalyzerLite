@@ -265,6 +265,8 @@ class BTagAnalyzerLiteT : public edm::EDAnalyzer
     PFJetIDSelectionFunctor pfjetIDLoose_;
     PFJetIDSelectionFunctor pfjetIDTight_;
 
+    const double beta_;
+    const double R0_;
     // N-subjettiness calculator
     fastjet::contrib::Njettiness njettiness_;
 };
@@ -277,7 +279,9 @@ BTagAnalyzerLiteT<IPTI,VTX>::BTagAnalyzerLiteT(const edm::ParameterSet& iConfig)
   hadronizerType_(0),
   pfjetIDLoose_( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE ),
   pfjetIDTight_( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::TIGHT ),
-  njettiness_(fastjet::contrib::OnePass_KT_Axes(), fastjet::contrib::NormalizedMeasure(1.0,0.8))
+  beta_(iConfig.getParameter<double>("beta")),
+  R0_(iConfig.getParameter<double>("R0")),
+  njettiness_(fastjet::contrib::OnePass_KT_Axes(), fastjet::contrib::NormalizedMeasure(beta_,R0_))
 {
   //now do what ever initialization you need
   std::string module_type  = iConfig.getParameter<std::string>("@module_type");

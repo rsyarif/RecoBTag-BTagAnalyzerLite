@@ -593,7 +593,7 @@ if options.runFatJets:
 
     process.Njettiness = Njettiness.clone(
         src = cms.InputTag("PFJetsCHS"),
-        cone = cms.double(options.jetRadius)
+        R0  = cms.double(options.jetRadius)
     )
 
     getattr(process,'patJetsPFCHS'+postfix).userData.userFloats.src += ['Njettiness:tau1','Njettiness:tau2','Njettiness:tau3']
@@ -765,6 +765,7 @@ if options.runFatJets:
     process.btaganaFatJets = process.btagana.clone(
         storeEventInfo      = cms.bool(not options.processStdAK4Jets),
         allowJetSkipping    = cms.bool(False),
+        R0                  = cms.double(options.jetRadius),
         BranchNamePrefix    = cms.string('FatJetInfo'),
         Jets                = cms.InputTag('packedPatJetsPFCHS'),
         SubJets             = cms.VInputTag(),

@@ -20,6 +20,8 @@ bTagAnalyzerLiteCommon = cms.PSet(
     triggerTable             = cms.InputTag('TriggerResults'),
     prunedGenParticles       = cms.InputTag('prunedGenParticlesBoost'),
     primaryVertexColl        = cms.InputTag('offlinePrimaryVertices'),
+    beta                     = cms.double(1.0),
+    R0                       = cms.double(0.8),
     TriggerPathNames = cms.vstring(
         "HLT_HT750_v*"
     )
