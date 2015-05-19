@@ -856,6 +856,7 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
       JetInfo[iJetColl].Jet_tau1IVF[JetInfo[iJetColl].nJet] = tau1IVF;
       JetInfo[iJetColl].Jet_tau2IVF[JetInfo[iJetColl].nJet] = tau2IVF;
 
+      // store N-subjettiness axes
       if(currentAxes.size()>0)
       {
         JetInfo[iJetColl].Jet_tauAxis1_px[JetInfo[iJetColl].nJet] = currentAxes[0].px();
@@ -917,7 +918,6 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
 
         JetInfo[iJetColl].Track_dxy[JetInfo[iJetColl].nTrack]      = ptrack.dxy(pv->position());
         JetInfo[iJetColl].Track_dz[JetInfo[iJetColl].nTrack]       = ptrack.dz(pv->position());
-        JetInfo[iJetColl].Track_zIP[JetInfo[iJetColl].nTrack]      = ptrack.dz()-(*pv).z();
 
         float deltaR = reco::deltaR( ptrack.eta(), ptrack.phi(),
                                      JetInfo[iJetColl].Jet_eta[JetInfo[iJetColl].nJet], JetInfo[iJetColl].Jet_phi[JetInfo[iJetColl].nJet] );

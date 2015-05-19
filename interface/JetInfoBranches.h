@@ -90,7 +90,6 @@ class JetInfoBranches {
     int   nTrack;
     float Track_dxy[nMaxTrk_];
     float Track_dz[nMaxTrk_];
-    float Track_zIP[nMaxTrk_];
     float Track_LongIP[nMaxTrk_];
     float Track_length[nMaxTrk_];
     float Track_dist[nMaxTrk_];
@@ -184,7 +183,7 @@ class JetInfoBranches {
     float SV_EnergyRatio[nMaxSVs_];
     float SV_dir_x[nMaxSVs_];
     float SV_dir_y[nMaxSVs_];
-    float SV_dir_z[nMaxSVs_]; 	  
+    float SV_dir_z[nMaxSVs_];
 
     // TagInfo TaggingVariables
     // per jet
@@ -347,14 +346,14 @@ class JetInfoBranches {
       tree->Branch((name+"SV_flight2DErr").c_str()     ,SV_flight2DErr     ,(name+"SV_flight2DErr["+name+"nSV]/F").c_str());
       tree->Branch((name+"SV_totCharge").c_str()       ,SV_totCharge       ,(name+"SV_totCharge ["+name+"nSV]/F").c_str());
       tree->Branch((name+"SV_vtxDistJetAxis").c_str()  ,SV_vtxDistJetAxis  ,(name+"SV_vtxDistJetAxis ["+name+"nSV]/F").c_str());
-      tree->Branch((name+"SV_EnergyRatio").c_str()  ,SV_EnergyRatio  ,(name+"SV_EnergyRatio ["+name+"nSV]/F").c_str());	
-      tree->Branch((name+"SV_dir_x").c_str()  ,SV_dir_x  ,(name+"SV_dir_x ["+name+"nSV]/F").c_str());
-      tree->Branch((name+"SV_dir_y").c_str()  ,SV_dir_y  ,(name+"SV_dir_y ["+name+"nSV]/F").c_str());
-      tree->Branch((name+"SV_dir_z").c_str()  ,SV_dir_z  ,(name+"SV_dir_z ["+name+"nSV]/F").c_str());	
       tree->Branch((name+"SV_nTrk").c_str()            ,SV_nTrk            ,(name+"SV_nTrk["+name+"nSV]/I").c_str());
       tree->Branch((name+"SV_mass").c_str()            ,SV_mass            ,(name+"SV_mass["+name+"nSV]/F").c_str());
       tree->Branch((name+"SV_vtx_eta").c_str()         ,SV_vtx_eta         ,(name+"SV_vtx_eta["+name+"nSV]/F").c_str());
       tree->Branch((name+"SV_vtx_phi").c_str()         ,SV_vtx_phi         ,(name+"SV_vtx_phi["+name+"nSV]/F").c_str());
+      tree->Branch((name+"SV_EnergyRatio").c_str()     ,SV_EnergyRatio     ,(name+"SV_EnergyRatio ["+name+"nSV]/F").c_str());
+      tree->Branch((name+"SV_dir_x").c_str()           ,SV_dir_x           ,(name+"SV_dir_x ["+name+"nSV]/F").c_str());
+      tree->Branch((name+"SV_dir_y").c_str()           ,SV_dir_y           ,(name+"SV_dir_y ["+name+"nSV]/F").c_str());
+      tree->Branch((name+"SV_dir_z").c_str()           ,SV_dir_z           ,(name+"SV_dir_z ["+name+"nSV]/F").c_str());
     }
 
     void RegisterJetPFLeptonTree(TTree *tree, std::string name="") {
@@ -409,7 +408,6 @@ class JetInfoBranches {
       tree->Branch((name+"nTrack").c_str()           ,&nTrack          ,(name+"nTrack/I").c_str());
       tree->Branch((name+"Track_dxy").c_str()        ,Track_dxy             ,(name+"Track_dxy["+name+"nTrack]/F").c_str());
       tree->Branch((name+"Track_dz").c_str()         ,Track_dz         ,(name+"Track_dz["+name+"nTrack]/F").c_str());
-      tree->Branch((name+"Track_zIP").c_str()        ,Track_zIP             ,(name+"Track_zIP["+name+"nTrack]/F").c_str());
       tree->Branch((name+"Track_length").c_str()     ,Track_length     ,(name+"Track_length["+name+"nTrack]/F").c_str());
       tree->Branch((name+"Track_dist").c_str()       ,Track_dist            ,(name+"Track_dist["+name+"nTrack]/F").c_str());
       tree->Branch((name+"Track_IP2D").c_str()       ,Track_IP2D            ,(name+"Track_IP2D["+name+"nTrack]/F").c_str());
@@ -614,9 +612,9 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Jet_CombIVF_P").c_str(),   Jet_CombIVF_P   );
       tree->SetBranchAddress((name+"Jet_CombIVF_N").c_str(),   Jet_CombIVF_N   );
 
-      tree->SetBranchAddress((name+"Jet_SoftMuN").c_str(), Jet_SoftMuN     );
-      tree->SetBranchAddress((name+"Jet_SoftMuP").c_str(), Jet_SoftMuP     );
-      tree->SetBranchAddress((name+"Jet_SoftMu").c_str(),  Jet_SoftMu      );
+      tree->SetBranchAddress((name+"Jet_SoftMuN").c_str(),     Jet_SoftMuN     );
+      tree->SetBranchAddress((name+"Jet_SoftMuP").c_str(),     Jet_SoftMuP     );
+      tree->SetBranchAddress((name+"Jet_SoftMu").c_str(),      Jet_SoftMu      );
 
       tree->SetBranchAddress((name+"Jet_SoftElN").c_str(),     Jet_SoftElN     );
       tree->SetBranchAddress((name+"Jet_SoftElP").c_str(),     Jet_SoftElP     );
@@ -653,14 +651,14 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"SV_flight2DErr").c_str()     ,SV_flight2DErr     ) ;
       tree->SetBranchAddress((name+"SV_totCharge").c_str()       ,SV_totCharge       ) ;
       tree->SetBranchAddress((name+"SV_vtxDistJetAxis").c_str()  ,SV_vtxDistJetAxis  ) ;
-      tree->SetBranchAddress((name+"SV_EnergyRatio").c_str()     ,SV_EnergyRatio     ) ;
-      tree->SetBranchAddress((name+"SV_dir_x").c_str()           ,SV_dir_x           ) ;
-      tree->SetBranchAddress((name+"SV_dir_y").c_str()           ,SV_dir_y           ) ;
-      tree->SetBranchAddress((name+"SV_dir_z").c_str()           ,SV_dir_z           ) ;
       tree->SetBranchAddress((name+"SV_nTrk").c_str()            ,SV_nTrk            ) ;
       tree->SetBranchAddress((name+"SV_mass").c_str()            ,SV_mass            ) ;
       tree->SetBranchAddress((name+"SV_vtx_eta").c_str()         ,SV_vtx_eta         ) ;
       tree->SetBranchAddress((name+"SV_vtx_phi").c_str()         ,SV_vtx_phi         ) ;
+      tree->SetBranchAddress((name+"SV_EnergyRatio").c_str()     ,SV_EnergyRatio     ) ;
+      tree->SetBranchAddress((name+"SV_dir_x").c_str()           ,SV_dir_x           ) ;
+      tree->SetBranchAddress((name+"SV_dir_y").c_str()           ,SV_dir_y           ) ;
+      tree->SetBranchAddress((name+"SV_dir_z").c_str()           ,SV_dir_z           ) ;
     }
 
     void ReadJetPFLeptonTree(TTree *tree, std::string name="") {
@@ -715,7 +713,6 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"nTrack").c_str()          ,&nTrack            ) ;
       tree->SetBranchAddress((name+"Track_dxy").c_str()       ,Track_dxy          ) ;
       tree->SetBranchAddress((name+"Track_dz").c_str()        ,Track_dz           ) ;
-      tree->SetBranchAddress((name+"Track_zIP").c_str()       ,Track_zIP          ) ;
       tree->SetBranchAddress((name+"Track_length").c_str()    ,Track_length   ) ;
       tree->SetBranchAddress((name+"Track_dist").c_str()      ,Track_dist     ) ;
       tree->SetBranchAddress((name+"Track_IP2D").c_str()      ,Track_IP2D     ) ;
