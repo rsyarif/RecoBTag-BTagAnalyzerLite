@@ -44,6 +44,7 @@ class JetInfoBranches {
     float Jet_SoftElN[nMaxJets_];
     float Jet_SoftElP[nMaxJets_];
     float Jet_SoftEl[nMaxJets_];
+    float Jet_DoubleSV[nMaxJets_];
     int   Jet_ntracks[nMaxJets_];
     int   Jet_nseltracks[nMaxJets_];
     int   Jet_flavour[nMaxJets_];
@@ -327,6 +328,8 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_SoftElN").c_str(),     Jet_SoftElN     ,(name+"Jet_SoftElN["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_SoftElP").c_str(),     Jet_SoftElP     ,(name+"Jet_SoftElP["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_SoftEl").c_str(),      Jet_SoftEl      ,(name+"Jet_SoftEl["+name+"nJet]/F").c_str());
+
+      tree->Branch((name+"Jet_DoubleSV").c_str(),    Jet_DoubleSV    ,(name+"Jet_DoubleSV["+name+"nJet]/F").c_str());
 
       tree->Branch((name+"Jet_nFirstTrack").c_str(), Jet_nFirstTrack ,(name+"Jet_nFirstTrack["+name+"nJet]/I").c_str());
       tree->Branch((name+"Jet_nLastTrack").c_str(),  Jet_nLastTrack  ,(name+"Jet_nLastTrack["+name+"nJet]/I").c_str());
@@ -646,6 +649,8 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Jet_SoftElN").c_str(),     Jet_SoftElN     );
       tree->SetBranchAddress((name+"Jet_SoftElP").c_str(),     Jet_SoftElP     );
       tree->SetBranchAddress((name+"Jet_SoftEl").c_str(),      Jet_SoftEl      );
+
+      tree->SetBranchAddress((name+"Jet_DoubleSV").c_str(),    Jet_DoubleSV    );
 
       tree->SetBranchAddress((name+"Jet_nFirstTrack").c_str(), Jet_nFirstTrack );
       tree->SetBranchAddress((name+"Jet_nLastTrack").c_str(),  Jet_nLastTrack  );

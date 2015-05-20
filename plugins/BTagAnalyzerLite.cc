@@ -220,6 +220,8 @@ class BTagAnalyzerLiteT : public edm::EDAnalyzer
     std::string softPFElectronNegBJetTags_;
     std::string softPFElectronPosBJetTags_;
 
+    std::string doubleSVBJetTags_;
+
     std::string ipTagInfos_;
     std::string svTagInfos_;
     std::string softPFMuonTagInfos_;
@@ -359,6 +361,8 @@ BTagAnalyzerLiteT<IPTI,VTX>::BTagAnalyzerLiteT(const edm::ParameterSet& iConfig)
   softPFElectronBJetTags_       = iConfig.getParameter<std::string>("softPFElectronBJetTags");
   softPFElectronNegBJetTags_    = iConfig.getParameter<std::string>("softPFElectronNegBJetTags");
   softPFElectronPosBJetTags_    = iConfig.getParameter<std::string>("softPFElectronPosBJetTags");
+
+  doubleSVBJetTags_ = iConfig.getParameter<std::string>("doubleSVBJetTags");
 
   ipTagInfos_              = iConfig.getParameter<std::string>("ipTagInfos");
   svTagInfos_              = iConfig.getParameter<std::string>("svTagInfos");
@@ -1127,6 +1131,8 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
     float SoftEN = pjet->bDiscriminator(softPFElectronNegBJetTags_.c_str());
     float SoftEP = pjet->bDiscriminator(softPFElectronPosBJetTags_.c_str());
 
+    float DoubleSV = pjet->bDiscriminator(doubleSVBJetTags_.c_str());
+
     // Jet information
     JetInfo[iJetColl].Jet_ProbaN[JetInfo[iJetColl].nJet]   = ProbaN;
     JetInfo[iJetColl].Jet_ProbaP[JetInfo[iJetColl].nJet]   = ProbaP;
@@ -1150,6 +1156,7 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
     JetInfo[iJetColl].Jet_SoftElN[JetInfo[iJetColl].nJet]  = SoftEN;
     JetInfo[iJetColl].Jet_SoftElP[JetInfo[iJetColl].nJet]  = SoftEP;
     JetInfo[iJetColl].Jet_SoftEl[JetInfo[iJetColl].nJet]   = SoftE;
+    JetInfo[iJetColl].Jet_DoubleSV[JetInfo[iJetColl].nJet] = DoubleSV;
 
     // TagInfo TaggingVariables
     if ( storeTagVariables_ )
