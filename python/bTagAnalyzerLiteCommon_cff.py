@@ -20,6 +20,7 @@ bTagAnalyzerLiteCommon = cms.PSet(
     triggerTable             = cms.InputTag('TriggerResults'),
     prunedGenParticles       = cms.InputTag('prunedGenParticlesBoost'),
     primaryVertexColl        = cms.InputTag('offlinePrimaryVertices'),
+    useBCands                = cms.bool(False),
     beta                     = cms.double(1.0),
     R0                       = cms.double(0.8),
     maxSVDeltaRToJet         = cms.double(0.7),

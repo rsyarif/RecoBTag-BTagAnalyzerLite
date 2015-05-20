@@ -95,6 +95,11 @@ options.register('runIVF', False, # needs to be set to True when running over 7X
     VarParsing.varType.bool,
     "Run IVF"
 )
+options.register('useBCands', False,
+    VarParsing.multiplicity.singleton,
+    VarParsing.varType.bool,
+    "Use IVF b candidates in the N-subjettiness calculation"
+)
 options.register('runQjets', False,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.bool,
@@ -765,6 +770,7 @@ if options.runFatJets:
     process.btaganaFatJets = process.btagana.clone(
         storeEventInfo      = cms.bool(not options.processStdAK4Jets),
         allowJetSkipping    = cms.bool(False),
+        useBCands           = cms.bool(options.useBCands),
         R0                  = cms.double(options.jetRadius),
         maxSVDeltaRToJet    = cms.double(options.jetRadius-(0.1+(options.jetRadius-0.8)*(0.1/0.7))), # linear interpolation from 0.7 at R=0.8 to 1.3 at R=1.5
         BranchNamePrefix    = cms.string('FatJetInfo'),

@@ -267,6 +267,7 @@ class BTagAnalyzerLiteT : public edm::EDAnalyzer
     PFJetIDSelectionFunctor pfjetIDLoose_;
     PFJetIDSelectionFunctor pfjetIDTight_;
 
+    const bool   useBCands_;
     const double beta_;
     const double R0_;
     // N-subjettiness calculator
@@ -283,6 +284,7 @@ BTagAnalyzerLiteT<IPTI,VTX>::BTagAnalyzerLiteT(const edm::ParameterSet& iConfig)
   hadronizerType_(0),
   pfjetIDLoose_( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE ),
   pfjetIDTight_( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::TIGHT ),
+  useBCands_(iConfig.getParameter<bool>("useBCands")),
   beta_(iConfig.getParameter<double>("beta")),
   R0_(iConfig.getParameter<double>("R0")),
   njettiness_(fastjet::contrib::OnePass_KT_Axes(), fastjet::contrib::NormalizedMeasure(beta_,R0_)),
@@ -1778,15 +1780,18 @@ void BTagAnalyzerLiteT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::r
   std::vector<fastjet::PseudoJet> fjParticles;
   std::vector<reco::CandidatePtr> svDaughters;
 
-  // loop over IVF vertices and push them in the vector of FastJet constituents and also collect their daughters
-  for(size_t i=0; i<svTagInfo.nVertices(); ++i)
+  if ( useBCands_ )
   {
-    const reco::VertexCompositePtrCandidate & vtx = svTagInfo.secondaryVertex(i);
+    // loop over IVF vertices and push them in the vector of FastJet constituents and also collect their daughters
+    for(size_t i=0; i<svTagInfo.nVertices(); ++i)
+    {
+      const reco::VertexCompositePtrCandidate & vtx = svTagInfo.secondaryVertex(i);
 
-    fjParticles.push_back( fastjet::PseudoJet( vtx.px(), vtx.py(), vtx.pz(), vtx.energy() ) );
+      fjParticles.push_back( fastjet::PseudoJet( vtx.px(), vtx.py(), vtx.pz(), vtx.energy() ) );
 
-    const std::vector<reco::CandidatePtr> & daughters = vtx.daughterPtrVector();
-    svDaughters.insert(svDaughters.end(), daughters.begin(), daughters.end());
+      const std::vector<reco::CandidatePtr> & daughters = vtx.daughterPtrVector();
+      svDaughters.insert(svDaughters.end(), daughters.begin(), daughters.end());
+    }
   }
 
   // loop over jet constituents and select those that are not daughters of IVF vertices
