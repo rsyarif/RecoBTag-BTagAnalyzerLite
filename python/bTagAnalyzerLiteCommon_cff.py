@@ -22,6 +22,7 @@ bTagAnalyzerLiteCommon = cms.PSet(
     primaryVertexColl        = cms.InputTag('offlinePrimaryVertices'),
     beta                     = cms.double(1.0),
     R0                       = cms.double(0.8),
+    maxSVDeltaRToJet         = cms.double(0.7),
     TriggerPathNames = cms.vstring(
         "HLT_HT750_v*"
     )
