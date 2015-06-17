@@ -33,4 +33,4 @@ class MVAEvaluator {
   std::string mva_weightFile_;
 };
 
-#endif // RecoBTag_PerformanceMeasurements_MVAEvaluator_h
+#endif // RecoBTag_BTagAnalyzerLite_MVAEvaluator_h
