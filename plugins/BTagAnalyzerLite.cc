@@ -76,7 +76,7 @@ Implementation:
 
 #include "RecoBTag/BTagAnalyzerLite/interface/JetInfoBranches.h"
 #include "RecoBTag/BTagAnalyzerLite/interface/EventInfoBranches.h"
-#include "RecoBTag/PerformanceMeasurements/interface/MVAEvaluator.h"
+#include "RecoBTag/BTagAnalyzerLite/interface/MVAEvaluator.h"
 
 //
 // constants, enums and typedefs
