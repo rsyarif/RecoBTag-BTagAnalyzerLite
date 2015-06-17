@@ -6,6 +6,7 @@
   <use name="FWCore/Utilities"/>
   <use name="RecoBTau/JetTagComputer"/>
   <use name="RecoBTag/SecondaryVertex"/>
+  <use name="RecoBTag/BTagAnalyzerLite"/>
   <use name="DataFormats/PatCandidates"/>
   <use name="CommonTools/UtilAlgos"/>
   <use name="fastjet"/>
