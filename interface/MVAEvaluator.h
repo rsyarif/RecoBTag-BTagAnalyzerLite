@@ -1,5 +1,5 @@
-#ifndef RecoBTag_PerformanceMeasurements_MVAEvaluator_h
-#define RecoBTag_PerformanceMeasurements_MVAEvaluator_h
+#ifndef RecoBTag_BTagAnalyzerLite_MVAEvaluator_h
+#define RecoBTag_BTagAnalyzerLite_MVAEvaluator_h
 
 #include <memory>
 #include <cassert>
