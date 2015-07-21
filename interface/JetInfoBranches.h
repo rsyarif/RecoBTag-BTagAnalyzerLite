@@ -582,7 +582,7 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_FatJetIdx").c_str(),   Jet_FatJetIdx   ,(name+"Jet_FatJetIdx["+name+"nJet]/I").c_str());
     }
 
-    void RegisterFatJetSpecificTree(TTree *tree, std::string name="") {
+    void RegisterFatJetSpecificTree(TTree *tree, std::string name="", bool trackVars=false) {
       if(name!="") name += ".";
       tree->Branch((name+"Jet_ptSoftDrop").c_str(),    Jet_ptSoftDrop    ,(name+"Jet_ptSoftDrop["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_etaSoftDrop").c_str(),   Jet_etaSoftDrop   ,(name+"Jet_etaSoftDrop["+name+"nJet]/F").c_str());
@@ -617,10 +617,13 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_BDTG_SL").c_str(),          Jet_BDTG_SL          ,(name+"Jet_BDTG_SL["+name+"nJet]/F").c_str()         );
       tree->Branch((name+"Jet_BDTG_Cascade").c_str(),     Jet_BDTG_Cascade     ,(name+"Jet_BDTG_Cascade["+name+"nJet]/F").c_str()    );
 
-      TBranch* br = (TBranch*)tree->GetListOfBranches()->FindObject(TString((name+"nTrack").c_str()));
-      if (!br) tree->Branch((name+"nTrack").c_str()     ,&nTrack               ,(name+"nTrack/I").c_str());
-      tree->Branch((name+"Track_lengthTau").c_str()     ,Track_lengthTau       ,(name+"Track_lengthTau["+name+"nTrack]/F").c_str());
-      tree->Branch((name+"Track_distTau").c_str()       ,Track_distTau         ,(name+"Track_distTau["+name+"nTrack]/F").c_str());
+      if (trackVars)
+      {
+        TBranch* br = (TBranch*)tree->GetListOfBranches()->FindObject(TString((name+"nTrack").c_str()));
+        if (!br) tree->Branch((name+"nTrack").c_str()     ,&nTrack               ,(name+"nTrack/I").c_str());
+        tree->Branch((name+"Track_lengthTau").c_str()     ,Track_lengthTau       ,(name+"Track_lengthTau["+name+"nTrack]/F").c_str());
+        tree->Branch((name+"Track_distTau").c_str()       ,Track_distTau         ,(name+"Track_distTau["+name+"nTrack]/F").c_str());
+      }
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -914,7 +917,7 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Jet_FatJetIdx").c_str(),   Jet_FatJetIdx   );
     }
 
-    void ReadFatJetSpecificTree(TTree *tree, std::string name="") {
+    void ReadFatJetSpecificTree(TTree *tree, std::string name="", bool trackVars=false) {
       if(name!="") name += ".";
       tree->SetBranchAddress((name+"Jet_ptSoftDrop").c_str(),    Jet_ptSoftDrop    );
       tree->SetBranchAddress((name+"Jet_etaSoftDrop").c_str(),   Jet_etaSoftDrop   );
@@ -949,10 +952,13 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Jet_BDTG_SL").c_str(),          Jet_BDTG_SL      );
       tree->SetBranchAddress((name+"Jet_BDTG_Cascade").c_str(),     Jet_BDTG_Cascade );
 
-      TBranch* br = (TBranch*)tree->GetListOfBranches()->FindObject(TString((name+"nTrack").c_str()));
-      if (!br) tree->SetBranchAddress((name+"nTrack").c_str()    ,&nTrack            ) ;
-      tree->SetBranchAddress((name+"Track_lengthTau").c_str()    ,Track_lengthTau   ) ;
-      tree->SetBranchAddress((name+"Track_distTau").c_str()      ,Track_distTau     ) ;
+      if (trackVars)
+      {
+        TBranch* br = (TBranch*)tree->GetListOfBranches()->FindObject(TString((name+"nTrack").c_str()));
+        if (!br) tree->SetBranchAddress((name+"nTrack").c_str()    ,&nTrack            ) ;
+        tree->SetBranchAddress((name+"Track_lengthTau").c_str()    ,Track_lengthTau   ) ;
+        tree->SetBranchAddress((name+"Track_distTau").c_str()      ,Track_distTau     ) ;
+      }
     }
 };
 
