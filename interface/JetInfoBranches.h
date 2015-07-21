@@ -138,6 +138,7 @@ class JetInfoBranches {
     int   Track_isfromSV[nMaxTrk_];
     float Track_PVweight[nMaxTrk_];
     float Track_SVweight[nMaxTrk_];
+    int   Track_isfromV0[nMaxTrk_];
 
     int   nPFElectron;
     int   PFElectron_IdxJet[nMaxElectrons_];
@@ -463,6 +464,7 @@ class JetInfoBranches {
       tree->Branch((name+"Track_PVweight").c_str()   ,Track_PVweight   ,(name+"Track_PVweight["+name+"nTrack]/F").c_str());
       tree->Branch((name+"Track_SVweight").c_str()   ,Track_SVweight   ,(name+"Track_SVweight["+name+"nTrack]/F").c_str());
       tree->Branch((name+"Track_isfromSV").c_str()   ,Track_isfromSV   ,(name+"Track_isfromSV["+name+"nTrack]/I").c_str());
+      tree->Branch((name+"Track_isfromV0").c_str()   ,Track_isfromV0   ,(name+"Track_isfromV0["+name+"nTrack]/I").c_str());
     }
 
     void RegisterTagVarTree(TTree *tree, std::string name=""){
@@ -787,6 +789,7 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Track_PVweight").c_str()  ,Track_PVweight ) ;
       tree->SetBranchAddress((name+"Track_SVweight").c_str()  ,Track_SVweight ) ;
       tree->SetBranchAddress((name+"Track_isfromSV").c_str()  ,Track_isfromSV ) ;
+      tree->SetBranchAddress((name+"Track_isfromV0").c_str()  ,Track_isfromV0 ) ;
     }
 
     void ReadTagVarTree(TTree *tree, std::string name=""){
