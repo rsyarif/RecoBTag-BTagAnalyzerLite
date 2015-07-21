@@ -9,6 +9,9 @@
   <use name="RecoBTag/BTagAnalyzerLite"/>
   <use name="DataFormats/PatCandidates"/>
   <use name="CommonTools/UtilAlgos"/>
+  <use name="TrackingTools/IPTools"/>
+  <use name="TrackingTools/Records"/>
+  <use name="TrackingTools/TransientTrack"/>
   <use name="fastjet"/>
   <use name="fastjet-contrib"/>
   <flags EDM_PLUGIN="1"/>

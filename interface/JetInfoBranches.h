@@ -139,6 +139,8 @@ class JetInfoBranches {
     float Track_PVweight[nMaxTrk_];
     float Track_SVweight[nMaxTrk_];
     int   Track_isfromV0[nMaxTrk_];
+    float Track_lengthTau[nMaxTrk_];
+    float Track_distTau[nMaxTrk_];
 
     int   nPFElectron;
     int   PFElectron_IdxJet[nMaxElectrons_];
@@ -431,7 +433,8 @@ class JetInfoBranches {
       //--------------------------------------
       // track information
       //--------------------------------------
-      tree->Branch((name+"nTrack").c_str()           ,&nTrack          ,(name+"nTrack/I").c_str());
+      TBranch* br = (TBranch*)tree->GetListOfBranches()->FindObject(TString((name+"nTrack").c_str()));
+      if (!br) tree->Branch((name+"nTrack").c_str()           ,&nTrack          ,(name+"nTrack/I").c_str());
       tree->Branch((name+"Track_dxy").c_str()        ,Track_dxy             ,(name+"Track_dxy["+name+"nTrack]/F").c_str());
       tree->Branch((name+"Track_dz").c_str()         ,Track_dz         ,(name+"Track_dz["+name+"nTrack]/F").c_str());
       tree->Branch((name+"Track_length").c_str()     ,Track_length     ,(name+"Track_length["+name+"nTrack]/F").c_str());
@@ -613,6 +616,11 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_BDTG_SV").c_str(),          Jet_BDTG_SV          ,(name+"Jet_BDTG_SV["+name+"nJet]/F").c_str()         );
       tree->Branch((name+"Jet_BDTG_SL").c_str(),          Jet_BDTG_SL          ,(name+"Jet_BDTG_SL["+name+"nJet]/F").c_str()         );
       tree->Branch((name+"Jet_BDTG_Cascade").c_str(),     Jet_BDTG_Cascade     ,(name+"Jet_BDTG_Cascade["+name+"nJet]/F").c_str()    );
+
+      TBranch* br = (TBranch*)tree->GetListOfBranches()->FindObject(TString((name+"nTrack").c_str()));
+      if (!br) tree->Branch((name+"nTrack").c_str()     ,&nTrack               ,(name+"nTrack/I").c_str());
+      tree->Branch((name+"Track_lengthTau").c_str()     ,Track_lengthTau       ,(name+"Track_lengthTau["+name+"nTrack]/F").c_str());
+      tree->Branch((name+"Track_distTau").c_str()       ,Track_distTau         ,(name+"Track_distTau["+name+"nTrack]/F").c_str());
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -756,7 +764,8 @@ class JetInfoBranches {
       //--------------------------------------
       // track information
       //--------------------------------------
-      tree->SetBranchAddress((name+"nTrack").c_str()          ,&nTrack            ) ;
+      TBranch* br = (TBranch*)tree->GetListOfBranches()->FindObject(TString((name+"nTrack").c_str()));
+      if (!br) tree->SetBranchAddress((name+"nTrack").c_str()          ,&nTrack            ) ;
       tree->SetBranchAddress((name+"Track_dxy").c_str()       ,Track_dxy          ) ;
       tree->SetBranchAddress((name+"Track_dz").c_str()        ,Track_dz           ) ;
       tree->SetBranchAddress((name+"Track_length").c_str()    ,Track_length   ) ;
@@ -939,6 +948,11 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Jet_BDTG_SV").c_str(),          Jet_BDTG_SV      );
       tree->SetBranchAddress((name+"Jet_BDTG_SL").c_str(),          Jet_BDTG_SL      );
       tree->SetBranchAddress((name+"Jet_BDTG_Cascade").c_str(),     Jet_BDTG_Cascade );
+
+      TBranch* br = (TBranch*)tree->GetListOfBranches()->FindObject(TString((name+"nTrack").c_str()));
+      if (!br) tree->SetBranchAddress((name+"nTrack").c_str()    ,&nTrack            ) ;
+      tree->SetBranchAddress((name+"Track_lengthTau").c_str()    ,Track_lengthTau   ) ;
+      tree->SetBranchAddress((name+"Track_distTau").c_str()      ,Track_distTau     ) ;
     }
 };
 

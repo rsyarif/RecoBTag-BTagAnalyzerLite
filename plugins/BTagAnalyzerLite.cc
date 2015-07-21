@@ -68,6 +68,10 @@ Implementation:
 #include "RecoBTag/SecondaryVertex/interface/V0Filter.h"
 #include "RecoVertex/VertexPrimitives/interface/ConvertToFromReco.h"
 
+#include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
+#include "TrackingTools/Records/interface/TransientTrackRecord.h"
+#include "TrackingTools/IPTools/interface/IPTools.h"
+
 #include "fastjet/contrib/Njettiness.hh"
 
 #include "TFile.h"
@@ -255,6 +259,7 @@ class BTagAnalyzerLiteT : public edm::EDAnalyzer
     std::vector<JetInfoBranches> JetInfo;
     std::map<std::string, SubJetInfoBranches> SubJetInfo;
 
+    edm::ESHandle<TransientTrackBuilder> trackBuilder;
     edm::Handle<reco::VertexCollection> primaryVertex;
 
     const reco::Vertex *pv;
@@ -595,6 +600,11 @@ void BTagAnalyzerLiteT<IPTI,VTX>::analyze(const edm::Event& iEvent, const edm::E
   edm::Handle<edm::View<reco::Muon> >  muonsHandle;
   iEvent.getByLabel(muonCollectionName_,muonsHandle);
   muons = *muonsHandle;
+
+  //----------------------------------------
+  // Transient track for IP calculation
+  //----------------------------------------
+  iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder", trackBuilder);
 
   //------------------
   // Primary vertex
@@ -1046,6 +1056,35 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
             JetInfo[iJetColl].Track_isfromV0[JetInfo[iJetColl].nTrack] = 1;
             break;
           }
+        }
+
+        // compute decay length and distance to tau axis
+        if ( runFatJets_ && iJetColl == 0 )
+        {
+          reco::TransientTrack transientTrack = trackBuilder->build(ptrack);
+          GlobalVector direction(pjet->px(), pjet->py(), pjet->pz());
+
+          if (currentAxes.size() > 1)
+          {
+            if (reco::deltaR2(ptrack,currentAxes[1]) < reco::deltaR2(ptrack,currentAxes[0]))
+              direction = GlobalVector(currentAxes[1].px(), currentAxes[1].py(), currentAxes[1].pz());
+            else
+              direction = GlobalVector(currentAxes[0].px(), currentAxes[0].py(), currentAxes[0].pz());
+          }
+          else if (currentAxes.size() > 0)
+            direction = GlobalVector(currentAxes[0].px(), currentAxes[0].py(), currentAxes[0].pz());
+
+          float decayLengthTau=-1;
+          float distTauAxis=-1;
+
+          TrajectoryStateOnSurface closest = IPTools::closestApproachToJet(transientTrack.impactPointState(), *pv, direction, transientTrack.field());
+          if (closest.isValid())
+            decayLengthTau =  (closest.globalPosition() - RecoVertex::convertPos(pv->position())).mag();
+
+          distTauAxis = std::abs(IPTools::jetTrackDistance(transientTrack, direction, *pv).second.value());
+
+          JetInfo[iJetColl].Track_distTau[JetInfo[iJetColl].nTrack]   = distTauAxis;
+          JetInfo[iJetColl].Track_lengthTau[JetInfo[iJetColl].nTrack] = decayLengthTau;
         }
 
         ++JetInfo[iJetColl].nTrack;
