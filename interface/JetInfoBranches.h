@@ -89,7 +89,13 @@ class JetInfoBranches {
     float Jet_PFLepton_ratio[nMaxJets_];
     float Jet_z_ratio[nMaxJets_];
     float Jet_tau_dot[nMaxJets_];
-   float Jet_trackSip3dSig_3[nMaxJets_];
+    float Jet_trackSip3dSig_3[nMaxJets_];
+    float Jet_trackSip3dSig_2[nMaxJets_];
+    float Jet_trackSip3dSig_1[nMaxJets_];
+    float Jet_trackSip3dSig_0[nMaxJets_];
+    float Jet_trackEtaRel_2[nMaxJets_];
+    float Jet_trackEtaRel_1[nMaxJets_];
+    float Jet_trackEtaRel_0[nMaxJets_];
     float Jet_SV_mass_0[nMaxJets_];
     float Jet_SV_EnergyRatio_0[nMaxJets_];
     float Jet_SV_EnergyRatio_1[nMaxJets_];
