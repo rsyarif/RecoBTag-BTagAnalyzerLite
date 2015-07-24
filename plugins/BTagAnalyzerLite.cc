@@ -1658,198 +1658,198 @@ bool BTagAnalyzerLiteT<IPTI,VTX>::NameCompatible(const std::string& pattern, con
 // ------------ method that matches groomed and original jets based on minimum dR ------------
 template<typename IPTI,typename VTX>
 void BTagAnalyzerLiteT<IPTI,VTX>::matchGroomedJets(const edm::Handle<PatJetCollection>& jets,
-		const edm::Handle<PatJetCollection>& groomedJets,
-		std::vector<int>& matchedIndices)
+	const edm::Handle<PatJetCollection>& groomedJets,
+	std::vector<int>& matchedIndices)
 {
-	std::vector<bool> jetLocks(jets->size(),false);
-	std::vector<int>  jetIndices;
+   std::vector<bool> jetLocks(jets->size(),false);
+   std::vector<int>  jetIndices;
 
-	for(size_t gj=0; gj<groomedJets->size(); ++gj)
-	{
-		double matchedDR2 = 1e9;
-		int matchedIdx = -1;
+   for(size_t gj=0; gj<groomedJets->size(); ++gj)
+   {
+	   double matchedDR2 = 1e9;
+	   int matchedIdx = -1;
 
-		for(size_t j=0; j<jets->size(); ++j)
-		{
-			if( jetLocks.at(j) ) continue; // skip jets that have already been matched
+	   for(size_t j=0; j<jets->size(); ++j)
+	   {
+		   if( jetLocks.at(j) ) continue; // skip jets that have already been matched
 
-			double tempDR2 = reco::deltaR2( jets->at(j).rapidity(), jets->at(j).phi(), groomedJets->at(gj).rapidity(), groomedJets->at(gj).phi() );
-			if( tempDR2 < matchedDR2 )
-			{
-				matchedDR2 = tempDR2;
-				matchedIdx = j;
-			}
-		}
+		   double tempDR2 = reco::deltaR2( jets->at(j).rapidity(), jets->at(j).phi(), groomedJets->at(gj).rapidity(), groomedJets->at(gj).phi() );
+		   if( tempDR2 < matchedDR2 )
+		   {
+			   matchedDR2 = tempDR2;
+			   matchedIdx = j;
+		   }
+	   }
 
-		if( matchedIdx>=0 ) jetLocks.at(matchedIdx) = true;
-		jetIndices.push_back(matchedIdx);
-	}
+	   if( matchedIdx>=0 ) jetLocks.at(matchedIdx) = true;
+	   jetIndices.push_back(matchedIdx);
+   }
 
-	if( std::find( jetIndices.begin(), jetIndices.end(), -1 ) != jetIndices.end() )
-		edm::LogError("JetMatchingFailed") << "Matching groomed to original jets failed. Please check that the two jet collections belong to each other.";
+   if( std::find( jetIndices.begin(), jetIndices.end(), -1 ) != jetIndices.end() )
+	   edm::LogError("JetMatchingFailed") << "Matching groomed to original jets failed. Please check that the two jet collections belong to each other.";
 
-	for(size_t j=0; j<jets->size(); ++j)
-	{
-		std::vector<int>::iterator matchedIndex = std::find( jetIndices.begin(), jetIndices.end(), j );
+   for(size_t j=0; j<jets->size(); ++j)
+   {
+	   std::vector<int>::iterator matchedIndex = std::find( jetIndices.begin(), jetIndices.end(), j );
 
-		matchedIndices.push_back( matchedIndex != jetIndices.end() ? std::distance(jetIndices.begin(),matchedIndex) : -1 );
-	}
+	   matchedIndices.push_back( matchedIndex != jetIndices.end() ? std::distance(jetIndices.begin(),matchedIndex) : -1 );
+   }
 }
 
 // -------------- template specializations --------------------
 // -------------- toIPTagInfo ----------------
 template<>
-const BTagAnalyzerLiteT<reco::TrackIPTagInfo,reco::Vertex>::IPTagInfo *
+	const BTagAnalyzerLiteT<reco::TrackIPTagInfo,reco::Vertex>::IPTagInfo *
 BTagAnalyzerLiteT<reco::TrackIPTagInfo,reco::Vertex>::toIPTagInfo(const pat::Jet & jet, const std::string & tagInfos)
 {
-    return jet.tagInfoTrackIP(tagInfos.c_str());
+	return jet.tagInfoTrackIP(tagInfos.c_str());
 }
 
 template<>
-const BTagAnalyzerLiteT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::IPTagInfo *
+	const BTagAnalyzerLiteT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::IPTagInfo *
 BTagAnalyzerLiteT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::toIPTagInfo(const pat::Jet & jet, const std::string & tagInfos)
 {
-     return jet.tagInfoCandIP(tagInfos.c_str());
+	return jet.tagInfoCandIP(tagInfos.c_str());
 }
 
 // -------------- toSVTagInfo ----------------
 template<>
-const BTagAnalyzerLiteT<reco::TrackIPTagInfo,reco::Vertex>::SVTagInfo *
+	const BTagAnalyzerLiteT<reco::TrackIPTagInfo,reco::Vertex>::SVTagInfo *
 BTagAnalyzerLiteT<reco::TrackIPTagInfo,reco::Vertex>::toSVTagInfo(const pat::Jet & jet, const std::string & tagInfos)
 {
-    return jet.tagInfoSecondaryVertex(tagInfos.c_str());
+	return jet.tagInfoSecondaryVertex(tagInfos.c_str());
 }
 
 template<>
-const BTagAnalyzerLiteT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::SVTagInfo *
+	const BTagAnalyzerLiteT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::SVTagInfo *
 BTagAnalyzerLiteT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::toSVTagInfo(const pat::Jet & jet, const std::string & tagInfos)
 {
-    return jet.tagInfoCandSecondaryVertex(tagInfos.c_str());
+	return jet.tagInfoCandSecondaryVertex(tagInfos.c_str());
 }
 
 // -------------- setTracksPV ----------------
-template<>
+	template<>
 void BTagAnalyzerLiteT<reco::TrackIPTagInfo,reco::Vertex>::setTracksPV(const TrackRef & trackRef, const edm::Handle<reco::VertexCollection> & pvHandle, int & iPV, float & PVweight)
 {
-    setTracksPVBase(trackRef, pvHandle, iPV, PVweight);
+	setTracksPVBase(trackRef, pvHandle, iPV, PVweight);
 }
 
-template<>
+	template<>
 void BTagAnalyzerLiteT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::setTracksPV(const TrackRef & trackRef, const edm::Handle<reco::VertexCollection> & pvHandle, int & iPV, float & PVweight)
 {
-    iPV = -1;
-    PVweight = 0.;
+	iPV = -1;
+	PVweight = 0.;
 
-    const pat::PackedCandidate * pcand = dynamic_cast<const pat::PackedCandidate *>(trackRef.get());
+	const pat::PackedCandidate * pcand = dynamic_cast<const pat::PackedCandidate *>(trackRef.get());
 
-    if(pcand) // MiniAOD case
-    {
-	    if( pcand->fromPV() == pat::PackedCandidate::PVUsedInFit )
-	    {
-		    iPV = 0;
-		    PVweight = 1.;
-	    }
-    }
-    else
-    {
-	    const reco::PFCandidate * pfcand = dynamic_cast<const reco::PFCandidate *>(trackRef.get());
+	if(pcand) // MiniAOD case
+	{
+		if( pcand->fromPV() == pat::PackedCandidate::PVUsedInFit )
+		{
+			iPV = 0;
+			PVweight = 1.;
+		}
+	}
+	else
+	{
+		const reco::PFCandidate * pfcand = dynamic_cast<const reco::PFCandidate *>(trackRef.get());
 
-	    setTracksPVBase(pfcand->trackRef(), pvHandle, iPV, PVweight);
-    }
+		setTracksPVBase(pfcand->trackRef(), pvHandle, iPV, PVweight);
+	}
 }
 
 // -------------- setTracksSV ----------------
-template<>
+	template<>
 void BTagAnalyzerLiteT<reco::TrackIPTagInfo,reco::Vertex>::setTracksSV(const TrackRef & trackRef, const SVTagInfo * svTagInfo, int & isFromSV, int & iSV, float & SVweight)
 {
-    isFromSV = 0;
-    iSV = -1;
-    SVweight = 0.;
+	isFromSV = 0;
+	iSV = -1;
+	SVweight = 0.;
 
-    const reco::TrackBaseRef trackBaseRef( trackRef );
+	const reco::TrackBaseRef trackBaseRef( trackRef );
 
-    typedef reco::Vertex::trackRef_iterator IT;
+	typedef reco::Vertex::trackRef_iterator IT;
 
-    size_t nSV = svTagInfo->nVertices();
-    for(size_t iv=0; iv<nSV; ++iv)
-    {
-	    const reco::Vertex & vtx = svTagInfo->secondaryVertex(iv);
-	    // loop over tracks in vertices
-	    for(IT it=vtx.tracks_begin(); it!=vtx.tracks_end(); ++it)
-	    {
-		    const reco::TrackBaseRef & baseRef = *it;
-		    // one of the tracks in the vertex is the same as the track considered in the function
-		    if( baseRef == trackBaseRef )
-		    {
-			    float w = vtx.trackWeight(baseRef);
-			    // select the vertex for which the track has the highest weight
-			    if( w > SVweight )
-			    {
-				    SVweight = w;
-				    isFromSV = 1;
-				    iSV = iv;
-				    break;
-			    }
-		    }
-	    }
-    }
+	size_t nSV = svTagInfo->nVertices();
+	for(size_t iv=0; iv<nSV; ++iv)
+	{
+		const reco::Vertex & vtx = svTagInfo->secondaryVertex(iv);
+		// loop over tracks in vertices
+		for(IT it=vtx.tracks_begin(); it!=vtx.tracks_end(); ++it)
+		{
+			const reco::TrackBaseRef & baseRef = *it;
+			// one of the tracks in the vertex is the same as the track considered in the function
+			if( baseRef == trackBaseRef )
+			{
+				float w = vtx.trackWeight(baseRef);
+				// select the vertex for which the track has the highest weight
+				if( w > SVweight )
+				{
+					SVweight = w;
+					isFromSV = 1;
+					iSV = iv;
+					break;
+				}
+			}
+		}
+	}
 }
 
-template<>
+	template<>
 void BTagAnalyzerLiteT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::setTracksSV(const TrackRef & trackRef, const SVTagInfo * svTagInfo, int & isFromSV, int & iSV, float & SVweight)
 {
-    isFromSV = 0;
-    iSV = -1;
-    SVweight = 0.;
+	isFromSV = 0;
+	iSV = -1;
+	SVweight = 0.;
 
-    typedef std::vector<reco::CandidatePtr>::const_iterator IT;
+	typedef std::vector<reco::CandidatePtr>::const_iterator IT;
 
-    size_t nSV = svTagInfo->nVertices();
-    for(size_t iv=0; iv<nSV; ++iv)
-    {
-	    const Vertex & vtx = svTagInfo->secondaryVertex(iv);
-	    const std::vector<reco::CandidatePtr> & tracks = vtx.daughterPtrVector();
+	size_t nSV = svTagInfo->nVertices();
+	for(size_t iv=0; iv<nSV; ++iv)
+	{
+		const Vertex & vtx = svTagInfo->secondaryVertex(iv);
+		const std::vector<reco::CandidatePtr> & tracks = vtx.daughterPtrVector();
 
-	    // one of the tracks in the vertex is the same as the track considered in the function
-	    if( std::find(tracks.begin(),tracks.end(),trackRef) != tracks.end() )
-	    {
-		    SVweight = 1.;
-		    isFromSV = 1;
-		    iSV = iv;
-	    }
+		// one of the tracks in the vertex is the same as the track considered in the function
+		if( std::find(tracks.begin(),tracks.end(),trackRef) != tracks.end() )
+		{
+			SVweight = 1.;
+			isFromSV = 1;
+			iSV = iv;
+		}
 
-	    // select the first vertex for which the track is used in the fit
-	    // (reco::VertexCompositePtrCandidate does not store track weights so can't select the vertex for which the track has the highest weight)
-	    if(iSV>=0)
-		    break;
-    }
+		// select the first vertex for which the track is used in the fit
+		// (reco::VertexCompositePtrCandidate does not store track weights so can't select the vertex for which the track has the highest weight)
+		if(iSV>=0)
+			break;
+	}
 }
 
 // -------------- vertexKinematicsAndChange ----------------
-template<>
+	template<>
 void BTagAnalyzerLiteT<reco::TrackIPTagInfo,reco::Vertex>::vertexKinematicsAndChange(const Vertex & vertex, reco::TrackKinematics & vertexKinematics, Int_t & charge)
 {
-  Bool_t hasRefittedTracks = vertex.hasRefittedTracks();
+	Bool_t hasRefittedTracks = vertex.hasRefittedTracks();
 
-  for(reco::Vertex::trackRef_iterator track = vertex.tracks_begin();
-      track != vertex.tracks_end(); ++track) {
-    Double_t w = vertex.trackWeight(*track);
-    if (w < 0.5)
-	    continue;
-    if (hasRefittedTracks) {
-	    reco::Track actualTrack = vertex.refittedTrack(*track);
-	    vertexKinematics.add(actualTrack, w);
-	    charge+=actualTrack.charge();
-    }
-    else {
-	    const reco::Track& mytrack = **track;
-	    vertexKinematics.add(mytrack, w);
-	    charge+=mytrack.charge();
-    }
-  }
+	for(reco::Vertex::trackRef_iterator track = vertex.tracks_begin();
+			track != vertex.tracks_end(); ++track) {
+		Double_t w = vertex.trackWeight(*track);
+		if (w < 0.5)
+			continue;
+		if (hasRefittedTracks) {
+			reco::Track actualTrack = vertex.refittedTrack(*track);
+			vertexKinematics.add(actualTrack, w);
+			charge+=actualTrack.charge();
+		}
+		else {
+			const reco::Track& mytrack = **track;
+			vertexKinematics.add(mytrack, w);
+			charge+=mytrack.charge();
+		}
+	}
 }
 
-template<>
+	template<>
 void BTagAnalyzerLiteT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::vertexKinematicsAndChange(const Vertex & vertex, reco::TrackKinematics & vertexKinematics, Int_t & charge)
 {
 	const std::vector<reco::CandidatePtr> & tracks = vertex.daughterPtrVector();
@@ -1862,53 +1862,53 @@ void BTagAnalyzerLiteT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::v
 }
 
 // -------------- recalcNsubjettiness ----------------
-template<>
+	template<>
 void BTagAnalyzerLiteT<reco::TrackIPTagInfo,reco::Vertex>::recalcNsubjettiness(const pat::Jet & jet, const SVTagInfo & svTagInfo, float & tau1, float & tau2, std::vector<fastjet::PseudoJet> & currentAxes)
 {
 	// need candidate-based IVF vertices so do nothing here
 }
 
-template<>
+	template<>
 void BTagAnalyzerLiteT<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::recalcNsubjettiness(const pat::Jet & jet, const SVTagInfo & svTagInfo, float & tau1, float & tau2, std::vector<fastjet::PseudoJet> & currentAxes)
 {
-  std::vector<fastjet::PseudoJet> fjParticles;
-  std::vector<reco::CandidatePtr> svDaughters;
+	std::vector<fastjet::PseudoJet> fjParticles;
+	std::vector<reco::CandidatePtr> svDaughters;
 
-  if ( useBCands_ )
-  {
-	  // loop over IVF vertices and push them in the vector of FastJet constituents and also collect their daughters
-	  for(size_t i=0; i<svTagInfo.nVertices(); ++i)
-	  {
-		  const reco::VertexCompositePtrCandidate & vtx = svTagInfo.secondaryVertex(i);
+	if ( useBCands_ )
+	{
+		// loop over IVF vertices and push them in the vector of FastJet constituents and also collect their daughters
+		for(size_t i=0; i<svTagInfo.nVertices(); ++i)
+		{
+			const reco::VertexCompositePtrCandidate & vtx = svTagInfo.secondaryVertex(i);
 
-		  fjParticles.push_back( fastjet::PseudoJet( vtx.px(), vtx.py(), vtx.pz(), vtx.energy() ) );
+			fjParticles.push_back( fastjet::PseudoJet( vtx.px(), vtx.py(), vtx.pz(), vtx.energy() ) );
 
-		  const std::vector<reco::CandidatePtr> & daughters = vtx.daughterPtrVector();
-		  svDaughters.insert(svDaughters.end(), daughters.begin(), daughters.end());
-	  }
-  }
+			const std::vector<reco::CandidatePtr> & daughters = vtx.daughterPtrVector();
+			svDaughters.insert(svDaughters.end(), daughters.begin(), daughters.end());
+		}
+	}
 
-  // loop over jet constituents and select those that are not daughters of IVF vertices
-  std::vector<reco::CandidatePtr> constituentsOther;
-  for(const reco::CandidatePtr & daughter : jet.daughterPtrVector())
-  {
-	  if (std::find(svDaughters.begin(), svDaughters.end(), daughter) == svDaughters.end())
-		  constituentsOther.push_back( daughter );
-  }
+	// loop over jet constituents and select those that are not daughters of IVF vertices
+	std::vector<reco::CandidatePtr> constituentsOther;
+	for(const reco::CandidatePtr & daughter : jet.daughterPtrVector())
+	{
+		if (std::find(svDaughters.begin(), svDaughters.end(), daughter) == svDaughters.end())
+			constituentsOther.push_back( daughter );
+	}
 
-  // loop over jet constituents that are not daughters of IVF vertices and push them in the vector of FastJet constituents
-  for(const reco::CandidatePtr & constit : constituentsOther)
-  {
-	  if ( constit.isNonnull() && constit.isAvailable() )
-		  fjParticles.push_back( fastjet::PseudoJet( constit->px(), constit->py(), constit->pz(), constit->energy() ) );
-	  else
-		  edm::LogWarning("MissingJetConstituent") << "Jet constituent required for N-subjettiness computation is missing!";
-  }
+	// loop over jet constituents that are not daughters of IVF vertices and push them in the vector of FastJet constituents
+	for(const reco::CandidatePtr & constit : constituentsOther)
+	{
+		if ( constit.isNonnull() && constit.isAvailable() )
+			fjParticles.push_back( fastjet::PseudoJet( constit->px(), constit->py(), constit->pz(), constit->energy() ) );
+		else
+			edm::LogWarning("MissingJetConstituent") << "Jet constituent required for N-subjettiness computation is missing!";
+	}
 
-  // re-calculate N-subjettiness
-  tau1 = njettiness_.getTau(1, fjParticles);
-  tau2 = njettiness_.getTau(2, fjParticles);
-  currentAxes = njettiness_.currentAxes();
+	// re-calculate N-subjettiness
+	tau1 = njettiness_.getTau(1, fjParticles);
+	tau2 = njettiness_.getTau(2, fjParticles);
+	currentAxes = njettiness_.currentAxes();
 }
 
 
