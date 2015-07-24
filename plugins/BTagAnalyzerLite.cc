@@ -329,7 +329,7 @@ BTagAnalyzerLiteT<IPTI,VTX>::BTagAnalyzerLiteT(const edm::ParameterSet& iConfig)
       // initialize MVA evaluators
       evaluator_SV_.reset( new MVAEvaluator("BDTG", edm::FileInPath("RecoBTag/BTagAnalyzerLite/data/TMVA_SV_spring15.weights.xml.gz").fullPath()) );
       evaluator_SL_.reset( new MVAEvaluator("BDTG", edm::FileInPath("RecoBTag/BTagAnalyzerLite/data/TMVA_SL_spring15.weights.xml.gz").fullPath()) );
-      evaluator_cascade_.reset( new MVAEvaluator("BDTG", edm::FileInPath("RecoBTag/BTagAnalyzerLite/data/TMVA_all_spring15.weights.xml.gz").fullPath()) );
+      evaluator_cascade_.reset( new MVAEvaluator("BDTG", edm::FileInPath("RecoBTag/BTagAnalyzerLite/data/TMVA_cascade.weights.xml.gz").fullPath()) );
 
       // book TMVA readers
       std::vector<std::string> variables_SV({"SubJet_csv","trackSip3dSig_3","trackSip3dSig_2","trackSip3dSig_1","trackSip3dSig_0","TagVarCSV1_trackSip2dSigAboveCharm","trackEtaRel_0","trackEtaRel_1","trackEtaRel_2","TagVarCSV1_vertexMass","TagVarCSV1_vertexEnergyRatio" ,"TagVarCSV1_vertexJetDeltaR" ,"TagVarCSV1_flightDistance2dSig","TagVarCSV1_jetNTracks" ,"TagVarCSV1_jetNTracksEtaRel" ,"TagVarCSV1_jetNSecondaryVertices","TagVarCSV1_vertexNTracks"});
@@ -811,7 +811,7 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
     }
 
     //int iSubJet1 =-1;
-    //int iSubJet2 =-1;		
+    //int iSubJet2 =-1;
     if ( runFatJets_ && runSubJets_ && iJetColl == 0 )
     {
       for ( size_t i = 0; i < SubJetLabels_.size(); ++i )
@@ -1098,13 +1098,13 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
         ++JetInfo[iJetColl].nPFMuon;
       }
       JetInfo[iJetColl].Jet_nLastSM[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nPFMuon;
-      JetInfo[iJetColl].Jet_nSM[JetInfo[iJetColl].nJet] = nSM_3; 
+      JetInfo[iJetColl].Jet_nSM[JetInfo[iJetColl].nJet] = nSM_3;
 
       // PFElectron information
       int nSE = (pjet->hasTagInfo(softPFElectronTagInfos_.c_str()) ? softPFElTagInfo->leptons() : 0);
       //JetInfo[iJetColl].Jet_nSE[JetInfo[iJetColl].nJet] = nSE;
       JetInfo[iJetColl].Jet_nFirstSE[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nPFElectron;
-      int nSE_3 = 0; 
+      int nSE_3 = 0;
       for (size_t leptIdx = 0; leptIdx < (size_t)nSE; ++leptIdx) {
         if(softPFElTagInfo->properties(leptIdx).ptRel > 5.) nSE_3++;
         JetInfo[iJetColl].PFElectron_IdxJet[JetInfo[iJetColl].nPFElectron]    = JetInfo[iJetColl].nJet;
@@ -1127,7 +1127,7 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
         ++JetInfo[iJetColl].nPFElectron;
       }
       JetInfo[iJetColl].Jet_nLastSE[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nPFElectron;
-      JetInfo[iJetColl].Jet_nSE[JetInfo[iJetColl].nJet] = nSE_3;	
+      JetInfo[iJetColl].Jet_nSE[JetInfo[iJetColl].nJet] = nSE_3;
     }
 
     if(PFLepton_ptrel >5){
@@ -1137,7 +1137,7 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
     else{
 	JetInfo[iJetColl].Jet_PFLepton_ptrel[JetInfo[iJetColl].nJet] = -3.;
 	JetInfo[iJetColl].Jet_PFLepton_ratio[JetInfo[iJetColl].nJet]  = -3.;
-	}	
+	}
 
     // b-tagger discriminants
     float Proba  = pjet->bDiscriminator(jetPBJetTags_.c_str());
@@ -1369,8 +1369,8 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
       }
       for (int iTrk = JetInfo[iJetColl].Jet_nFirstTrkEtaRelTagVarCSV[JetInfo[iJetColl].nJet]; iTrk < JetInfo[iJetColl].Jet_nLastTrkEtaRelTagVarCSV[JetInfo[iJetColl].nJet]; ++iTrk){
                                         etaRels.push_back( TMath::Abs(JetInfo[iJetColl].TagVarCSV_trackEtaRel[iTrk]) );
-      }	
-      double dummyTrack =99.;	
+      }
+      double dummyTrack =99.;
       int numTracks = JetInfo[iJetColl].TagVarCSV_jetNTracks[JetInfo[iJetColl].nJet];
       int numEtaRelTracks = JetInfo[iJetColl].TagVarCSV_jetNTracksEtaRel[JetInfo[iJetColl].nJet];
       float dummyEtaRel = 99.;
@@ -1382,7 +1382,7 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
                                 switch(numTracks){
                                         case 0:
 
-                               
+
                                                 trackSip3dSig_0 = dummyTrack;
                                                 trackSip3dSig_1 = dummyTrack;
                                                 trackSip3dSig_2 = dummyTrack;
@@ -1424,7 +1424,7 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
                                                 trackSip3dSig_2 = IP3Ds.at(2);
                                                 trackSip3dSig_3 = IP3Ds.at(3);
 
-                                 } 
+                                 }
 
                                 switch(numEtaRelTracks){
                                         case 0:
@@ -1454,17 +1454,17 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
                                                 trackEtaRel_1 = etaRels.at(1);
                                                 trackEtaRel_2 = etaRels.at(2);
 
-                                } 
-	
+                                }
 
 
-       JetInfo[iJetColl].Jet_trackSip3dSig_3[JetInfo[iJetColl].nJet] =trackSip3dSig_3;		
+
+       JetInfo[iJetColl].Jet_trackSip3dSig_3[JetInfo[iJetColl].nJet] =trackSip3dSig_3;
        JetInfo[iJetColl].Jet_trackSip3dSig_2[JetInfo[iJetColl].nJet] =trackSip3dSig_2;
        JetInfo[iJetColl].Jet_trackSip3dSig_1[JetInfo[iJetColl].nJet] =trackSip3dSig_1;
        JetInfo[iJetColl].Jet_trackSip3dSig_0[JetInfo[iJetColl].nJet] =trackSip3dSig_0;
        JetInfo[iJetColl].Jet_trackEtaRel_2[JetInfo[iJetColl].nJet] =trackEtaRel_2;
        JetInfo[iJetColl].Jet_trackEtaRel_1[JetInfo[iJetColl].nJet] =trackEtaRel_1;
-       JetInfo[iJetColl].Jet_trackEtaRel_0[JetInfo[iJetColl].nJet] =trackEtaRel_0;	
+       JetInfo[iJetColl].Jet_trackEtaRel_0[JetInfo[iJetColl].nJet] =trackEtaRel_0;
 
       //---------------------------
       JetInfo[iJetColl].Jet_nFirstTrkEtaRelTagVarCSV[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nTrkEtaRelTagVarCSV;
@@ -1588,13 +1588,14 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
           flightDir_1 = svTagInfo->flightDirection(iVtx->second);
 	  SV_p4_1 = vertex.p4();
 	  z_ratio = reco::deltaR(flightDir_0,flightDir_1)*(SV_p4_1).pt()/(SV_p4_1).mass();
-	  //std::cout<<z_ratio<<"  "<<reco::deltaR(flightDir_0,flightDir_1)<<"   "<<SV_pt_0<<"   "<<(SV_p4_0+SV_p4_1).mass()<<std::endl;	
+	  //std::cout<<z_ratio<<"  "<<reco::deltaR(flightDir_0,flightDir_1)<<"   "<<SV_pt_0<<"   "<<(SV_p4_0+SV_p4_1).mass()<<std::endl;
 	  break;
 	}
       }
-	
 
-      float SubJet_csv ;//= TMath::Min(SubJetInfo[iSubJet2].Jet_CombIVF[JetInfo[iJetColl].nJet],SubJetInfo[iSubJet1].Jet_CombIVF[JetInfo[iJetColl].nJet]);		
+
+      float SubJet_csv = -3 ;
+      if (pjet->subjets("SoftDrop").size() > 0) SubJet_csv = TMath::Min(pjet->subjets("SoftDrop").at(0)->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"),pjet->subjets("SoftDrop").at(1)->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
       if(SubJet_csv >1. || SubJet_csv<-1.) SubJet_csv = -1;
 
       std::map<std::string,float> variables;
@@ -1616,17 +1617,17 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
       variables["trackEtaRel_1"] = JetInfo[iJetColl].Jet_trackEtaRel_1[JetInfo[iJetColl].nJet];
       variables["trackEtaRel_2"] = JetInfo[iJetColl].Jet_trackEtaRel_2[JetInfo[iJetColl].nJet];
       variables["TagVarCSV1_jetNTracksEtaRel"]= JetInfo[iJetColl].TagVarCSV_jetNTracksEtaRel[JetInfo[iJetColl].nJet];
-      variables["TagVarCSV1_jetNTracks"]= JetInfo[iJetColl].TagVarCSV_jetNTracks[JetInfo[iJetColl].nJet];	
-      variables["TagVarCSV1_vertexNTracks"]= JetInfo[iJetColl].TagVarCSV_vertexNTracks[JetInfo[iJetColl].nJet];  
-      variables["TagVarCSV1_jetNSecondaryVertices"]= JetInfo[iJetColl].TagVarCSV_jetNSecondaryVertices[JetInfo[iJetColl].nJet];     
-      variables["TagVarCSV1_trackSip2dSigAboveCharm"]= JetInfo[iJetColl].TagVarCSV_trackSip2dSigAboveCharm[JetInfo[iJetColl].nJet];     
-      variables["TagVarCSV1_vertexMass"]= JetInfo[iJetColl].TagVarCSV_vertexMass[JetInfo[iJetColl].nJet];     
-      variables["TagVarCSV1_vertexEnergyRatio"]= JetInfo[iJetColl].TagVarCSV_vertexEnergyRatio[JetInfo[iJetColl].nJet];     
-      variables["TagVarCSV1_vertexJetDeltaR"]= JetInfo[iJetColl].TagVarCSV_vertexJetDeltaR[JetInfo[iJetColl].nJet];     
-      variables["TagVarCSV1_flightDistance2dSig"]= JetInfo[iJetColl].TagVarCSV_flightDistance2dSig[JetInfo[iJetColl].nJet];     
-      variables["SubJet_csv"]=SubJet_csv;   	
-      
-	
+      variables["TagVarCSV1_jetNTracks"]= JetInfo[iJetColl].TagVarCSV_jetNTracks[JetInfo[iJetColl].nJet];
+      variables["TagVarCSV1_vertexNTracks"]= JetInfo[iJetColl].TagVarCSV_vertexNTracks[JetInfo[iJetColl].nJet];
+      variables["TagVarCSV1_jetNSecondaryVertices"]= JetInfo[iJetColl].TagVarCSV_jetNSecondaryVertices[JetInfo[iJetColl].nJet];
+      variables["TagVarCSV1_trackSip2dSigAboveCharm"]= JetInfo[iJetColl].TagVarCSV_trackSip2dSigAboveCharm[JetInfo[iJetColl].nJet];
+      variables["TagVarCSV1_vertexMass"]= JetInfo[iJetColl].TagVarCSV_vertexMass[JetInfo[iJetColl].nJet];
+      variables["TagVarCSV1_vertexEnergyRatio"]= JetInfo[iJetColl].TagVarCSV_vertexEnergyRatio[JetInfo[iJetColl].nJet];
+      variables["TagVarCSV1_vertexJetDeltaR"]= JetInfo[iJetColl].TagVarCSV_vertexJetDeltaR[JetInfo[iJetColl].nJet];
+      variables["TagVarCSV1_flightDistance2dSig"]= JetInfo[iJetColl].TagVarCSV_flightDistance2dSig[JetInfo[iJetColl].nJet];
+      variables["SubJet_csv"]=SubJet_csv;
+
+
 
       BDTG_SV = evaluator_SV_->evaluate(variables);
       BDTG_SL = evaluator_SL_->evaluate(variables);
