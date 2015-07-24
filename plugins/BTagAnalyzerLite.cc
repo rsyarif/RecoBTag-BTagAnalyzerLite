@@ -1566,24 +1566,24 @@ void BTagAnalyzerLiteT<IPTI,VTX>::setTracksPVBase(const reco::TrackRef & trackRe
 
   for(IV iv=pvHandle->begin(); iv!=pvHandle->end(); ++iv)
   {
-	  const reco::Vertex & vtx = *iv;
-	  // loop over tracks in vertices
-	  for(IT it=vtx.tracks_begin(); it!=vtx.tracks_end(); ++it)
-	  {
-		  const reco::TrackBaseRef & baseRef = *it;
-		  // one of the tracks in the vertex is the same as the track considered in the function
-		  if( baseRef == trackBaseRef )
-		  {
-			  float w = vtx.trackWeight(baseRef);
-			  // select the vertex for which the track has the highest weight
-			  if( w > PVweight )
-			  {
-				  PVweight = w;
-				  iPV = ( iv - pvHandle->begin() );
-				  break;
-			  }
-		  }
-	  }
+    const reco::Vertex & vtx = *iv;
+    // loop over tracks in vertices
+    for(IT it=vtx.tracks_begin(); it!=vtx.tracks_end(); ++it)
+      {
+      const reco::TrackBaseRef & baseRef = *it;
+      // one of the tracks in the vertex is the same as the track considered in the function
+      if( baseRef == trackBaseRef )
+      {
+	float w = vtx.trackWeight(baseRef);
+	// select the vertex for which the track has the highest weight
+	if( w > PVweight )
+        {
+          PVweight = w;
+	  iPV = ( iv - pvHandle->begin() );
+	  break;
+	}
+      }
+    }
   }
 }
 
