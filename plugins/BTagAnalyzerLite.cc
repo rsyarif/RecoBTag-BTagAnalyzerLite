@@ -1367,6 +1367,9 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
       for (int iTrk = JetInfo[iJetColl].Jet_nFirstTrkTagVarCSV[JetInfo[iJetColl].nJet]; iTrk < JetInfo[iJetColl].Jet_nLastTrkTagVarCSV[JetInfo[iJetColl].nJet]; ++iTrk){
 	      IP3Ds.push_back( JetInfo[iJetColl].TagVarCSV_trackSip3dSig[iTrk] );
       }
+      for (int iTrk = JetInfo[iJetColl].Jet_nFirstTrkEtaRelTagVarCSV[JetInfo[iJetColl].nJet]; iTrk < JetInfo[iJetColl].Jet_nLastTrkEtaRelTagVarCSV[JetInfo[iJetColl].nJet]; ++iTrk){
+                                        etaRels.push_back( TMath::Abs(JetInfo[iJetColl].TagVarCSV_trackEtaRel[iTrk]) );
+      }	
       double dummyTrack =99.;	
       int numTracks = JetInfo[iJetColl].TagVarCSV_jetNTracks[JetInfo[iJetColl].nJet];
       int numEtaRelTracks = JetInfo[iJetColl].TagVarCSV_jetNTracksEtaRel[JetInfo[iJetColl].nJet];
