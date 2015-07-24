@@ -1476,65 +1476,65 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
     float BDTG_SV = -1., BDTG_SL = -1., BDTG_Cascade = -1.;
     if ( runFatJets_ && iJetColl == 0 )
     {
-	    int cont=0;
-	    float SV_pt_0 = -1.;
-	    GlobalVector flightDir_0, flightDir_1;
-	    reco::Candidate::LorentzVector SV_p4_0 , SV_p4_1;
-	    for ( std::map<double, size_t>::reverse_iterator iVtx=VTXmass.rbegin(); iVtx!=VTXmass.rend(); ++iVtx)
-	    {
-		    ++cont;
-		    const Vertex &vertex = svTagInfo->secondaryVertex(iVtx->second);
-		    float SV_EnergyRatio = JetInfo[iJetColl].SV_EnergyRatio[JetInfo[iJetColl].Jet_nFirstSV[JetInfo[iJetColl].nJet]+int(iVtx->second)];
+      int cont=0;
+      float SV_pt_0 = -1.;
+      GlobalVector flightDir_0, flightDir_1;
+      reco::Candidate::LorentzVector SV_p4_0 , SV_p4_1;
+      for ( std::map<double, size_t>::reverse_iterator iVtx=VTXmass.rbegin(); iVtx!=VTXmass.rend(); ++iVtx)
+      {
+	      ++cont;
+	      const Vertex &vertex = svTagInfo->secondaryVertex(iVtx->second);
+	      float SV_EnergyRatio = JetInfo[iJetColl].SV_EnergyRatio[JetInfo[iJetColl].Jet_nFirstSV[JetInfo[iJetColl].nJet]+int(iVtx->second)];
 
-		    if (cont==1)
-		    {
-			    SV_mass_0 = vertex.p4().mass()  ;
-			    SV_EnergyRatio_0 = SV_EnergyRatio;
-			    SV_pt_0 = vertex.p4().pt();
-			    flightDir_0 = svTagInfo->flightDirection(iVtx->second);
-			    SV_p4_0 = vertex.p4();
+	      if (cont==1)
+	      {
+		      SV_mass_0 = vertex.p4().mass()  ;
+		      SV_EnergyRatio_0 = SV_EnergyRatio;
+		      SV_pt_0 = vertex.p4().pt();
+		      flightDir_0 = svTagInfo->flightDirection(iVtx->second);
+		      SV_p4_0 = vertex.p4();
 
-			    if (reco::deltaR2(flightDir_0,currentAxes[1])<reco::deltaR2(flightDir_0,currentAxes[0]))
-				    tau_dot = (currentAxes[1].px()*flightDir_0.x()+currentAxes[1].py()*flightDir_0.y()+currentAxes[1].pz()*flightDir_0.z())/(sqrt(currentAxes[1].modp2())*flightDir_0.mag());
-			    else
-				    tau_dot = (currentAxes[0].px()*flightDir_0.x()+currentAxes[0].py()*flightDir_0.y()+currentAxes[0].pz()*flightDir_0.z())/(sqrt(currentAxes[0].modp2())*flightDir_0.mag());
-			    z_ratio = reco::deltaR(currentAxes[1],currentAxes[0])*SV_pt_0/(SV_p4_0).mass(); //now it is defined even if we have one SV
-		    }
-		    if (cont==2)
-		    {
-			    SV_EnergyRatio_1 = SV_EnergyRatio;
-			    flightDir_1 = svTagInfo->flightDirection(iVtx->second);
-			    SV_p4_1 = vertex.p4();
-			    z_ratio = reco::deltaR(flightDir_0,flightDir_1)*(SV_p4_1).pt()/(SV_p4_1).mass();
-			    //std::cout<<z_ratio<<"  "<<reco::deltaR(flightDir_0,flightDir_1)<<"   "<<SV_pt_0<<"   "<<(SV_p4_0+SV_p4_1).mass()<<std::endl;	
-			    break;
-		    }
-	    }
+		      if (reco::deltaR2(flightDir_0,currentAxes[1])<reco::deltaR2(flightDir_0,currentAxes[0]))
+			      tau_dot = (currentAxes[1].px()*flightDir_0.x()+currentAxes[1].py()*flightDir_0.y()+currentAxes[1].pz()*flightDir_0.z())/(sqrt(currentAxes[1].modp2())*flightDir_0.mag());
+		      else
+			      tau_dot = (currentAxes[0].px()*flightDir_0.x()+currentAxes[0].py()*flightDir_0.y()+currentAxes[0].pz()*flightDir_0.z())/(sqrt(currentAxes[0].modp2())*flightDir_0.mag());
+		      z_ratio = reco::deltaR(currentAxes[1],currentAxes[0])*SV_pt_0/(SV_p4_0).mass(); //now it is defined even if we have one SV
+	      }
+	      if (cont==2)
+	      {
+		      SV_EnergyRatio_1 = SV_EnergyRatio;
+		      flightDir_1 = svTagInfo->flightDirection(iVtx->second);
+		      SV_p4_1 = vertex.p4();
+		      z_ratio = reco::deltaR(flightDir_0,flightDir_1)*(SV_p4_1).pt()/(SV_p4_1).mass();
+		      //std::cout<<z_ratio<<"  "<<reco::deltaR(flightDir_0,flightDir_1)<<"   "<<SV_pt_0<<"   "<<(SV_p4_0+SV_p4_1).mass()<<std::endl;	
+		      break;
+	      }
+      }
 
-	    std::map<std::string,float> variables;
-	    variables["z_ratio"] = z_ratio;
-	    variables["tau_dot"] = tau_dot;
-	    variables["SV_mass_0"] = SV_mass_0;
-	    variables["SV_vtx_EnergyRatio_0"] = SV_EnergyRatio_0;
-	    variables["SV_vtx_EnergyRatio_1"] = SV_EnergyRatio_1;
-	    variables["jetNTracksEtaRel"] = JetInfo[iJetColl].TagVarCSV_jetNTracksEtaRel[JetInfo[iJetColl].nJet];
-	    variables["PFLepton_ptrel"] = JetInfo[iJetColl].Jet_PFLepton_ptrel[JetInfo[iJetColl].nJet];
-	    variables["PFLepton_ratio"] = JetInfo[iJetColl].Jet_PFLepton_ratio[JetInfo[iJetColl].nJet];
-	    variables["nSL_3"] = (JetInfo[iJetColl].Jet_nSM[JetInfo[iJetColl].nJet] + JetInfo[iJetColl].Jet_nSE[JetInfo[iJetColl].nJet]);
-	    variables["trackSip3dSig_3"] = JetInfo[iJetColl].Jet_trackSip3dSig_3[JetInfo[iJetColl].nJet];
+      std::map<std::string,float> variables;
+      variables["z_ratio"] = z_ratio;
+      variables["tau_dot"] = tau_dot;
+      variables["SV_mass_0"] = SV_mass_0;
+      variables["SV_vtx_EnergyRatio_0"] = SV_EnergyRatio_0;
+      variables["SV_vtx_EnergyRatio_1"] = SV_EnergyRatio_1;
+      variables["jetNTracksEtaRel"] = JetInfo[iJetColl].TagVarCSV_jetNTracksEtaRel[JetInfo[iJetColl].nJet];
+      variables["PFLepton_ptrel"] = JetInfo[iJetColl].Jet_PFLepton_ptrel[JetInfo[iJetColl].nJet];
+      variables["PFLepton_ratio"] = JetInfo[iJetColl].Jet_PFLepton_ratio[JetInfo[iJetColl].nJet];
+      variables["nSL_3"] = (JetInfo[iJetColl].Jet_nSM[JetInfo[iJetColl].nJet] + JetInfo[iJetColl].Jet_nSE[JetInfo[iJetColl].nJet]);
+      variables["trackSip3dSig_3"] = JetInfo[iJetColl].Jet_trackSip3dSig_3[JetInfo[iJetColl].nJet];
 
-	    //BDTG_SV = evaluator_SV_->evaluate(variables);
-	    // BDTG_SL = evaluator_SL_->evaluate(variables);
-	    //float tau1 = JetInfo[iJetColl].Jet_tau1[JetInfo[iJetColl].nJet];
-	    //float tau2 = JetInfo[iJetColl].Jet_tau2[JetInfo[iJetColl].nJet];
-	    //float tau21 = ( tau1 != 0. ? tau2/tau1 : -1. );
+      //BDTG_SV = evaluator_SV_->evaluate(variables);
+      // BDTG_SL = evaluator_SL_->evaluate(variables);
+      //float tau1 = JetInfo[iJetColl].Jet_tau1[JetInfo[iJetColl].nJet];
+      //float tau2 = JetInfo[iJetColl].Jet_tau2[JetInfo[iJetColl].nJet];
+      //float tau21 = ( tau1 != 0. ? tau2/tau1 : -1. );
 
-	    //  std::map<std::string,float> variables_cascade;
-	    //  variables_cascade["BDTGSV"] = BDTG_SV;
-	    //  variables_cascade["BDTGSL"] = BDTG_SL;
-	    // variables_cascade["tau2/tau1"] = tau21;
+      //  std::map<std::string,float> variables_cascade;
+      //  variables_cascade["BDTGSV"] = BDTG_SV;
+      //  variables_cascade["BDTGSL"] = BDTG_SL;
+      // variables_cascade["tau2/tau1"] = tau21;
 
-	    // BDTG_Cascade = evaluator_cascade_->evaluate(variables); //check cascade later
+      // BDTG_Cascade = evaluator_cascade_->evaluate(variables); //check cascade later
 
     }
     JetInfo[iJetColl].Jet_z_ratio[JetInfo[iJetColl].nJet]          = z_ratio;
