@@ -1553,38 +1553,38 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
 } // BTagAnalyzerLiteT:: processJets
 
 
-	template<typename IPTI,typename VTX>
+template<typename IPTI,typename VTX>
 void BTagAnalyzerLiteT<IPTI,VTX>::setTracksPVBase(const reco::TrackRef & trackRef, const edm::Handle<reco::VertexCollection> & pvHandle, int & iPV, float & PVweight)
 {
-	iPV = -1;
-	PVweight = 0.;
+  iPV = -1;
+  PVweight = 0.;
 
-	const reco::TrackBaseRef trackBaseRef( trackRef );
+  const reco::TrackBaseRef trackBaseRef( trackRef );
 
-	typedef reco::VertexCollection::const_iterator IV;
-	typedef reco::Vertex::trackRef_iterator IT;
+  typedef reco::VertexCollection::const_iterator IV;
+  typedef reco::Vertex::trackRef_iterator IT;
 
-	for(IV iv=pvHandle->begin(); iv!=pvHandle->end(); ++iv)
-	{
-		const reco::Vertex & vtx = *iv;
-		// loop over tracks in vertices
-		for(IT it=vtx.tracks_begin(); it!=vtx.tracks_end(); ++it)
-		{
-			const reco::TrackBaseRef & baseRef = *it;
-			// one of the tracks in the vertex is the same as the track considered in the function
-			if( baseRef == trackBaseRef )
-			{
-				float w = vtx.trackWeight(baseRef);
-				// select the vertex for which the track has the highest weight
-				if( w > PVweight )
-				{
-					PVweight = w;
-					iPV = ( iv - pvHandle->begin() );
-					break;
-				}
-			}
-		}
-	}
+  for(IV iv=pvHandle->begin(); iv!=pvHandle->end(); ++iv)
+  {
+	  const reco::Vertex & vtx = *iv;
+	  // loop over tracks in vertices
+	  for(IT it=vtx.tracks_begin(); it!=vtx.tracks_end(); ++it)
+	  {
+		  const reco::TrackBaseRef & baseRef = *it;
+		  // one of the tracks in the vertex is the same as the track considered in the function
+		  if( baseRef == trackBaseRef )
+		  {
+			  float w = vtx.trackWeight(baseRef);
+			  // select the vertex for which the track has the highest weight
+			  if( w > PVweight )
+			  {
+				  PVweight = w;
+				  iPV = ( iv - pvHandle->begin() );
+				  break;
+			  }
+		  }
+	  }
+  }
 }
 
 
@@ -1602,46 +1602,46 @@ void BTagAnalyzerLiteT<IPTI,VTX>::endJob() {
 template<typename IPTI,typename VTX>
 const edm::Ptr<reco::Muon> BTagAnalyzerLiteT<IPTI,VTX>::matchMuon(const edm::Ptr<reco::Candidate>& theMuon, const edm::View<reco::Muon>& muons ){
 
-	const pat::PackedCandidate * pcand = dynamic_cast<const pat::PackedCandidate *>(theMuon.get());
+  const pat::PackedCandidate * pcand = dynamic_cast<const pat::PackedCandidate *>(theMuon.get());
 
-	if(pcand) // MiniAOD case
-	{
-		for(edm::View<reco::Muon>::const_iterator muon = muons.begin(); muon != muons.end(); ++muon )
-		{
-			const pat::Muon * patmuon = dynamic_cast<const pat::Muon *>(&(*muon));
+  if(pcand) // MiniAOD case
+  {
+	  for(edm::View<reco::Muon>::const_iterator muon = muons.begin(); muon != muons.end(); ++muon )
+	  {
+		  const pat::Muon * patmuon = dynamic_cast<const pat::Muon *>(&(*muon));
 
-			if(patmuon)
-			{
-				if(patmuon->originalObjectRef()==theMuon)
-					return muons.ptrAt(muon - muons.begin());
-			}
-		}
-		return edm::Ptr<reco::Muon>();
-	}
-	else
-	{
-		const reco::PFCandidate * pfcand = dynamic_cast<const reco::PFCandidate *>(theMuon.get());
+		  if(patmuon)
+		  {
+			  if(patmuon->originalObjectRef()==theMuon)
+				  return muons.ptrAt(muon - muons.begin());
+		  }
+	  }
+	  return edm::Ptr<reco::Muon>();
+  }
+  else
+  {
+	  const reco::PFCandidate * pfcand = dynamic_cast<const reco::PFCandidate *>(theMuon.get());
 
-		return edm::refToPtr( pfcand->muonRef() );
-	}
+	  return edm::refToPtr( pfcand->muonRef() );
+  }
 }
 
-	template<typename IPTI,typename VTX>
+template<typename IPTI,typename VTX>
 bool BTagAnalyzerLiteT<IPTI,VTX>::isHardProcess(const int status)
 {
 	// if Pythia8
-	if( hadronizerType_ & (1 << 1) )
-	{
-		if( status>=21 && status<=29 )
-			return true;
-	}
-	else // assuming Pythia6
-	{
-		if( status==3 )
-			return true;
-	}
+  if( hadronizerType_ & (1 << 1) )
+  {
+	  if( status>=21 && status<=29 )
+		  return true;
+  }
+  else // assuming Pythia6
+  {
+	  if( status==3 )
+		  return true;
+  }
 
-	return false;
+  return false;
 }
 
 // -------------------------------------------------------------------------
