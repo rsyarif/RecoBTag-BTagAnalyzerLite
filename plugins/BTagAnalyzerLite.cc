@@ -1488,26 +1488,26 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
 
 	if (cont==1)
 	{
-		SV_mass_0 = vertex.p4().mass()  ;
-		SV_EnergyRatio_0 = SV_EnergyRatio;
-		SV_pt_0 = vertex.p4().pt();
-		flightDir_0 = svTagInfo->flightDirection(iVtx->second);
-		SV_p4_0 = vertex.p4();
+          SV_mass_0 = vertex.p4().mass()  ;
+          SV_EnergyRatio_0 = SV_EnergyRatio;
+	  SV_pt_0 = vertex.p4().pt();
+	  flightDir_0 = svTagInfo->flightDirection(iVtx->second);
+	  SV_p4_0 = vertex.p4();
 
-		if (reco::deltaR2(flightDir_0,currentAxes[1])<reco::deltaR2(flightDir_0,currentAxes[0]))
-			tau_dot = (currentAxes[1].px()*flightDir_0.x()+currentAxes[1].py()*flightDir_0.y()+currentAxes[1].pz()*flightDir_0.z())/(sqrt(currentAxes[1].modp2())*flightDir_0.mag());
-		else
-			tau_dot = (currentAxes[0].px()*flightDir_0.x()+currentAxes[0].py()*flightDir_0.y()+currentAxes[0].pz()*flightDir_0.z())/(sqrt(currentAxes[0].modp2())*flightDir_0.mag());
-		z_ratio = reco::deltaR(currentAxes[1],currentAxes[0])*SV_pt_0/(SV_p4_0).mass(); //now it is defined even if we have one SV
+	  if (reco::deltaR2(flightDir_0,currentAxes[1])<reco::deltaR2(flightDir_0,currentAxes[0]))
+		  tau_dot = (currentAxes[1].px()*flightDir_0.x()+currentAxes[1].py()*flightDir_0.y()+currentAxes[1].pz()*flightDir_0.z())/(sqrt(currentAxes[1].modp2())*flightDir_0.mag());
+	  else
+		  tau_dot = (currentAxes[0].px()*flightDir_0.x()+currentAxes[0].py()*flightDir_0.y()+currentAxes[0].pz()*flightDir_0.z())/(sqrt(currentAxes[0].modp2())*flightDir_0.mag());
+	  z_ratio = reco::deltaR(currentAxes[1],currentAxes[0])*SV_pt_0/(SV_p4_0).mass(); //now it is defined even if we have one SV
 	}
 	if (cont==2)
 	{
-		SV_EnergyRatio_1 = SV_EnergyRatio;
-		flightDir_1 = svTagInfo->flightDirection(iVtx->second);
-		SV_p4_1 = vertex.p4();
-		z_ratio = reco::deltaR(flightDir_0,flightDir_1)*(SV_p4_1).pt()/(SV_p4_1).mass();
-		//std::cout<<z_ratio<<"  "<<reco::deltaR(flightDir_0,flightDir_1)<<"   "<<SV_pt_0<<"   "<<(SV_p4_0+SV_p4_1).mass()<<std::endl;	
-		break;
+          SV_EnergyRatio_1 = SV_EnergyRatio;
+          flightDir_1 = svTagInfo->flightDirection(iVtx->second);
+	  SV_p4_1 = vertex.p4();
+	  z_ratio = reco::deltaR(flightDir_0,flightDir_1)*(SV_p4_1).pt()/(SV_p4_1).mass();
+	  //std::cout<<z_ratio<<"  "<<reco::deltaR(flightDir_0,flightDir_1)<<"   "<<SV_pt_0<<"   "<<(SV_p4_0+SV_p4_1).mass()<<std::endl;	
+	  break;
 	}
       }
 
