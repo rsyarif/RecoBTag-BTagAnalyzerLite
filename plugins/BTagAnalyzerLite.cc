@@ -280,6 +280,7 @@ class BTagAnalyzerLiteT : public edm::EDAnalyzer
     std::unique_ptr<MVAEvaluator> evaluator_SV_;
     std::unique_ptr<MVAEvaluator> evaluator_SL_;
     std::unique_ptr<MVAEvaluator> evaluator_cascade_;
+    std::unique_ptr<MVAEvaluator> evaluator_all_;
 };
 
 
