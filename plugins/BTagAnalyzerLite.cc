@@ -1406,68 +1406,68 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
     for (size_t vtx = 0; vtx < (size_t)JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]; ++vtx)
     {
 
-	JetInfo[iJetColl].SV_x[JetInfo[iJetColl].nSV]    = position(svTagInfo->secondaryVertex(vtx)).x();
-	JetInfo[iJetColl].SV_y[JetInfo[iJetColl].nSV]    = position(svTagInfo->secondaryVertex(vtx)).y();
-	JetInfo[iJetColl].SV_z[JetInfo[iJetColl].nSV]    = position(svTagInfo->secondaryVertex(vtx)).z();
-	JetInfo[iJetColl].SV_ex[JetInfo[iJetColl].nSV]   = xError(svTagInfo->secondaryVertex(vtx));
-	JetInfo[iJetColl].SV_ey[JetInfo[iJetColl].nSV]   = yError(svTagInfo->secondaryVertex(vtx));
-	JetInfo[iJetColl].SV_ez[JetInfo[iJetColl].nSV]   = zError(svTagInfo->secondaryVertex(vtx));
-	JetInfo[iJetColl].SV_chi2[JetInfo[iJetColl].nSV] = chi2(svTagInfo->secondaryVertex(vtx));
-	JetInfo[iJetColl].SV_ndf[JetInfo[iJetColl].nSV]  = ndof(svTagInfo->secondaryVertex(vtx));
+      JetInfo[iJetColl].SV_x[JetInfo[iJetColl].nSV]    = position(svTagInfo->secondaryVertex(vtx)).x();
+      JetInfo[iJetColl].SV_y[JetInfo[iJetColl].nSV]    = position(svTagInfo->secondaryVertex(vtx)).y();
+      JetInfo[iJetColl].SV_z[JetInfo[iJetColl].nSV]    = position(svTagInfo->secondaryVertex(vtx)).z();
+      JetInfo[iJetColl].SV_ex[JetInfo[iJetColl].nSV]   = xError(svTagInfo->secondaryVertex(vtx));
+      JetInfo[iJetColl].SV_ey[JetInfo[iJetColl].nSV]   = yError(svTagInfo->secondaryVertex(vtx));
+      JetInfo[iJetColl].SV_ez[JetInfo[iJetColl].nSV]   = zError(svTagInfo->secondaryVertex(vtx));
+      JetInfo[iJetColl].SV_chi2[JetInfo[iJetColl].nSV] = chi2(svTagInfo->secondaryVertex(vtx));
+      JetInfo[iJetColl].SV_ndf[JetInfo[iJetColl].nSV]  = ndof(svTagInfo->secondaryVertex(vtx));
 
-	JetInfo[iJetColl].SV_flight[JetInfo[iJetColl].nSV]      = svTagInfo->flightDistance(vtx).value();
-	JetInfo[iJetColl].SV_flightErr[JetInfo[iJetColl].nSV]   = svTagInfo->flightDistance(vtx).error();
-	JetInfo[iJetColl].SV_flight2D[JetInfo[iJetColl].nSV]    = svTagInfo->flightDistance(vtx, true).value();
-	JetInfo[iJetColl].SV_flight2DErr[JetInfo[iJetColl].nSV] = svTagInfo->flightDistance(vtx, true).error();
-	JetInfo[iJetColl].SV_nTrk[JetInfo[iJetColl].nSV]        = nTracks(svTagInfo->secondaryVertex(vtx));
-
-
-	const Vertex &vertex = svTagInfo->secondaryVertex(vtx);
-
-	JetInfo[iJetColl].SV_vtx_pt[JetInfo[iJetColl].nSV]  = vertex.p4().pt();
-	JetInfo[iJetColl].SV_vtx_eta[JetInfo[iJetColl].nSV] = vertex.p4().eta();
-	JetInfo[iJetColl].SV_vtx_phi[JetInfo[iJetColl].nSV] = vertex.p4().phi();
-	JetInfo[iJetColl].SV_mass[JetInfo[iJetColl].nSV]    = vertex.p4().mass();
-
-	Int_t totcharge=0;
-	reco::TrackKinematics vertexKinematics;
-
-	// get the vertex kinematics and charge
-	vertexKinematicsAndChange(vertex, vertexKinematics, totcharge);
-
-	// total charge at the secondary vertex
-	JetInfo[iJetColl].SV_totCharge[JetInfo[iJetColl].nSV]=totcharge;
-
-	math::XYZTLorentzVector vertexSum = vertexKinematics.weightedVectorSum();
-	edm::RefToBase<reco::Jet> jet = ipTagInfo->jet();
-	math::XYZVector jetDir = jet->momentum().Unit();
-	GlobalVector flightDir = svTagInfo->flightDirection(vtx);
-
-	JetInfo[iJetColl].SV_deltaR_jet[JetInfo[iJetColl].nSV]     = ( reco::deltaR(flightDir, jetDir) );
-	JetInfo[iJetColl].SV_deltaR_sum_jet[JetInfo[iJetColl].nSV] = ( reco::deltaR(vertexSum, jetDir) );
-	JetInfo[iJetColl].SV_deltaR_sum_dir[JetInfo[iJetColl].nSV] = ( reco::deltaR(vertexSum, flightDir) );
-
-	Line::PositionType pos(GlobalPoint(position(vertex).x(),position(vertex).y(),position(vertex).z()));
-	Line trackline(pos,flightDir);
-	// get the Jet  line
-	Line::PositionType pos2(GlobalPoint(pv->x(),pv->y(),pv->z()));
-	Line::DirectionType dir2(GlobalVector(jetDir.x(),jetDir.y(),jetDir.z()));
-	Line jetline(pos2,dir2);
-	// now compute the distance between the two lines
-	JetInfo[iJetColl].SV_vtxDistJetAxis[JetInfo[iJetColl].nSV] = (jetline.distance(trackline)).mag();
+      JetInfo[iJetColl].SV_flight[JetInfo[iJetColl].nSV]      = svTagInfo->flightDistance(vtx).value();
+      JetInfo[iJetColl].SV_flightErr[JetInfo[iJetColl].nSV]   = svTagInfo->flightDistance(vtx).error();
+      JetInfo[iJetColl].SV_flight2D[JetInfo[iJetColl].nSV]    = svTagInfo->flightDistance(vtx, true).value();
+      JetInfo[iJetColl].SV_flight2DErr[JetInfo[iJetColl].nSV] = svTagInfo->flightDistance(vtx, true).error();
+      JetInfo[iJetColl].SV_nTrk[JetInfo[iJetColl].nSV]        = nTracks(svTagInfo->secondaryVertex(vtx));
 
 
-	math::XYZTLorentzVector allSum =  allKinematics.weightedVectorSum() ; //allKinematics.vectorSum()
-	JetInfo[iJetColl].SV_EnergyRatio[JetInfo[iJetColl].nSV] = vertexSum.E() / allSum.E();
+      const Vertex &vertex = svTagInfo->secondaryVertex(vtx);
 
-	JetInfo[iJetColl].SV_dir_x[JetInfo[iJetColl].nSV]= flightDir.x();
-	JetInfo[iJetColl].SV_dir_y[JetInfo[iJetColl].nSV]= flightDir.y();
-	JetInfo[iJetColl].SV_dir_z[JetInfo[iJetColl].nSV]= flightDir.z();
+      JetInfo[iJetColl].SV_vtx_pt[JetInfo[iJetColl].nSV]  = vertex.p4().pt();
+      JetInfo[iJetColl].SV_vtx_eta[JetInfo[iJetColl].nSV] = vertex.p4().eta();
+      JetInfo[iJetColl].SV_vtx_phi[JetInfo[iJetColl].nSV] = vertex.p4().phi();
+      JetInfo[iJetColl].SV_mass[JetInfo[iJetColl].nSV]    = vertex.p4().mass();
 
-	if (runFatJets_ && iJetColl == 0 && reco::deltaR2(flightDir, jetDir)<(maxSVDeltaRToJet_*maxSVDeltaRToJet_))
-		VTXmass[vertex.p4().pt()]=vtx; //ordered according the pt
+      Int_t totcharge=0;
+      reco::TrackKinematics vertexKinematics;
 
-	++JetInfo[iJetColl].nSV;
+      // get the vertex kinematics and charge
+      vertexKinematicsAndChange(vertex, vertexKinematics, totcharge);
+
+      // total charge at the secondary vertex
+      JetInfo[iJetColl].SV_totCharge[JetInfo[iJetColl].nSV]=totcharge;
+
+      math::XYZTLorentzVector vertexSum = vertexKinematics.weightedVectorSum();
+      edm::RefToBase<reco::Jet> jet = ipTagInfo->jet();
+      math::XYZVector jetDir = jet->momentum().Unit();
+      GlobalVector flightDir = svTagInfo->flightDirection(vtx);
+
+      JetInfo[iJetColl].SV_deltaR_jet[JetInfo[iJetColl].nSV]     = ( reco::deltaR(flightDir, jetDir) );
+      JetInfo[iJetColl].SV_deltaR_sum_jet[JetInfo[iJetColl].nSV] = ( reco::deltaR(vertexSum, jetDir) );
+      JetInfo[iJetColl].SV_deltaR_sum_dir[JetInfo[iJetColl].nSV] = ( reco::deltaR(vertexSum, flightDir) );
+
+      Line::PositionType pos(GlobalPoint(position(vertex).x(),position(vertex).y(),position(vertex).z()));
+      Line trackline(pos,flightDir);
+      // get the Jet  line
+      Line::PositionType pos2(GlobalPoint(pv->x(),pv->y(),pv->z()));
+      Line::DirectionType dir2(GlobalVector(jetDir.x(),jetDir.y(),jetDir.z()));
+      Line jetline(pos2,dir2);
+      // now compute the distance between the two lines
+      JetInfo[iJetColl].SV_vtxDistJetAxis[JetInfo[iJetColl].nSV] = (jetline.distance(trackline)).mag();
+
+
+      math::XYZTLorentzVector allSum =  allKinematics.weightedVectorSum() ; //allKinematics.vectorSum()
+      JetInfo[iJetColl].SV_EnergyRatio[JetInfo[iJetColl].nSV] = vertexSum.E() / allSum.E();
+
+      JetInfo[iJetColl].SV_dir_x[JetInfo[iJetColl].nSV]= flightDir.x();
+      JetInfo[iJetColl].SV_dir_y[JetInfo[iJetColl].nSV]= flightDir.y();
+      JetInfo[iJetColl].SV_dir_z[JetInfo[iJetColl].nSV]= flightDir.z();
+
+      if (runFatJets_ && iJetColl == 0 && reco::deltaR2(flightDir, jetDir)<(maxSVDeltaRToJet_*maxSVDeltaRToJet_))
+	      VTXmass[vertex.p4().pt()]=vtx; //ordered according the pt
+
+      ++JetInfo[iJetColl].nSV;
 
     } //// if secondary vertices present
     JetInfo[iJetColl].Jet_nLastSV[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nSV;
