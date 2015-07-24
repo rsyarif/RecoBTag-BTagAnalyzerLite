@@ -102,6 +102,7 @@ class JetInfoBranches {
     float Jet_BDTG_SV[nMaxJets_];
     float Jet_BDTG_SL[nMaxJets_];
     float Jet_BDTG_Cascade[nMaxJets_];
+    float Jet_BDTG_All[nMaxJets_];
     int   Jet_nFirstTrkTagVar[nMaxJets_];
     int   Jet_nLastTrkTagVar[nMaxJets_];
     int   Jet_nFirstSVTagVar[nMaxJets_];
@@ -625,6 +626,7 @@ class JetInfoBranches {
       tree->Branch((name+"Jet_BDTG_SV").c_str(),          Jet_BDTG_SV          ,(name+"Jet_BDTG_SV["+name+"nJet]/F").c_str()         );
       tree->Branch((name+"Jet_BDTG_SL").c_str(),          Jet_BDTG_SL          ,(name+"Jet_BDTG_SL["+name+"nJet]/F").c_str()         );
       tree->Branch((name+"Jet_BDTG_Cascade").c_str(),     Jet_BDTG_Cascade     ,(name+"Jet_BDTG_Cascade["+name+"nJet]/F").c_str()    );
+      tree->Branch((name+"Jet_BDTG_All").c_str(),     Jet_BDTG_All     ,(name+"Jet_BDTG_All["+name+"nJet]/F").c_str()    );
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -957,6 +959,7 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"Jet_BDTG_SV").c_str(),          Jet_BDTG_SV      );
       tree->SetBranchAddress((name+"Jet_BDTG_SL").c_str(),          Jet_BDTG_SL      );
       tree->SetBranchAddress((name+"Jet_BDTG_Cascade").c_str(),     Jet_BDTG_Cascade );
+      tree->SetBranchAddress((name+"Jet_BDTG_All").c_str(),     Jet_BDTG_All );
     }
 };
 

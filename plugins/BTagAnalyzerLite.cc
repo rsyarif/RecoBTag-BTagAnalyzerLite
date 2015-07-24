@@ -330,16 +330,19 @@ BTagAnalyzerLiteT<IPTI,VTX>::BTagAnalyzerLiteT(const edm::ParameterSet& iConfig)
       evaluator_SV_.reset( new MVAEvaluator("BDTG", edm::FileInPath("RecoBTag/BTagAnalyzerLite/data/TMVA_SV_spring15.weights.xml.gz").fullPath()) );
       evaluator_SL_.reset( new MVAEvaluator("BDTG", edm::FileInPath("RecoBTag/BTagAnalyzerLite/data/TMVA_SL_spring15.weights.xml.gz").fullPath()) );
       evaluator_cascade_.reset( new MVAEvaluator("BDTG", edm::FileInPath("RecoBTag/BTagAnalyzerLite/data/TMVA_cascade.weights.xml.gz").fullPath()) );
+      evaluator_all_.reset( new MVAEvaluator("BDTG", edm::FileInPath("RecoBTag/BTagAnalyzerLite/data/TMVA_all_spring15.weights.xml.gz").fullPath()) );
 
       // book TMVA readers
       std::vector<std::string> variables_SV({"SubJet_csv","trackSip3dSig_3","trackSip3dSig_2","trackSip3dSig_1","trackSip3dSig_0","TagVarCSV1_trackSip2dSigAboveCharm","trackEtaRel_0","trackEtaRel_1","trackEtaRel_2","TagVarCSV1_vertexMass","TagVarCSV1_vertexEnergyRatio" ,"TagVarCSV1_vertexJetDeltaR" ,"TagVarCSV1_flightDistance2dSig","TagVarCSV1_jetNTracks" ,"TagVarCSV1_jetNTracksEtaRel" ,"TagVarCSV1_jetNSecondaryVertices","TagVarCSV1_vertexNTracks"});
       std::vector<std::string> variables_SL({"PFLepton_ratio", "PFLepton_ptrel", "nSL_3"});
       std::vector<std::string> variables_cascade({"BDTGSV","BDTGSL"});
+      std::vector<std::string> variables_all({"SubJet_csv","PFLepton_ratio", "PFLepton_ptrel","trackSip3dSig_3","trackSip3dSig_2","trackSip3dSig_1","trackSip3dSig_0","TagVarCSV1_trackSip2dSigAboveCharm","trackEtaRel_0","trackEtaRel_1","trackEtaRel_2","TagVarCSV1_vertexMass","TagVarCSV1_vertexEnergyRatio" ,"TagVarCSV1_vertexJetDeltaR" ,"TagVarCSV1_flightDistance2dSig","nSL_3","TagVarCSV1_jetNTracks" ,"TagVarCSV1_jetNTracksEtaRel" ,"TagVarCSV1_jetNSecondaryVertices","TagVarCSV1_vertexNTracks"});
       std::vector<std::string> spectators({"massPruned", "flavour", "nbHadrons", "ptPruned", "etaPruned"});
       evaluator_SV_->bookReader(variables_SV, spectators);
       evaluator_SL_->bookReader(variables_SL, spectators);
 
       evaluator_cascade_->bookReader(variables_cascade, spectators);
+      evaluator_all_->bookReader(variables_all, spectators);
     }
 
   if( runSubJets_ && ( SubJetCollectionTags_.size()>0 || SubJetLabels_.size()>0 ) )
@@ -1555,7 +1558,7 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
     JetInfo[iJetColl].Jet_nLastSV[JetInfo[iJetColl].nJet] = JetInfo[iJetColl].nSV;
 
     float z_ratio = -3. , tau_dot = 0., SV_mass_0 = -3., SV_EnergyRatio_0 = -3., SV_EnergyRatio_1 = -3.;
-    float BDTG_SV = -1., BDTG_SL = -1., BDTG_Cascade = -1.;
+    float BDTG_SV = -1., BDTG_SL = -1., BDTG_Cascade = -1.; float BDTG_All = -1;
     if ( runFatJets_ && iJetColl == 0 )
     {
       int cont=0;
@@ -1644,6 +1647,8 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
 
       BDTG_Cascade = evaluator_cascade_->evaluate(variables_cascade); //check cascade later
 
+      BDTG_All = evaluator_all_->evaluate(variables);
+
     }
     JetInfo[iJetColl].Jet_z_ratio[JetInfo[iJetColl].nJet]          = z_ratio;
     JetInfo[iJetColl].Jet_tau_dot[JetInfo[iJetColl].nJet]          = tau_dot;
@@ -1653,6 +1658,7 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
     JetInfo[iJetColl].Jet_BDTG_SV[JetInfo[iJetColl].nJet]          = BDTG_SV;
     JetInfo[iJetColl].Jet_BDTG_SL[JetInfo[iJetColl].nJet]          = BDTG_SL;
     JetInfo[iJetColl].Jet_BDTG_Cascade[JetInfo[iJetColl].nJet]     = BDTG_Cascade;
+    JetInfo[iJetColl].Jet_BDTG_All[JetInfo[iJetColl].nJet]     	   = BDTG_All;
 
     ++JetInfo[iJetColl].nJet;
   } // end loop on jet
