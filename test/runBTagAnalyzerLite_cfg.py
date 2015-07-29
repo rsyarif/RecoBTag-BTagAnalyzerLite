@@ -181,6 +181,7 @@ bTagDiscriminatorsLegacy = [
     ,'softPFElectronBJetTags'
     ,'positiveSoftPFElectronBJetTags'
     ,'negativeSoftPFElectronBJetTags'
+    ,'combinedMVABJetTags'
 ]
 
 bTagDiscriminators = [
@@ -210,6 +211,7 @@ bTagDiscriminators = [
     ,'softPFElectronBJetTags'
     ,'positiveSoftPFElectronBJetTags'
     ,'negativeSoftPFElectronBJetTags'
+    ,'pfCombinedMVABJetTags'
 ]
 
 ## Legacy taggers not supported with MiniAOD
