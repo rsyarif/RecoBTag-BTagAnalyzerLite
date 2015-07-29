@@ -1599,7 +1599,7 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
 
 
       float SubJet_csv = -1 ;
-      if (pjet->subjets("SoftDrop").size() > 1){
+      if (pjet->hasSubjets("SoftDrop") && pjet->subjets("SoftDrop").size() > 1){
         SubJet_csv = TMath::Min(pjet->subjets("SoftDrop").at(0)->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"),pjet->subjets("SoftDrop").at(1)->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
       }
       if(SubJet_csv >1. || SubJet_csv<-1.) SubJet_csv = -1;
