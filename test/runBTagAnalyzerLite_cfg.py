@@ -772,6 +772,10 @@ if options.runFatJets:
     process.btaganaFatJets = process.btagana.clone(
         storeEventInfo      = cms.bool(not options.processStdAK4Jets),
         allowJetSkipping    = cms.bool(False),
+        storeTagVariables   = cms.bool(False),
+        storeCSVTagVariables = cms.bool(True),
+        storeTagVariablesSubJets = cms.bool(False),
+        storeCSVTagVariablesSubJets = cms.bool(True),
         useBCands           = cms.bool(options.useBCands),
         R0                  = cms.double(options.jetRadius),
         maxSVDeltaRToJet    = cms.double(options.jetRadius-(0.1+(options.jetRadius-0.8)*(0.1/0.7))), # linear interpolation from 0.7 at R=0.8 to 1.3 at R=1.5
