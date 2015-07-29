@@ -342,17 +342,9 @@ class JetInfoBranches {
 
       tree->Branch((name+"Jet_DoubleSV").c_str(),    Jet_DoubleSV    ,(name+"Jet_DoubleSV["+name+"nJet]/F").c_str());
 
-      tree->Branch((name+"Jet_nFirstTrack").c_str(), Jet_nFirstTrack ,(name+"Jet_nFirstTrack["+name+"nJet]/I").c_str());
-      tree->Branch((name+"Jet_nLastTrack").c_str(),  Jet_nLastTrack  ,(name+"Jet_nLastTrack["+name+"nJet]/I").c_str());
-      tree->Branch((name+"Jet_nFirstSV").c_str(),    Jet_nFirstSV    ,(name+"Jet_nFirstSV["+name+"nJet]/I").c_str());
-      tree->Branch((name+"Jet_nLastSV").c_str(),     Jet_nLastSV     ,(name+"Jet_nLastSV["+name+"nJet]/I").c_str());
       tree->Branch((name+"Jet_SV_multi").c_str(),    Jet_SV_multi      ,(name+"Jet_SV_multi["+name+"nJet]/I").c_str());
       tree->Branch((name+"Jet_nSM").c_str(),         Jet_nSM         ,(name+"Jet_nSM["+name+"nJet]/I").c_str()      );
-      tree->Branch((name+"Jet_nFirstSM").c_str(),    Jet_nFirstSM    ,(name+"Jet_nFirstSM["+name+"nJet]/I").c_str() );
-      tree->Branch((name+"Jet_nLastSM").c_str(),     Jet_nLastSM     ,(name+"Jet_nLastSM["+name+"nJet]/I").c_str()  );
       tree->Branch((name+"Jet_nSE").c_str(),         Jet_nSE         ,(name+"Jet_nSE["+name+"nJet]/I").c_str()      );
-      tree->Branch((name+"Jet_nFirstSE").c_str(),    Jet_nFirstSE    ,(name+"Jet_nFirstSE["+name+"nJet]/I").c_str() );
-      tree->Branch((name+"Jet_nLastSE").c_str(),     Jet_nLastSE     ,(name+"Jet_nLastSE["+name+"nJet]/I").c_str()  );
 
       tree->Branch((name+"Jet_looseID").c_str(),      Jet_looseID  ,(name+"Jet_looseID["+name+"nJet]/I").c_str());
       tree->Branch((name+"Jet_tightID").c_str(),      Jet_tightID  ,(name+"Jet_tightID["+name+"nJet]/I").c_str());
@@ -360,6 +352,9 @@ class JetInfoBranches {
       //--------------------------------------
       // secondary vertex information
       //--------------------------------------
+      tree->Branch((name+"Jet_nFirstSV").c_str(),    Jet_nFirstSV    ,(name+"Jet_nFirstSV["+name+"nJet]/I").c_str());
+      tree->Branch((name+"Jet_nLastSV").c_str(),     Jet_nLastSV     ,(name+"Jet_nLastSV["+name+"nJet]/I").c_str());
+
       tree->Branch((name+"nSV").c_str()                ,&nSV               ,(name+"nSV/I").c_str());
       tree->Branch((name+"SV_x").c_str()               ,SV_x                 ,(name+"SV_x["+name+"nSV]/F").c_str());
       tree->Branch((name+"SV_y").c_str()               ,SV_y                 ,(name+"SV_y["+name+"nSV]/F").c_str());
@@ -394,6 +389,9 @@ class JetInfoBranches {
       //--------------------------------------
       // pf electron information
       //--------------------------------------
+      tree->Branch((name+"Jet_nFirstSE").c_str(),    Jet_nFirstSE    ,(name+"Jet_nFirstSE["+name+"nJet]/I").c_str() );
+      tree->Branch((name+"Jet_nLastSE").c_str(),     Jet_nLastSE     ,(name+"Jet_nLastSE["+name+"nJet]/I").c_str()  );
+
       tree->Branch((name+"nPFElectron").c_str()         ,&nPFElectron        ,(name+"nPFElectron/I").c_str());
       tree->Branch((name+"PFElectron_IdxJet").c_str()   ,PFElectron_IdxJet   ,(name+"PFElectron_IdxJet["+name+"nPFElectron]/I").c_str());
       tree->Branch((name+"PFElectron_pt").c_str()       ,PFElectron_pt       ,(name+"PFElectron_pt["+name+"nPFElectron]/F").c_str());
@@ -409,6 +407,9 @@ class JetInfoBranches {
       //--------------------------------------
       // pf muon information
       //--------------------------------------
+      tree->Branch((name+"Jet_nFirstSM").c_str(),    Jet_nFirstSM    ,(name+"Jet_nFirstSM["+name+"nJet]/I").c_str() );
+      tree->Branch((name+"Jet_nLastSM").c_str(),     Jet_nLastSM     ,(name+"Jet_nLastSM["+name+"nJet]/I").c_str()  );
+
       tree->Branch((name+"nPFMuon").c_str()            ,&nPFMuon            ,(name+"nPFMuon/I").c_str());
       tree->Branch((name+"PFMuon_IdxJet").c_str()      ,PFMuon_IdxJet       ,(name+"PFMuon_IdxJet["+name+"nPFMuon]/I").c_str());
       tree->Branch((name+"PFMuon_nMuHit").c_str()      ,PFMuon_nMuHit       ,(name+"PFMuon_nMuHit["+name+"nPFMuon]/I").c_str());
@@ -438,6 +439,9 @@ class JetInfoBranches {
       //--------------------------------------
       // track information
       //--------------------------------------
+      tree->Branch((name+"Jet_nFirstTrack").c_str(), Jet_nFirstTrack ,(name+"Jet_nFirstTrack["+name+"nJet]/I").c_str());
+      tree->Branch((name+"Jet_nLastTrack").c_str(),  Jet_nLastTrack  ,(name+"Jet_nLastTrack["+name+"nJet]/I").c_str());
+
       tree->Branch((name+"nTrack").c_str()           ,&nTrack          ,(name+"nTrack/I").c_str());
       tree->Branch((name+"Track_dxy").c_str()        ,Track_dxy             ,(name+"Track_dxy["+name+"nTrack]/F").c_str());
       tree->Branch((name+"Track_dz").c_str()         ,Track_dz         ,(name+"Track_dz["+name+"nTrack]/F").c_str());
@@ -674,17 +678,9 @@ class JetInfoBranches {
 
       tree->SetBranchAddress((name+"Jet_DoubleSV").c_str(),    Jet_DoubleSV    );
 
-      tree->SetBranchAddress((name+"Jet_nFirstTrack").c_str(), Jet_nFirstTrack );
-      tree->SetBranchAddress((name+"Jet_nLastTrack").c_str(),  Jet_nLastTrack  );
-      tree->SetBranchAddress((name+"Jet_nFirstSV").c_str(),    Jet_nFirstSV    );
-      tree->SetBranchAddress((name+"Jet_nLastSV").c_str(),     Jet_nLastSV     );
       tree->SetBranchAddress((name+"Jet_SV_multi").c_str(),    Jet_SV_multi      );
       tree->SetBranchAddress((name+"Jet_nSM").c_str(),         Jet_nSM         );
-      tree->SetBranchAddress((name+"Jet_nFirstSM").c_str(),    Jet_nFirstSM    );
-      tree->SetBranchAddress((name+"Jet_nLastSM").c_str(),     Jet_nLastSM     );
       tree->SetBranchAddress((name+"Jet_nSE").c_str(),         Jet_nSE         );
-      tree->SetBranchAddress((name+"Jet_nFirstSE").c_str(),    Jet_nFirstSE    );
-      tree->SetBranchAddress((name+"Jet_nLastSE").c_str(),     Jet_nLastSE     );
 
       tree->SetBranchAddress((name+"Jet_looseID").c_str(),     Jet_looseID);
       tree->SetBranchAddress((name+"Jet_tightID").c_str(),     Jet_tightID);
@@ -692,6 +688,9 @@ class JetInfoBranches {
       //--------------------------------------
       // secondary vertex information
       //--------------------------------------
+      tree->SetBranchAddress((name+"Jet_nFirstSV").c_str(),    Jet_nFirstSV    );
+      tree->SetBranchAddress((name+"Jet_nLastSV").c_str(),     Jet_nLastSV     );
+
       tree->SetBranchAddress((name+"nSV").c_str()                ,&nSV               ) ;
       tree->SetBranchAddress((name+"SV_x").c_str()               ,SV_x                     ) ;
       tree->SetBranchAddress((name+"SV_y").c_str()               ,SV_y                     ) ;
@@ -726,6 +725,9 @@ class JetInfoBranches {
       //--------------------------------------
       // pf electron information
       //--------------------------------------
+      tree->SetBranchAddress((name+"Jet_nFirstSE").c_str(),    Jet_nFirstSE    );
+      tree->SetBranchAddress((name+"Jet_nLastSE").c_str(),     Jet_nLastSE     );
+
       tree->SetBranchAddress((name+"nPFElectron").c_str()         ,&nPFElectron        ) ;
       tree->SetBranchAddress((name+"PFElectron_IdxJet").c_str()   ,PFElectron_IdxJet  ) ;
       tree->SetBranchAddress((name+"PFElectron_pt").c_str()       ,PFElectron_pt      ) ;
@@ -741,6 +743,9 @@ class JetInfoBranches {
       //--------------------------------------
       // pf muon information
       //--------------------------------------
+      tree->SetBranchAddress((name+"Jet_nFirstSM").c_str(),    Jet_nFirstSM    );
+      tree->SetBranchAddress((name+"Jet_nLastSM").c_str(),     Jet_nLastSM     );
+
       tree->SetBranchAddress((name+"nPFMuon").c_str()            ,&nPFMuon            ) ;
       tree->SetBranchAddress((name+"PFMuon_IdxJet").c_str()      ,PFMuon_IdxJet       ) ;
       tree->SetBranchAddress((name+"PFMuon_nMuHit").c_str()      ,PFMuon_nMuHit       ) ;
@@ -770,6 +775,9 @@ class JetInfoBranches {
       //--------------------------------------
       // track information
       //--------------------------------------
+      tree->SetBranchAddress((name+"Jet_nFirstTrack").c_str(), Jet_nFirstTrack );
+      tree->SetBranchAddress((name+"Jet_nLastTrack").c_str(),  Jet_nLastTrack  );
+
       tree->SetBranchAddress((name+"nTrack").c_str()          ,&nTrack            ) ;
       tree->SetBranchAddress((name+"Track_dxy").c_str()       ,Track_dxy          ) ;
       tree->SetBranchAddress((name+"Track_dz").c_str()        ,Track_dz           ) ;
