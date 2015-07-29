@@ -1501,7 +1501,7 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
     JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]  = svTagInfo->nVertices();
 
     // if secondary vertices present
-    std::map<double, size_t> VTXmass;
+    std::map<double, size_t> VTXmap;
     for (size_t vtx = 0; vtx < (size_t)JetInfo[iJetColl].Jet_SV_multi[JetInfo[iJetColl].nJet]; ++vtx)
     {
 
@@ -1564,7 +1564,7 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
       JetInfo[iJetColl].SV_dir_z[JetInfo[iJetColl].nSV]= flightDir.z();
 
       if (runFatJets_ && iJetColl == 0 && reco::deltaR2(flightDir, jetDir)<(maxSVDeltaRToJet_*maxSVDeltaRToJet_))
-        VTXmass[vertex.p4().pt()]=vtx; //ordered according the pt
+        VTXmap[vertex.p4().pt()]=vtx; //ordered according the pt
 
       ++JetInfo[iJetColl].nSV;
 
@@ -1579,7 +1579,7 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
       float SV_pt_0 = -1.;
       GlobalVector flightDir_0, flightDir_1;
       reco::Candidate::LorentzVector SV_p4_0 , SV_p4_1;
-      for ( std::map<double, size_t>::reverse_iterator iVtx=VTXmass.rbegin(); iVtx!=VTXmass.rend(); ++iVtx)
+      for ( std::map<double, size_t>::reverse_iterator iVtx=VTXmap.rbegin(); iVtx!=VTXmap.rend(); ++iVtx)
       {
         ++cont;
         const Vertex &vertex = svTagInfo->secondaryVertex(iVtx->second);
