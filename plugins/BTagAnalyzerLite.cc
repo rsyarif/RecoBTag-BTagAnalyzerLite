@@ -873,7 +873,7 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
 
         SubJetInfo[SubJetLabels_[i]].Jet_nsubjettracks[JetInfo[iJetColl].nJet] = nsubjettracks-nsharedsubjettracks;
         SubJetInfo[SubJetLabels_[i]].Jet_nsharedsubjettracks[JetInfo[iJetColl].nJet] = nsharedsubjettracks;
-	//iSubJet1 = SubJetInfo[SubJetLabels_[i]].SubJetIdx[SubJetInfo[SubJetLabels_[i]].Jet_nFirstSJ[JetInfo[iJetColl].nJet]];
+        //iSubJet1 = SubJetInfo[SubJetLabels_[i]].SubJetIdx[SubJetInfo[SubJetLabels_[i]].Jet_nFirstSJ[JetInfo[iJetColl].nJet]];
         //iSubJet2 = SubJetInfo[SubJetLabels_[i]].SubJetIdx[SubJetInfo[SubJetLabels_[i]].Jet_nFirstSJ[JetInfo[iJetColl].nJet]+1];
       }
     }
@@ -1012,8 +1012,8 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
                     JetInfo[iJetColl].Track_PV[JetInfo[iJetColl].nTrack],
                     JetInfo[iJetColl].Track_PVweight[JetInfo[iJetColl].nTrack]);
 
-	if(JetInfo[iJetColl].Track_PV[JetInfo[iJetColl].nTrack]==0 &&
-	   JetInfo[iJetColl].Track_PVweight[JetInfo[iJetColl].nTrack]>0) { allKinematics.add(ptrack, JetInfo[iJetColl].Track_PVweight[JetInfo[iJetColl].nTrack]); }
+        if(JetInfo[iJetColl].Track_PV[JetInfo[iJetColl].nTrack]==0 &&
+           JetInfo[iJetColl].Track_PVweight[JetInfo[iJetColl].nTrack]>0) { allKinematics.add(ptrack, JetInfo[iJetColl].Track_PVweight[JetInfo[iJetColl].nTrack]); }
 
         if( pjet->hasTagInfo(svTagInfos_.c_str()) )
         {
@@ -1134,14 +1134,14 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
       JetInfo[iJetColl].Jet_nSE[JetInfo[iJetColl].nJet] = nSE_3;
     }
 
-    if(PFLepton_ptrel >5){
-	 JetInfo[iJetColl].Jet_PFLepton_ptrel[JetInfo[iJetColl].nJet] = PFLepton_ptrel;
-    	 JetInfo[iJetColl].Jet_PFLepton_ratio[JetInfo[iJetColl].nJet]  = PFLepton_ratio;
-	}
-    else{
-	JetInfo[iJetColl].Jet_PFLepton_ptrel[JetInfo[iJetColl].nJet] = -3.;
-	JetInfo[iJetColl].Jet_PFLepton_ratio[JetInfo[iJetColl].nJet]  = -3.;
-	}
+    if ( PFLepton_ptrel > 5 ) {
+         JetInfo[iJetColl].Jet_PFLepton_ptrel[JetInfo[iJetColl].nJet] = PFLepton_ptrel;
+         JetInfo[iJetColl].Jet_PFLepton_ratio[JetInfo[iJetColl].nJet]  = PFLepton_ratio;
+    }
+    else {
+        JetInfo[iJetColl].Jet_PFLepton_ptrel[JetInfo[iJetColl].nJet] = -3.;
+        JetInfo[iJetColl].Jet_PFLepton_ratio[JetInfo[iJetColl].nJet]  = -3.;
+    }
 
     // b-tagger discriminants
     float Proba  = pjet->bDiscriminator(jetPBJetTags_.c_str());
@@ -1369,7 +1369,7 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
       double trackSip3dSig_3, trackSip3dSig_0, trackSip3dSig_1,trackSip3dSig_2, trackEtaRel_0,trackEtaRel_1,trackEtaRel_2;
       std::vector<float> IP3Ds, etaRels;
       for (int iTrk = JetInfo[iJetColl].Jet_nFirstTrkTagVarCSV[JetInfo[iJetColl].nJet]; iTrk < JetInfo[iJetColl].Jet_nLastTrkTagVarCSV[JetInfo[iJetColl].nJet]; ++iTrk){
-	      IP3Ds.push_back( JetInfo[iJetColl].TagVarCSV_trackSip3dSig[iTrk] );
+              IP3Ds.push_back( JetInfo[iJetColl].TagVarCSV_trackSip3dSig[iTrk] );
       }
       for (int iTrk = JetInfo[iJetColl].Jet_nFirstTrkEtaRelTagVarCSV[JetInfo[iJetColl].nJet]; iTrk < JetInfo[iJetColl].Jet_nLastTrkEtaRelTagVarCSV[JetInfo[iJetColl].nJet]; ++iTrk){
                                         etaRels.push_back( TMath::Abs(JetInfo[iJetColl].TagVarCSV_trackEtaRel[iTrk]) );
@@ -1551,7 +1551,7 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
       JetInfo[iJetColl].SV_dir_z[JetInfo[iJetColl].nSV]= flightDir.z();
 
       if (runFatJets_ && iJetColl == 0 && reco::deltaR2(flightDir, jetDir)<(maxSVDeltaRToJet_*maxSVDeltaRToJet_))
-	      VTXmass[vertex.p4().pt()]=vtx; //ordered according the pt
+        VTXmass[vertex.p4().pt()]=vtx; //ordered according the pt
 
       ++JetInfo[iJetColl].nSV;
 
@@ -1570,37 +1570,37 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
       {
         ++cont;
         const Vertex &vertex = svTagInfo->secondaryVertex(iVtx->second);
-	float SV_EnergyRatio = JetInfo[iJetColl].SV_EnergyRatio[JetInfo[iJetColl].Jet_nFirstSV[JetInfo[iJetColl].nJet]+int(iVtx->second)];
+        float SV_EnergyRatio = JetInfo[iJetColl].SV_EnergyRatio[JetInfo[iJetColl].Jet_nFirstSV[JetInfo[iJetColl].nJet]+int(iVtx->second)];
 
-	if (cont==1)
-	{
+        if (cont==1)
+        {
           SV_mass_0 = vertex.p4().mass()  ;
           SV_EnergyRatio_0 = SV_EnergyRatio;
-	  SV_pt_0 = vertex.p4().pt();
-	  flightDir_0 = svTagInfo->flightDirection(iVtx->second);
-	  SV_p4_0 = vertex.p4();
+          SV_pt_0 = vertex.p4().pt();
+          flightDir_0 = svTagInfo->flightDirection(iVtx->second);
+          SV_p4_0 = vertex.p4();
 
-	  if (reco::deltaR2(flightDir_0,currentAxes[1])<reco::deltaR2(flightDir_0,currentAxes[0]))
-		  tau_dot = (currentAxes[1].px()*flightDir_0.x()+currentAxes[1].py()*flightDir_0.y()+currentAxes[1].pz()*flightDir_0.z())/(sqrt(currentAxes[1].modp2())*flightDir_0.mag());
-	  else
-		  tau_dot = (currentAxes[0].px()*flightDir_0.x()+currentAxes[0].py()*flightDir_0.y()+currentAxes[0].pz()*flightDir_0.z())/(sqrt(currentAxes[0].modp2())*flightDir_0.mag());
-	  z_ratio = reco::deltaR(currentAxes[1],currentAxes[0])*SV_pt_0/(SV_p4_0).mass(); //now it is defined even if we have one SV
-	}
-	if (cont==2)
-	{
+          if (reco::deltaR2(flightDir_0,currentAxes[1])<reco::deltaR2(flightDir_0,currentAxes[0]))
+            tau_dot = (currentAxes[1].px()*flightDir_0.x()+currentAxes[1].py()*flightDir_0.y()+currentAxes[1].pz()*flightDir_0.z())/(sqrt(currentAxes[1].modp2())*flightDir_0.mag());
+          else
+            tau_dot = (currentAxes[0].px()*flightDir_0.x()+currentAxes[0].py()*flightDir_0.y()+currentAxes[0].pz()*flightDir_0.z())/(sqrt(currentAxes[0].modp2())*flightDir_0.mag());
+          z_ratio = reco::deltaR(currentAxes[1],currentAxes[0])*SV_pt_0/(SV_p4_0).mass(); //now it is defined even if we have one SV
+        }
+        if (cont==2)
+        {
           SV_EnergyRatio_1 = SV_EnergyRatio;
           flightDir_1 = svTagInfo->flightDirection(iVtx->second);
-	  SV_p4_1 = vertex.p4();
-	  z_ratio = reco::deltaR(flightDir_0,flightDir_1)*(SV_p4_1).pt()/(SV_p4_1).mass();
-	  //std::cout<<z_ratio<<"  "<<reco::deltaR(flightDir_0,flightDir_1)<<"   "<<SV_pt_0<<"   "<<(SV_p4_0+SV_p4_1).mass()<<std::endl;
-	  break;
-	}
+          SV_p4_1 = vertex.p4();
+          z_ratio = reco::deltaR(flightDir_0,flightDir_1)*(SV_p4_1).pt()/(SV_p4_1).mass();
+          //std::cout<<z_ratio<<"  "<<reco::deltaR(flightDir_0,flightDir_1)<<"   "<<SV_pt_0<<"   "<<(SV_p4_0+SV_p4_1).mass()<<std::endl;
+          break;
+        }
       }
 
 
       float SubJet_csv = -1 ;
       if (pjet->subjets("SoftDrop").size() > 1){
-	SubJet_csv = TMath::Min(pjet->subjets("SoftDrop").at(0)->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"),pjet->subjets("SoftDrop").at(1)->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
+        SubJet_csv = TMath::Min(pjet->subjets("SoftDrop").at(0)->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"),pjet->subjets("SoftDrop").at(1)->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
       }
       if(SubJet_csv >1. || SubJet_csv<-1.) SubJet_csv = -1;
 
@@ -1634,7 +1634,6 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
       variables["SubJet_csv"]=SubJet_csv;
 
 
-
       BDTG_SV = evaluator_SV_->evaluate(variables);
       BDTG_SL = evaluator_SL_->evaluate(variables);
       //float tau1 = JetInfo[iJetColl].Jet_tau1[JetInfo[iJetColl].nJet];
@@ -1659,7 +1658,7 @@ void BTagAnalyzerLiteT<IPTI,VTX>::processJets(const edm::Handle<PatJetCollection
     JetInfo[iJetColl].Jet_BDTG_SV[JetInfo[iJetColl].nJet]          = BDTG_SV;
     JetInfo[iJetColl].Jet_BDTG_SL[JetInfo[iJetColl].nJet]          = BDTG_SL;
     JetInfo[iJetColl].Jet_BDTG_Cascade[JetInfo[iJetColl].nJet]     = BDTG_Cascade;
-    JetInfo[iJetColl].Jet_BDTG_All[JetInfo[iJetColl].nJet]     	   = BDTG_All;
+    JetInfo[iJetColl].Jet_BDTG_All[JetInfo[iJetColl].nJet]         = BDTG_All;
 
     ++JetInfo[iJetColl].nJet;
   } // end loop on jet
@@ -1684,19 +1683,19 @@ void BTagAnalyzerLiteT<IPTI,VTX>::setTracksPVBase(const reco::TrackRef & trackRe
     const reco::Vertex & vtx = *iv;
     // loop over tracks in vertices
     for(IT it=vtx.tracks_begin(); it!=vtx.tracks_end(); ++it)
-      {
+    {
       const reco::TrackBaseRef & baseRef = *it;
       // one of the tracks in the vertex is the same as the track considered in the function
       if( baseRef == trackBaseRef )
       {
-	float w = vtx.trackWeight(baseRef);
-	// select the vertex for which the track has the highest weight
-	if( w > PVweight )
+        float w = vtx.trackWeight(baseRef);
+        // select the vertex for which the track has the highest weight
+        if( w > PVweight )
         {
           PVweight = w;
-	  iPV = ( iv - pvHandle->begin() );
-	  break;
-	}
+          iPV = ( iv - pvHandle->begin() );
+          break;
+        }
       }
     }
   }
@@ -1714,8 +1713,7 @@ template<typename IPTI,typename VTX>
 void BTagAnalyzerLiteT<IPTI,VTX>::endJob() {
 }
 
-
- template<typename IPTI,typename VTX>
+template<typename IPTI,typename VTX>
 const edm::Ptr<reco::Muon> BTagAnalyzerLiteT<IPTI,VTX>::matchMuon(const edm::Ptr<reco::Candidate>& theMuon, const edm::View<reco::Muon>& muons ){
 
   const pat::PackedCandidate * pcand = dynamic_cast<const pat::PackedCandidate *>(theMuon.get());
